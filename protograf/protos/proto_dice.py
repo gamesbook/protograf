@@ -11,6 +11,8 @@ import random
 # project
 from protograf.utils.messaging import feedback
 
+from . import utils  # globals_set, validate_globals, margins
+
 
 class Dice:
     """Base class for a dice."""

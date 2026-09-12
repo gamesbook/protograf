@@ -13,7 +13,7 @@ from pymupdf import Point as muPoint
 
 # local
 from protograf import globals
-from protograf.shapes_utils import draw_line
+from protograf.shapes.utils import draw_line
 from protograf.utils import colrs, geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.messaging import feedback

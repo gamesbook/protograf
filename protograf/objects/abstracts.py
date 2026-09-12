@@ -9,7 +9,8 @@ import re
 
 # third party
 
-# project
+# module
+from protograf import globals
 from protograf.base import BaseShape
 from protograf.shapes import (
     CircleShape,

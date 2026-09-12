@@ -5,7 +5,6 @@ from ._version import __version__, __version_info__
 
 # protos
 from protograf.protos import *
-from protograf.layout import Layout
 
 # utils
 from protograf.utils.geoms import point_from_angle
@@ -16,3 +15,4 @@ from protograf.utils.structures import Point
 from protograf.utils.support import file_exists, cairo_pentagon_snail, steps, letters
 from protograf.utils.tools import split
 from math import sqrt
+from .globals import unit

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-protograf Abstract Class for grid layouts
+Abstract Class definitions for protograf
 """
 
 # lib

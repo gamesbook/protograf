@@ -5,9 +5,8 @@ protograf Class for layout of Hexagons on a grid
 
 # lib
 
-# module
+# project
 from protograf import globals
-from protograf.proto_shapes import hexagon, Hexagon
 from protograf.shapes import HexShape
 from protograf.utils import tools  # , geoms, support
 from protograf.utils.messaging import feedback
@@ -19,9 +18,10 @@ from protograf.utils.structures import (
     Point,
     ShapeGeometry,
 )
+from protograf.utils.abstracts import ProtografGrid
 
-# locale
-from .proto_grid import ProtografGrid
+# local
+from . import utils  # globals_set, validate_globals, margins
 
 
 class Hexagons(ProtografGrid):
@@ -76,6 +76,8 @@ class Hexagons(ProtografGrid):
         self, rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True
     ):
         """Draw rows of hexagons for each column in `the_cols`"""
+        from protograf.protos import hexagon, Hexagon
+
         locales = []
         sequence = 0
         top_row = 0
@@ -165,6 +167,7 @@ class Hexagons(ProtografGrid):
 
     def draw_layout_rectangle(self):
         """Layout of hexagons in a rectangle."""
+        from protograf.protos import hexagon, Hexagon
         sequence = 0
         for row in range(self.rows):
             for col in range(self.cols):

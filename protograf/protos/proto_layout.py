@@ -14,6 +14,7 @@ import logging
 # third party
 
 # project
+from protograf.base import BaseShape, WIDTH
 from protograf.utils import colrs, tools
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
@@ -27,34 +28,24 @@ from protograf.utils.tools import (  # used in scripts
 )
 
 # local
-from .base import WIDTH
-from .shapes import BaseShape
-from .layouts import VirtualLocations
-from .protos import (
+from .proto_shapes import (
     Dot,
     Rectangle,
     Rhombus,
     Triangle,
 )
+# local
+from . import utils  # globals_set, validate_globals, margins
 
 from protograf import globals
 
 log = logging.getLogger(__name__)
-globals_set = False
-
-GRAYS = ("0,0,0,25.5", "#BEBEBE")
-
-
-def validate_globals():
-    """Check that Create has been called to set initialise globals"""
-    global globals_set
-    if not globals_set:
-        feedback("Please ensure Create() command is called first!", True)
 
 
 def Layout(grid, **kwargs):
     """Draw shape(s) in locations, cols, & rows in a virtual layout"""
-    validate_globals()
+    from protograf.shapes.virtuals import VirtualLocations
+    utils.validate_globals()
 
     grid_classname = grid.__class__.__name__ if grid else ""
     kwargs = kwargs
@@ -401,7 +392,7 @@ def Layout(grid, **kwargs):
 
     # ---- iterate through locations & draw shape(s)
     for count, loc in _locations:
-        # print("time to draw locs:", count, loc)
+        # print("395: time to draw locs:", count, loc)
         if masked and count + 1 in masked:  # ignore if IN masked
             continue
         if visible and count + 1 not in visible:  # ignore if NOT in visible
@@ -446,7 +437,6 @@ def Layout(grid, **kwargs):
             shape = copy(_shape)
 
             # ---- * execute shape.draw()
-            # breakpoint()
             cx = loc.x * shape.units + shape._o.delta_x
             cy = loc.y * shape.units + shape._o.delta_y
             locale = Locale(
@@ -488,7 +478,7 @@ def Layout(grid, **kwargs):
                     Dot(
                         x=loc.x,
                         y=loc.y,
-                        label=f"{loc.sequence}",
+                        label=f"{loc.sequence or count}",
                         stroke=globals.debug_color,
                         fill=globals.debug_color,
                     )

@@ -4,10 +4,15 @@ protograf function for creating card and counter layouts
 """
 
 # lib
+from copy import copy
 import itertools
 import logging
 import os
 from pathlib import Path
+import random
+import sys
+import types
+from typing import Any
 
 # third party
 import jinja2
@@ -16,13 +21,14 @@ import pymupdf
 from pymupdf import Rect as muRect
 
 # project
-from protograf.utils.messaging import feedback
-from protograf.base import BaseCanvas, GroupBase, WIDTH
+# from protograf.protos import Switch
+
+from protograf.base import BaseShape, BaseCanvas, GroupBase, WIDTH
 from protograf.shapes import (
     RectangleShape,
+    CardShape,
 )
-from .groups import Switch  # used in scripts
-
+from protograf.utils.messaging import feedback
 from protograf.utils import colrs, loadr, tools, support
 from protograf.utils.constants import (
     DEFAULT_CARD_WIDTH,  # cm
@@ -48,7 +54,7 @@ from protograf.utils.structures import (
 from protograf.utils.tools import _lower
 
 # local
-from .utils import globals_set, validate_globals, margins
+from .utils import globals_set, validate_globals, margins, GRAYS
 
 log = logging.getLogger(__name__)
 
@@ -257,6 +263,7 @@ class DeckOfCards:
 
     def gallery_overrides(self, gallery):
         """Reset document and page properties to handle NxM card layouts"""
+        # from protograf.protos import PageBreak, page_setup, Switch
         err = f'The gallery property must be a pair of numbers in (M, N) format; not "{
             gallery}".'
         if isinstance(gallery, tuple) and len(gallery) == 2:
@@ -508,6 +515,7 @@ class DeckOfCards:
             Returns:
                 DeckPrintState at the end of a Page
             """
+            from protograf.protos import PageBreak
 
             # print(f'\n$$$ draw_the_cards {page_number=} {front=}')
             start_card = state.card_number
@@ -730,6 +738,7 @@ class DeckOfCards:
 
         def load_gutter_pages(is_landscape: bool, gutter_filename: str):
             """Insert gutter pages into primary document and reset globals."""
+            from protograf.protos import PageBreak
             # ---- * save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
             try:
@@ -1022,7 +1031,7 @@ def Card(
         feedback("The Deck() has not been defined or is incorrect.", True)
     if not sequence:
         feedback(
-            f"A Card() does not have a valid sequence and will be skipped.", False, True
+            "A Card() does not have a valid sequence and will be skipped.", False, True
         )
         return
     _cards = []
@@ -1076,7 +1085,7 @@ def Card(
             return
     if not _cards:
         feedback(
-            f"A Card() does not have a valid sequence and will be skipped.", False, True
+            "A Card() does not have a valid sequence and will be skipped.", False, True
         )
         return
     max_cards = len(globals.deck.fronts)
@@ -1530,7 +1539,7 @@ def Data(**kwargs):
     return globals.dataset
 
 
-def S(test="", result=None, alternate=None) -> Switch:
+def S(test="", result=None, alternate=None) -> object:
     """Enable selection of data from a dataset list
 
     Args:
@@ -1542,6 +1551,7 @@ def S(test="", result=None, alternate=None) -> Switch:
     - alternate (str / element): OPTIONAL; returned if `test` evaluates to False;
       if not supplied, then defaults to None
     """
+    from protograf.protos import Switch
 
     if globals.dataset and isinstance(globals.dataset, list):
         environment = jinja2.Environment()

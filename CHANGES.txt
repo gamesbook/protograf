@@ -4,7 +4,7 @@ protograf Changes
 2026-00-00 (0.5.9)
 ------------------
 - Add AbstractBoard and AbstractGame objects
-- Major code restructure; use namespaces
+- Major code restructure; better use of namespaces
 - [PLANNED-1] Expand geo coverage for minor shapes
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
 

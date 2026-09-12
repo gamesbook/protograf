@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from protograf import globals
 from protograf.utils.messaging import feedback
 
 globals_set = False
+GRAYS = ("0,0,0,25.5", "#BEBEBE")
 
 
 def validate_globals():

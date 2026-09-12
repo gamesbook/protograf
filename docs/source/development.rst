@@ -12,9 +12,36 @@ projects.
 
 .. _table-of-contents-dev:
 
+- `Structure`_
 - `Coding`_
+- `Testing`_
 - `Package Management`_
 - `Documentation`_
+
+
+Structure
+=========
+`↑ <table-of-contents-dev_>`_
+
+The following are the key sections of **protograf** along with their
+intended purpose.
+
+- *"shapes"* : single geometric shapes, including text and images |dash| shared
+  properties for such shapes can be stored in a common or default shape;
+  or layout shapes for grid-based arrangements (actual or virtual)
+
+- *"protos""* : commands issued by the user to: deal with flow and files
+  |dash| create & save |dash|; create or draw shapes, objects,
+  cards |dash| either singly or with repeats
+
+- *"objects""* : things made from compound, or customised, shapes; typically
+  representing "real world" items such as dice, dominoes etc.
+
+- *"utils""* : support and helper functions used for calculations;
+  for example, geometries
+
+- *"scripts""* : functions used for "quick start" setup of a **protograf**
+  script
 
 Coding
 ======
@@ -56,8 +83,10 @@ Code is formatted using ``black`` (https://black.readthedocs.io/) which is
 also triggered as a GitHub action |dash| see the ``.github/workflows/``
 directory.
 
+
 Testing
 =======
+`↑ <table-of-contents-dev_>`_
 
 GitHub Actions
 --------------

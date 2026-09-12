@@ -8,7 +8,7 @@ import re
 
 # local
 from protograf.base import BaseShape
-from protograf.shapes_utils import draw_line
+from protograf.shapes.utils import draw_line
 from protograf.utils.structures import Point
 from protograf.utils import colrs, geoms, tools, support
 from protograf.utils.messaging import feedback

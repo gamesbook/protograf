@@ -1,20 +1,130 @@
 # -*- coding: utf-8 -*-
-from protograf.base import (
-    BaseShape,
-    get_cache,
+"""
+Create CardShapes and Decks of Cards for protograf
+"""
+
+# lib
+import logging
+from collections import namedtuple
+import copy as copy_object
+import math
+import os
+from pathlib import Path
+import sys
+
+# third party
+import jinja2
+from PIL import Image as PIL_Image
+import pymupdf
+from pymupdf import Rect as muRect
+
+# project
+from protograf.protos.utils import GRAYS
+
+from protograf.base import BaseCanvas,  BaseShape, GroupBase, WIDTH
+from protograf.utils import colrs, tools, support
+from protograf.utils.constants import (
+    DEFAULT_CARD_WIDTH,  # cm
+    DEFAULT_CARD_HEIGHT,  # cm
+    DEFAULT_CARD_COUNT,
+    DEFAULT_CARD_RADIUS,  # cm
+    DEFAULT_COUNTER_SIZE,  # cm
+    DEFAULT_COUNTER_RADIUS,  # cm
+)
+from protograf.utils.messaging import feedback
+from protograf.utils.support import (  # used in scripts
+    CACHE_DIRECTORY,
+)
+from protograf.utils.tools import (  # used in scripts
+    as_bool,
+    _lower,
 )
 from protograf.utils.structures import (
+    BBox,
     CardFrame,
-    CrossParts,
-    DirectionGroup,
-    Perbis,
+    DatasetType,
+    DeckPrintState,
+    Locale,
     Point,
-    Radius,
-    SectorBand,
     ShapeGeometry,
-    TriangleType,
-    Vertex,
 )
+
+log = logging.getLogger(__name__)
+
+# ---- Support Functions
+
+
+class Switch:
+    """
+    Decide if to use an element or a value for a card attribute.
+
+    Note:
+        * This class is instantiated in the `proto` module, via a script's call
+          to the S() function.
+        * The class __call__ is accessed via the CardShape draw_card() method
+    """
+
+    def __init__(self, **kwargs):
+        self.switch_template = kwargs.get("template", None)
+        self.result = kwargs.get("result", None)  # usually a Shape
+        self.alternate = kwargs.get("alternate", None)  # usually a Shape
+        self.dataset = kwargs.get("dataset", [])
+        self.members = []  # card IDs, of which the affected card is a member
+        self.test = None
+
+    def __call__(self, cid):
+        """Process the test, for a given card 'ID' in the dataset."""
+        record = self.dataset[cid]  # dict data for chosen card
+        try:
+            outcome = self.switch_template.render(record)
+            # print('  +++', f'{ID=} {self.test} {outcome=}')
+            boolean = as_bool(outcome)
+            if boolean:
+                return self.result
+            else:
+                return self.alternate
+        except jinja2.exceptions.UndefinedError as err:
+            feedback(f'Switch "{self.test}" is incorrectly constructed ({err})', True)
+        except Exception as err:
+            feedback(f'Switch "{self.test}" is incorrectly constructed ({err})', True)
+        return None
+
+
+class Lookup:
+    """Enable lookup of data in a record of a dataset
+
+    Kwargs:
+        lookup: Any
+            the lookup column whose value must be used for the match
+        target: str
+            the name of the column of the data being searched
+        result: str
+            name of result column containing the data to be returned
+        default: Any
+            the data to be returned if no match is made
+
+    In short:
+        lookup and target enable finding a matching record in the dataset;
+        the data in the 'result' column of that record will be returned.
+
+    Note:
+        This class will be instantiated in the `proto` module, via a
+        script's call to the L() function.
+    """
+
+    def __init__(self, **kwargs):
+        self.data = kwargs.get("datalist", [])
+        self.lookup = kwargs.get("lookup", "")
+        self.members = []  # card IDs, of which the affected card is a member
+
+    def __call__(self, cid):
+        """Return datalist item number 'ID' (card number)."""
+        log.debug("data:%s cid:%s", self.data, cid)
+        try:
+            return None
+        except (ValueError, TypeError, IndexError):
+            return None
+
 
 # ---- Deck / Card related ====
 
@@ -61,6 +171,8 @@ class CardOutline(BaseShape):
         self.kwargs.pop("radius", None)
 
     def get_outline(self, cnv, row, col, cid, label, **kwargs):
+        """Get card outline."""
+        from protograf.shapes import CircleShape, HexShape, RectangleShape
         outline = None
         # feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
         kwargs["height"] = self.height
@@ -258,6 +370,9 @@ class CardShape(BaseShape):
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
 
+        from protograf.shapes import ImageShape, SequenceShape, RepeatShape, GridShape, DotGridShape
+        from protograf.protos import PageBreak, TemplatingType
+
         def draw_element(new_ele, cnv, off_x, off_y, ID, **kwargs):
             """Allow customisation of kwargs before call to Shape's draw()."""
             # print(f'$$$ draw_card::draw_element {cnv} {ID=} {type(new_ele)=}')
@@ -281,7 +396,7 @@ class CardShape(BaseShape):
 
         # ---- draw outline
         label = "ID:%s" % cid if self.show_id else ""
-        shape_kwargs = copy(kwargs)
+        shape_kwargs = copy_object.copy(kwargs)
         shape_kwargs["is_cards"] = True
         if not is_card_back:
             shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
@@ -321,534 +436,7 @@ class CardShape(BaseShape):
         # ---- draw card bleed
         if self.card_bleed:
             # print(f"$$$ 372 {cid=} {self.elements=} {self.card_bleed=}")
-            bleed_kwargs = copy(shape_kwargs)
-            bleed_kwargs["fill"] = self.card_bleed.fill
-            bleed_kwargs["stroke"] = self.card_bleed.fill
-            bleed_kwargs["bleed_x"] = self.card_bleed.offset_x
-            bleed_kwargs["bleed_y"] = self.card_bleed.offset_y
-            bleed_kwargs["bleed_radius"] = self.card_bleed.offset_radius
-            bleed_kwargs["grid_marks"] = None
-            # calculate size for bleed
-            bleed_shape = CardOutline(_object=None, canvas=cnv, **bleed_kwargs)
-            bleed_outline = bleed_shape.get_outline(
-                cnv=cnv, row=row, col=col, cid=cid, label=label, **bleed_kwargs
-            )
-            # feedback(f"$$$ 386 {cid=} {type(bleed_outline)=} {bleed_kwargs=}")
-            bleed_outline.draw(off_x=move_x, off_y=0, **bleed_kwargs)  # NO grid_marks!
-
-        # feedback(f'$$$ draw_card::OUTLINE {cid=} {row=} {col=} {outline._o=}') # KW=> {shape_kwargs}
-        outline.draw(
-            off_x=move_x, off_y=0, **shape_kwargs
-        )  # inc. grid_marks; globals.canvas
-
-        # ---- track frame outlines for possible image extraction
-        match kwargs["frame_type"]:
-            case CardFrame.RECTANGLE:
-                fr_vertices = outline._shape_vertexes  # clockwise from top-right
-                base_frame_bbox = BBox(tl=fr_vertices[3], br=fr_vertices[1])
-            case CardFrame.CIRCLE:
-                fr_vertices = []
-                base_frame_bbox = outline.bbox
-            case CardFrame.HEXAGON:
-                fr_vertices = outline._shape_vertexes  # anti-clockwise from mid-left
-                # print(f"$$$ HEXAGON {fr_vertices=}")
-                # _vvs = self._l2v(fr_vertices)
-                # for i,v in enumerate(_vvs): print(f'$$$ HEX-V {i=} {v=}')
-                #   5__4
-                #   /  \
-                # 0/    \3
-                #  \    /
-                #  1\__/2
-                base_frame_bbox = BBox(
-                    tl=Point(fr_vertices[0].x, fr_vertices[5].y),
-                    br=Point(fr_vertices[3].x, fr_vertices[2].y),
-                )
-            case _:
-                raise NotImplementedError(
-                    f'Outline cannot handle card frame type: {kwargs["frame_type"]}'
-                )
-        frame_width = base_frame_bbox.br.x - base_frame_bbox.tl.x
-        frame_height = base_frame_bbox.br.y - base_frame_bbox.tl.y
-        # print(f"$$$ {base_frame_bbox.tl.x=}  {base_frame_bbox.tl.y=}")
-        # print(f"$$$ {base_frame_bbox.br.x=}  {base_frame_bbox.br.y=}")
-
-        # ---- grid marks
-        kwargs["grid_marks"] = None  # reset so not used by elements on card
-
-        # ---- card frame shift
-        match kwargs["frame_type"]:
-            case CardFrame.RECTANGLE | CardFrame.CIRCLE:
-                if kwargs["grouping_cols"] == 1:
-                    _dx = col * (outline.width + outline.spacing_x) + outline.offset_x
-                else:
-                    group_no = col // kwargs["grouping_cols"]
-                    _dx = (
-                        col * outline.width
-                        + outline.offset_x
-                        + outline.spacing_x * group_no
-                    )
-                if kwargs["grouping_rows"] == 1:
-                    _dy = row * (outline.height + outline.spacing_y) + outline.offset_y
-
-                else:
-                    group_no = row // kwargs["grouping_rows"]
-                    _dy = (
-                        row * outline.height
-                        + outline.offset_y
-                        + outline.spacing_y * group_no
-                    )
-                # print(f"$$$ {col=} {outline.width=}  {group_no=} {_dx=}")
-                # print(f"$$$ {row=} {outline.height=} {group_no=} {_dy=}")
-            case CardFrame.HEXAGON:
-                _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
-                _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
-                if row & 1:  # odd row
-                    if is_card_back:
-                        _dx = _dx + side - outline.spacing_x
-                        # print('$$$ HEX ODD BACK {_dx=}')
-                    else:
-                        _dx = _dx + side + outline.spacing_x
-            case _:
-                raise NotImplementedError(
-                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
-                )
-
-        # ---- set x-shift to align card backs and fronts (elements)
-        if is_card_back:
-            _dx = _dx + move_x
-
-        # ---- track/update frame and store card fronts (plus card name)
-        if not is_card_back:
-            mx = self.unit(_dx or 0) + self._o.delta_x
-            my = self.unit(_dy or 0) + self._o.delta_y
-            # print(f"$$$ {mx=} {my=} {frame_width=} {frame_height=}")
-            frame_bbox = BBox(
-                tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
-            )
-            page = kwargs.get("page_number", 0)
-            _cframe = (frame_bbox, self.card_name)
-            # store for use by pdf_cards_to_png()
-            if page not in globals.card_frames:
-                globals.card_frames[page] = [_cframe]
-            else:
-                globals.card_frames[page].append(_cframe)
-        else:
-            frame_bbox = base_frame_bbox
-
-        # ---- set card frame geometry
-        self.frame_geometry = self.get_geometry(
-            kwargs["frame_type"], frame_bbox, fr_vertices
-        )
-
-        # ---- draw card grid for Rectangle cards
-        if card_grid and kwargs["frame_type"] == CardFrame.RECTANGLE:
-            _card_grid = tools.as_float(card_grid, "card_grid")
-            mx = self.unit(_dx or 0) + self._o.delta_x
-            my = self.unit(_dy or 0) + self._o.delta_y
-            stroke = colrs.get_color(globals.debug_color)
-            grid_size = _card_grid * globals.units
-            cols = int(frame_width // grid_size)
-            rows = int(frame_height // grid_size)
-            for col in range(1, cols + 1):
-                globals.doc_page.draw_line(
-                    (mx + col * grid_size, my),
-                    (mx + col * grid_size, my + frame_height),
-                    color=stroke,
-                    width=0.1,
-                )
-            for row in range(1, rows + 1):
-                globals.doc_page.draw_line(
-                    (mx, my + row * grid_size),
-                    (mx + frame_width, my + row * grid_size),
-                    color=stroke,
-                    width=0.1,
-                )
-
-        # ---- draw card elements
-        flat_elements = tools.flatten(self.elements)
-        # print(f"$$$ draw_card ELEMENTS {flat_elements=} ")
-        if cnv != globals.canvas:
-            # required because cnv was not reset for first page when using gutter option
-            # print(f"$$$ draw_card CANVAS {globals.page.current=}")
-            cnv = globals.canvas
-        for index, flat_ele in enumerate(flat_elements):
-            # ---- * replace image source placeholder
-            if image and isinstance(flat_ele, ImageShape):
-                if _lower(flat_ele.kwargs.get("source", "")) in ["*", "all"]:
-                    flat_ele.source = image
-
-            members = self.members or flat_ele.members
-            # ---- * clear kwargs for drawing
-            # (otherwise BaseShape self attributes already set are overwritten)
-            dargs = {
-                key: kwargs.get(key)
-                for key in [
-                    "dataset",
-                    "frame_type",
-                    "locale",
-                    "_is_countersheet",
-                    "page_number",
-                    "grouping_cols",
-                    "grouping_rows",
-                    "deck_data",
-                ]
-            }
-            kwargs = dargs
-            try:
-                # ---- * normal element
-                iid = members.index(cid + 1)
-                new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
-                # feedback(f'$$$ CS draw_card ele $$$ {type(new_ele)=}')
-                if isinstance(
-                    new_ele, (SequenceShape, RepeatShape, GridShape, DotGridShape)
-                ):
-                    new_ele.deck_data = self.deck_data
-                    kwargs["card_width"] = self.width
-                    kwargs["card_height"] = self.height
-                    kwargs["card_x"] = base_frame_bbox.tl.x
-                    kwargs["card_y"] = base_frame_bbox.tl.y
-                    draw_element(
-                        new_ele=new_ele, cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
-                    )
-                    cnv.commit()
-                elif isinstance(new_ele, TemplatingType):
-                    # convert Template into a string via render
-                    card_value = self.deck_data[iid]
-                    custom_value = new_ele.template.render(card_value)
-                    _one_or_more_eles = new_ele.function(custom_value)
-                    if isinstance(_one_or_more_eles, list):
-                        new_eles = _one_or_more_eles
-                    else:
-                        new_eles = (
-                            [
-                                _one_or_more_eles,
-                            ]
-                            if _one_or_more_eles
-                            else []
-                        )
-                    self.draw_new_elements(
-                        new_ele.function,
-                        new_eles,
-                        cnv=cnv,
-                        off_x=_dx,
-                        off_y=_dy,
-                        ID=iid,
-                        cid=cid,
-                        **kwargs,
-                    )
-                else:
-                    if callable(new_ele) and not isinstance(
-                        new_ele, (BaseShape, Switch)
-                    ):
-                        # call user defined card function or function-like object # UDF
-                        try:
-                            card_values = self.deck_data[cid]
-                        except (IndexError, TypeError):  # may not be any deck_data
-                            card_values = {}
-                        card_values["geo"] = self.frame_geometry
-                        Data = namedtuple("Data", card_values.keys())
-                        card_values_tuple = Data(**card_values)
-                        try:
-                            _one_or_more_eles = new_ele(card_values_tuple) or []
-                        except Exception as err:
-                            e_n = type(err).__name__
-                            fname = new_ele.__name__
-                            feedback(
-                                f"Unable to create card #{cid + 1}. ({e_n}: {err} for '{fname}' function)",
-                                True,
-                            )
-                        if isinstance(_one_or_more_eles, list):
-                            new_eles = _one_or_more_eles
-                        else:
-                            new_eles = (
-                                [
-                                    _one_or_more_eles,
-                                ]
-                                if _one_or_more_eles
-                                else []
-                            )
-                        # print(f'{card_values_tuple=} {new_eles=}')
-                        self.draw_new_elements(
-                            new_ele,
-                            new_eles,
-                            cnv=cnv,
-                            off_x=_dx,
-                            off_y=_dy,
-                            ID=iid,
-                            cid=cid,
-                            **kwargs,
-                        )
-                    else:
-                        draw_element(
-                            new_ele=new_ele,
-                            cnv=cnv,
-                            off_x=_dx,
-                            off_y=_dy,
-                            ID=iid,
-                            **kwargs,
-                        )
-                        cnv.commit()
-            except AttributeError:
-                # ---- * switch ... get a new element ... or not!?
-                try:
-                    new_ele = (
-                        flat_ele(cid=self.shape_id) if flat_ele else None
-                    )  # uses __call__ on Switch
-                    if new_ele:
-                        flat_new_eles = tools.flatten(new_ele)
-                        for flat_new_ele in flat_new_eles:
-                            members = flat_new_ele.members or self.members
-                            iid = members.index(cid + 1)
-                            # feedback(f'$$$ draw_card $$$ {iid=} {flat_new_ele=}')
-                            custom_new_ele = self.handle_custom_values(
-                                flat_new_ele, iid
-                            )
-                            # feedback(f'$$$ draw_card $$$ {iid=} {custom_new_ele=}')
-                            if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
-                                custom_new_ele.deck_data = self.deck_data
-                            # feedback(f'$$$ draw_card $$$ {self.shape_id=} {custom_new_ele=}')
-                            draw_element(
-                                new_ele=custom_new_ele,
-                                cnv=cnv,
-                                off_x=_dx,
-                                off_y=_dy,
-                                ID=iid,
-                                **kwargs,
-                            )
-                            cnv.commit()
-                except Exception as err:
-                    feedback(f"Unable to create card #{cid + 1}. (Error: {err})", True)
-            except Exception as err:
-                t_b = sys.exc_info()[2]
-                e_n = type(err).__name__
-                feedback(
-                    f"Unable to draw card #{cid + 1}. ({e_n}: {err} on line: {t_b.tb_lineno})",
-                    True,
-                )
-
-
-class CardShape(BaseShape):
-    """
-    Card shape on a given canvas.
-    """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super().__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
-        # feedback(f"\n$$$ CardShape KW=> {self.kwargs}")
-        self.elements = []  # container for objects which get added to the card
-        self.members = None
-        self.card_bleed = None  # possible CardBleed namedtuple
-        self.card_name = kwargs.get("card_name", None)  # prefix for card PNG images
-        self.outline_shape = CardOutline(_object=_object, canvas=canvas, **kwargs)
-        self.outline = self.outline_shape.get_outline(
-            cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
-        )
-        self.image = kwargs.get("image", None)
-        self.frame_geometry = ShapeGeometry()  # empty place-holder
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an element on a given canvas."""
-        raise NotImplementedError
-
-    def draw_new_elements(
-        self, the_function, new_eles, cnv, off_x, off_y, ID, cid, **kwargs
-    ):
-        """Draw a list of elements created via a Template or Card function call."""
-        # feedback(f"$$$ CardShape elements  {new_eles}")
-        for the_new_ele in new_eles:
-            try:
-                if isinstance(the_new_ele, GroupBase):
-                    for new_group_ele in the_new_ele:
-                        new_group_ele.draw(
-                            cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
-                        )
-                        cnv.commit()
-                else:
-                    the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
-                    cnv.commit()
-            except AttributeError:
-                feedback(
-                    f"Unable to draw card #{cid + 1}. Check that the elements"
-                    f" created by '{the_function.__name__}' are all shapes.",
-                    True,
-                )
-
-    def get_geometry(
-        self, frame_type: CardFrame, bbox: BBox, vertices: list
-    ) -> ShapeGeometry:
-        """Geometry of Card frame.
-
-        Notes:
-            * Used by user defined card functions (UDF)
-        """
-        _type = type(self)
-        cntr = Point(
-            bbox.tl.x + (bbox.br.x - bbox.tl.x) / 2.0,
-            bbox.tl.y + (bbox.br.y - bbox.tl.y) / 2.0,
-        )
-        cntr_user = self.as_point(cntr, self.units, None, None)
-        user_vertices = self._l2v(vertices, margin_offset=True)  # handle margins
-        # for i,v in enumerate(user_vertices): print(f'$$$ {frame_type} {i=} {v=}')
-        n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
-        nnw, nne, sse, ssw = None, None, None, None  # pointy hex
-        wnw, ene, ese, wsw = None, None, None, None  # flat hex
-        perim, radius, diameter, height, width, side, area = (
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-        )
-        match frame_type:
-            case CardFrame.RECTANGLE:
-                # user_vertices => clockwise from top-right
-                ne = user_vertices[0]
-                se = user_vertices[1]
-                sw = user_vertices[2]
-                nw = user_vertices[3]
-                height = self.height
-                width = self.width
-                area = height * width
-                perim = 2.0 * height + 2.0 * width
-            case CardFrame.CIRCLE:
-                radius = self.radius
-                diameter = 2 * self.radius
-                area = math.pi * radius**2
-            case CardFrame.HEXAGON:
-                #   5__4
-                #   /  \
-                # 0/    \3
-                #  \    /
-                #  1\__/2
-                ne = user_vertices[4]
-                e = user_vertices[3]
-                se = user_vertices[2]
-                sw = user_vertices[1]
-                w = user_vertices[0]
-                nw = user_vertices[5]
-                # radius = self._p2v(hex_geom.radius)
-                # diameter = self._p2v(hex_geom.diameter)
-                # height = self._p2v(hex_geom.height_flat)
-                # side = self._p2v(hex_geom.radius)
-                # area = math.sqrt(3) * 3 / 2 * side**2
-                # perim = 6 * side
-            case _:
-                raise NotImplementedError(
-                    f"Outline cannot handle card frame type: {frame_type}"
-                )
-
-        _type = type(self)
-        return ShapeGeometry(
-            # centre
-            centre=cntr_user,
-            center=cntr_user,
-            c=cntr_user,
-            # vertices and perbii
-            n=n,
-            ne=ne,
-            e=e,
-            se=se,
-            s=s,
-            sw=sw,
-            w=w,
-            nw=nw,
-            nnw=nnw,
-            nne=nne,
-            sse=sse,
-            ssw=ssw,
-            wnw=wnw,
-            ene=ene,
-            ese=ese,
-            wsw=wsw,
-            # length
-            perimeter=perim,
-            radius=radius,
-            diameter=diameter,
-            height=height,
-            width=width,
-            side=side,
-            # other
-            area=area,
-            # meta
-            t=_type,
-            type=_type,
-            shapetype=_type,
-            name=self.simple_name(self),
-        )
-
-    def draw_card(self, cnv, row, col, cid, **kwargs):
-        """Draw a Card on a given canvas.
-
-        Pass on `deck_data` to other commands, as needed, for them to draw Shapes
-        """
-
-        def draw_element(new_ele, cnv, off_x, off_y, ID, **kwargs):
-            """Allow customisation of kwargs before call to Shape's draw()."""
-            # print(f'$$$ draw_card::draw_element {cnv} {ID=} {type(new_ele)=}')
-            if isinstance(
-                new_ele, (SequenceShape, RepeatShape, GridShape, DotGridShape)
-            ):
-                new_ele.deck_data = self.deck_data
-                kwargs["card_width"] = self.width
-                kwargs["card_height"] = self.height
-                kwargs["card_x"] = base_frame_bbox.tl.x
-                kwargs["card_y"] = base_frame_bbox.tl.y
-
-            new_ele.draw(cnv, off_x, off_y, ID, **kwargs)
-
-        # feedback(f'\n$$$ draw_card {cnv=} {cid=} {row=} {col=}')
-        # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
-        is_card_back = kwargs.get("card_back", False)
-        image = kwargs.get("image", None)
-        right_gap = kwargs.get("right_gap", 0.0)  # gap between end-of-cards & page edge
-        card_grid = kwargs.get("card_grid", None)
-
-        # ---- draw outline
-        label = "ID:%s" % cid if self.show_id else ""
-        shape_kwargs = copy(kwargs)
-        shape_kwargs["is_cards"] = True
-        if not is_card_back:
-            shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
-        else:
-            shape_kwargs["fill"] = None
-        shape_kwargs.pop("image_list", None)  # do NOT draw linked image
-        shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
-        outline = self.outline_shape.get_outline(
-            cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
-        )
-
-        # ---- custom geometry
-        if kwargs["frame_type"] == CardFrame.HEXAGON:
-            _geom = outline.get_geometry()
-            radius, diameter, side, half_flat = (
-                _geom.radius,
-                2.0 * _geom.radius,
-                _geom.side,
-                _geom.half_flat,
-            )
-            side = self.points_to_value(side)
-            half_flat = self.points_to_value(half_flat)
-            width = self.points_to_value(diameter)
-
-        # ---- set x-shift to align card backs and fronts (frames)
-        if is_card_back:
-            # ---- alter right_gap for Hex odd row
-            if kwargs["frame_type"] == CardFrame.HEXAGON and row & 1:  # odd row
-                right_gap = right_gap - width
-            move_x = right_gap - self.offset_x - globals.margins.left
-        else:
-            move_x = 0
-        # feedback(f'$$$ 366 {right_gap=} {self.offset_x=} {move_x=}')
-        # feedback(f'$$$ 367 {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
-        # feedback(f"$$$ 368 {outline=} {shape_kwargs=}")
-
-        # ---- draw card bleed
-        if self.card_bleed:
-            # print(f"$$$ 372 {cid=} {self.elements=} {self.card_bleed=}")
-            bleed_kwargs = copy(shape_kwargs)
+            bleed_kwargs = copy_object.copy(shape_kwargs)
             bleed_kwargs["fill"] = self.card_bleed.fill
             bleed_kwargs["stroke"] = self.card_bleed.fill
             bleed_kwargs["bleed_x"] = self.card_bleed.offset_x
@@ -1327,6 +915,7 @@ class DeckOfCards:
 
     def gallery_overrides(self, gallery):
         """Reset document and page properties to handle NxM card layouts"""
+        from protograf.protos import PageMargins, page_setup
         err = f'The gallery property must be a pair of numbers in (M, N) format; not "{
             gallery}".'
         if isinstance(gallery, tuple) and len(gallery) == 2:
@@ -1410,7 +999,9 @@ class DeckOfCards:
             self.backs.append(_back)
 
     def draw_bleed(self, cnv, page_across: float, page_down: float):
+        """Draw card bleed."""
         # ---- bleed area for page (default)
+        from protograf.shapes import RectangleShape
         if self.bleed_fill:
             rect = RectangleShape(
                 canvas=cnv,
@@ -1541,7 +1132,7 @@ class DeckOfCards:
                             )
                         for number in numbers:
                             if number == page_number + 1 or number == "*":
-                                rkwargs = copy(kwargs)
+                                rkwargs = copy_object.copy(kwargs)
                                 rkwargs.pop("grid_marks", None)
                                 rkwargs.pop("stroke", None)
                                 rkwargs.pop("fill", None)
@@ -1578,6 +1169,7 @@ class DeckOfCards:
             Returns:
                 DeckPrintState at the end of a Page
             """
+            from protograf.protos import PageBreak
 
             # print(f'\n$$$ draw_the_cards {page_number=} {front=}')
             start_card = state.card_number
@@ -1727,8 +1319,9 @@ class DeckOfCards:
 
         def draw_gutter_cards() -> tuple:
             """Reset page size and associated globals."""
+            from protograf.protos import PageMargins, page_setup
             self.prime_globals = tools.save_globals()
-            globals_page = copy(globals.page)
+            globals_page = copy_object.copy(globals.page)
             gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
             # ---- pymupdf: new file, doc, page, shape/canvas
             cache_directory = Path(Path.home() / CACHE_DIRECTORY)
@@ -1800,6 +1393,7 @@ class DeckOfCards:
 
         def load_gutter_pages(is_landscape: bool, gutter_filename: str):
             """Insert gutter pages into primary document and reset globals."""
+            from protograf.protos import PageBreak, page_setup
             # ---- * save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
             try:

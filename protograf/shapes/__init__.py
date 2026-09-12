@@ -1,5 +1,6 @@
 # protograf - shapes
 # import here for direct use by other modules
+from .cards import CardShape, CardFrame, CardOutline
 from .core import (
     BaseShape,
     ArcShape,
@@ -33,3 +34,19 @@ from .polygon import PolygonShape
 from .circle import CircleShape
 from .rectangle import RectangleShape
 from .hexagon import HexShape
+from .layouts import (
+    DotGridShape,
+    GridShape,
+    HexHexShape,
+    RepeatShape,
+    SequenceShape,
+    TableShape,
+)
+from .virtuals import (
+    VirtualShape,
+    VirtualLocations,
+    DiamondLocations,
+    HexHexLocations,
+    RectangularLocations,
+    TriangularLocations,
+)

@@ -4,5 +4,5 @@
 from .abstracts import *
 from .boxes import *
 from .cubics import *
-from .ominos import *
+from .ominoes import *
 from .various import *

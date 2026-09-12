@@ -4,12 +4,10 @@ protograf function for layout of Location on a grid
 """
 
 # lib
-from typing import Union, Any
+from typing import Union
 
-# module
+# project
 from protograf.shapes import BaseShape
-
-# from protograf.utils import tools, geoms, support
 from protograf.utils.messaging import feedback
 from protograf.utils.tools import _lower
 from protograf.utils.structures import (
@@ -22,11 +20,14 @@ from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
     GRID_SHAPES_NO_CENTRE,
 )
-from .hexagons import Hexagons
+
+# local
+from .proto_hexagons import Hexagons
+from . import utils  # globals_set, validate_globals, margins
 
 
 def Location(grid: list, label: str, shapes: list, **kwargs):
-    kwargs = kwargs
+    # kwargs = kwargs
 
     def test_foo(x: bool = True, **kwargs):
         print("--- test only ---", kwargs)
@@ -89,7 +90,7 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
 
 
 def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
-    kwargs = kwargs
+    # kwargs = kwargs
 
     if isinstance(grid, Hexagons):
         grid = grid.locales

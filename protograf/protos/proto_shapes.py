@@ -6,12 +6,16 @@ Created on Wed Sep  9 16:21:42 2026
 @author: derek
 """
 
-from protograf.utils.messaging import feedback
+# module
+from protograf import globals
+# from protograf.utils.messaging import feedback
 from protograf.utils.docstrings import docstring_base, docstring_center, docstring_onimo
-from protograf.shapes.circle import CircleShape
-from protograf.shapes.hexagon import HexShape
-from protograf.shapes.polygon import PolygonShape
-from protograf.shapes.rectangle import RectangleShape
+from protograf.shapes import (
+    CircleShape,
+    HexShape,
+    PolygonShape,
+    RectangleShape,
+)
 from protograf.shapes.core import (
     BaseShape,
     ArcShape,
@@ -23,7 +27,7 @@ from protograf.shapes.core import (
     DefaultShape,
     DotShape,
     EllipseShape,
-    FooterShape,
+    # FooterShape,
     ImageShape,
     LineShape,
     QRCodeShape,
@@ -56,13 +60,13 @@ from protograf.objects import (
 )
 
 # local
-from .utils import gobals_set, validate_globals, margins
+from . import utils  # globals_set, validate_globals, margins
 
 # ---- shapes ====
 
 
 def base_shape(source=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     bshape = BaseShape(canvas=globals.canvas, **kwargs)
     return bshape
@@ -81,7 +85,7 @@ def Common(source=None, **kwargs):
     * `common_kwargs` will overwrite normal **kwargs supplied to a Shape
     """
     base_kwargs = kwargs
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
@@ -89,7 +93,7 @@ def Common(source=None, **kwargs):
 
 def common(source=None, **kwargs):
     base_kwargs = kwargs
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
@@ -108,7 +112,7 @@ def Default(source=None, **kwargs):
     * `default_kwargs` will be overwritten by equivalent **kwargs supplied to a Shape
     """
     base_kwargs = kwargs
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     dshape = DefaultShape(canvas=globals.canvas, default_kwargs=base_kwargs, **kwargs)
     return dshape
@@ -116,7 +120,7 @@ def Default(source=None, **kwargs):
 
 def default(source=None, **kwargs):
     base_kwargs = kwargs
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     dshape = DefaultShape(canvas=globals.canvas, default_kwargs=base_kwargs, **kwargs)
     return dshape
@@ -155,7 +159,7 @@ def Image(source=None, **kwargs):
       - *bottom* - bottom edge of image aligned to the y-position
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     image = ImageShape(canvas=globals.canvas, **kwargs)
     image.draw()
@@ -163,7 +167,7 @@ def Image(source=None, **kwargs):
 
 
 def image(source=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     return ImageShape(canvas=globals.canvas, **kwargs)
 
@@ -177,14 +181,14 @@ def Arc(**kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     arc = ArcShape(canvas=globals.canvas, **kwargs)
     arc.draw()
     return arc
 
 
 def arc(**kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return ArcShape(canvas=globals.canvas, **kwargs)
 
 
@@ -202,14 +206,14 @@ def Arrow(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     arr = arrow(row=row, col=col, **kwargs)
     arr.draw()
     return arr
 
 
 def arrow(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return ArrowShape(canvas=globals.canvas, **kwargs)
@@ -224,14 +228,14 @@ def Bezier(**kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     bezier = BezierShape(canvas=globals.canvas, **kwargs)
     bezier.draw()
     return bezier
 
 
 def bezier(**kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return BezierShape(canvas=globals.canvas, **kwargs)
 
 
@@ -249,14 +253,14 @@ def Chord(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     chd = chord(row=row, col=col, **kwargs)
     chd.draw()
     return chd
 
 
 def chord(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return ChordShape(canvas=globals.canvas, **kwargs)
@@ -330,14 +334,14 @@ def Circle(row=None, col=None, **kwargs):
       then by default all slices will be of equally-sized angles and occupy
       the full circumference of the circle
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     circle = CircleShape(canvas=globals.canvas, **kwargs)
     circle.draw()
     return circle
 
 
 def circle(**kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return CircleShape(canvas=globals.canvas, **kwargs)
 
 
@@ -355,14 +359,14 @@ def Dot(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     dtt = dot(row=row, col=col, **kwargs)
     dtt.draw()
     return dtt
 
 
 def dot(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return DotShape(canvas=globals.canvas, **kwargs)
 
 
@@ -380,14 +384,14 @@ def Cross(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     crs = cross(**kwargs)
     crs.draw()
     return crs
 
 
 def cross(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return CrossShape(canvas=globals.canvas, **kwargs)
 
 
@@ -405,7 +409,7 @@ def Ellipse(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     ellipse = EllipseShape(canvas=globals.canvas, **kwargs)
@@ -414,7 +418,7 @@ def Ellipse(row=None, col=None, **kwargs):
 
 
 def ellipse(**kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
@@ -479,7 +483,7 @@ def Hexagon(row=None, col=None, **kwargs):
     - radii_labels_stroke (str): the named or hexadecimal color of the label text
     - radii_labels_stroke_width (float): thickness of the label text
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     # print(f'$$$ Will draw HexShape: {kwargs}')
     kwargs["row"] = row
     kwargs["col"] = col
@@ -489,7 +493,7 @@ def Hexagon(row=None, col=None, **kwargs):
 
 
 def hexagon(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return HexShape(canvas=globals.canvas, **kwargs)
@@ -535,14 +539,14 @@ def Line(row=None, col=None, **kwargs):
       above, but facing in the opposite direction
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     lin = line(row=row, col=col, **kwargs)
     lin.draw()
     return lin
 
 
 def line(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return LineShape(canvas=globals.canvas, **kwargs)
@@ -562,7 +566,7 @@ def Pod(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     pod = PodShape(canvas=globals.canvas, **kwargs)
@@ -571,7 +575,7 @@ def Pod(row=None, col=None, **kwargs):
 
 
 def pod(**kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return PodShape(canvas=globals.canvas, **kwargs)
 
 
@@ -589,14 +593,14 @@ def Polygon(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     poly = polygon(row=row, col=col, **kwargs)
     poly.draw()
     return poly
 
 
 def polygon(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return PolygonShape(canvas=globals.canvas, **kwargs)
@@ -616,14 +620,14 @@ def Polyline(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     polylin = polyline(row=row, col=col, **kwargs)
     polylin.draw()
     return polylin
 
 
 def polyline(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return PolylineShape(canvas=globals.canvas, **kwargs)
@@ -643,14 +647,14 @@ def Rhombus(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     rhomb = rhombus(row=row, col=col, **kwargs)
     rhomb.draw()
     return rhomb
 
 
 def rhombus(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return RhombusShape(canvas=globals.canvas, **kwargs)
 
 
@@ -745,14 +749,14 @@ def Rectangle(row=None, col=None, **kwargs):
     - slices_stroke (str): the named or hexadecimal color of the slice line;
       defaults to ``black``
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     rect = rectangle(row=row, col=col, **kwargs)
     rect.draw()
     return rect
 
 
 def rectangle(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return RectangleShape(canvas=globals.canvas, **kwargs)
@@ -772,14 +776,14 @@ def Polyshape(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     shapeshape = polyshape(row=row, col=col, **kwargs)
     shapeshape.draw()
     return shapeshape
 
 
 def polyshape(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return ShapeShape(canvas=globals.canvas, **kwargs)
@@ -799,7 +803,7 @@ def QRCode(source=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     image = QRCodeShape(canvas=globals.canvas, **kwargs)
     image.draw()
@@ -807,7 +811,7 @@ def QRCode(source=None, **kwargs):
 
 
 def qrcode(source=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["source"] = source
     return QRCodeShape(canvas=globals.canvas, **kwargs)
 
@@ -826,14 +830,14 @@ def Sector(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     sct = sector(row=row, col=col, **kwargs)
     sct.draw()
     return sct
 
 
 def sector(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return SectorShape(canvas=globals.canvas, **kwargs)
@@ -853,14 +857,14 @@ def Square(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     sqr = square(row=row, col=col, **kwargs)
     sqr.draw()
     return sqr
 
 
 def square(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return SquareShape(canvas=globals.canvas, **kwargs)
@@ -880,7 +884,7 @@ def Stadium(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     std = StadiumShape(canvas=globals.canvas, **kwargs)
@@ -889,7 +893,7 @@ def Stadium(row=None, col=None, **kwargs):
 
 
 def stadium(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return StadiumShape(canvas=globals.canvas, **kwargs)
@@ -909,7 +913,7 @@ def Star(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     star = StarShape(canvas=globals.canvas, **kwargs)
@@ -918,7 +922,7 @@ def Star(row=None, col=None, **kwargs):
 
 
 def star(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return StarShape(canvas=globals.canvas, **kwargs)
@@ -938,7 +942,7 @@ def StarLine(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     starline = StarLineShape(canvas=globals.canvas, **kwargs)
@@ -947,7 +951,7 @@ def StarLine(row=None, col=None, **kwargs):
 
 
 def starline(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return StarLineShape(canvas=globals.canvas, **kwargs)
@@ -967,7 +971,7 @@ def Text(text: str | None = None, row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     if text and not kwargs.get("text"):
@@ -978,7 +982,7 @@ def Text(text: str | None = None, row=None, col=None, **kwargs):
 
 
 def text(text: str | None = None, row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     if text and not kwargs.get("text"):
@@ -1000,14 +1004,14 @@ def Trapezoid(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     trp = trapezoid(row=row, col=col, **kwargs)
     trp.draw()
     return trp
 
 
 def trapezoid(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return TrapezoidShape(canvas=globals.canvas, **kwargs)
@@ -1027,7 +1031,7 @@ def Triangle(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     eqt = TriangleShape(canvas=globals.canvas, **kwargs)
@@ -1036,7 +1040,7 @@ def Triangle(row=None, col=None, **kwargs):
 
 
 def triangle(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return TriangleShape(canvas=globals.canvas, **kwargs)
 
 
@@ -1053,7 +1057,7 @@ def Band(row=None, col=None, **kwargs):
     <center>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     bnd = BandShape(canvas=globals.canvas, **kwargs)
@@ -1062,7 +1066,7 @@ def Band(row=None, col=None, **kwargs):
 
 
 def band(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return BandShape(canvas=globals.canvas, **kwargs)
 
 
@@ -1104,14 +1108,14 @@ def AbstractGame(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     absboard = AbstractGameObject(canvas=globals.canvas, **kwargs)
     # absboard.draw()
     return absboard
 
 
 def abstractboard(*args, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return AbstractGameObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
@@ -1136,14 +1140,14 @@ def AbstractState(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     absgame = AbstractStateObject(canvas=globals.canvas, **kwargs)
     absgame.draw()
     return absgame
 
 
 def abstractgame(*args, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return AbstractStateObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
@@ -1168,14 +1172,14 @@ def Cube(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     Cube = CubeObject(canvas=globals.canvas, **kwargs)
     Cube.draw()
     return Cube
 
 
 def cube(*args, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return CubeObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
@@ -1199,14 +1203,14 @@ def D6(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     d6 = D6Object(canvas=globals.canvas, **kwargs)
     d6.draw()
     return d6
 
 
 def d6(*args, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return D6Object(_object=_obj, canvas=globals.canvas, **kwargs)
 
@@ -1251,14 +1255,14 @@ def CardBox(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     cardbox = CardBoxObject(canvas=globals.canvas, **kwargs)
     cardbox.draw()
     return cardbox
 
 
 def cardbox(*args, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return CardBoxObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
@@ -1290,14 +1294,14 @@ def Domino(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     domino = DominoObject(canvas=globals.canvas, **kwargs)
     domino.draw()
     return domino
 
 
 def domino(*args, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return DominoObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
@@ -1324,14 +1328,14 @@ def Polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
         PolyominoObject
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     polym = polyomino(row=row, col=col, **kwargs)
     polym.draw()
     return polym
 
 
 def polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return PolyominoObject(canvas=globals.canvas, **kwargs)
@@ -1356,14 +1360,14 @@ def Pentomino(row=None, col=None, **kwargs):
     Returns:
         PentominoObject
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     pentm = pentomino(row=row, col=col, **kwargs)
     pentm.draw()
     return pentm
 
 
 def pentomino(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return PentominoObject(canvas=globals.canvas, **kwargs)
@@ -1388,14 +1392,14 @@ def Tetromino(row=None, col=None, **kwargs):
 
         TetrominoObject
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     tetrm = tetromino(row=row, col=col, **kwargs)
     tetrm.draw()
     return tetrm
 
 
 def tetromino(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
     return TetrominoObject(canvas=globals.canvas, **kwargs)
@@ -1418,14 +1422,14 @@ def RaceTrack(row=None, col=None, **kwargs):
     <base>
 
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     racetrak = RaceTrackObject(canvas=globals.canvas, **kwargs)
     racetrak.draw()
     return racetrak
 
 
 def racetrack(*args, **kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return RaceTrackObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
@@ -1449,14 +1453,14 @@ def StarField(**kwargs):
 
         https://codeboje.de/starfields-and-galaxies-python/
     """
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     starfield = StarFieldObject(canvas=globals.canvas, **kwargs)
     starfield.draw()
     return starfield
 
 
 def starfield(**kwargs):
-    kwargs = margins(**kwargs)
+    kwargs = utils.margins(**kwargs)
     return StarFieldObject(canvas=globals.canvas, **kwargs)
 
 

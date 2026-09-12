@@ -8,10 +8,11 @@ from copy import copy
 import math
 
 # project
+from protograf import globals
 from protograf.utils import colrs, tools
 from protograf.utils.messaging import feedback
 from protograf.protos.proto_shapes import Common, Text
-from protograf.layouts import (
+from protograf.shapes import (
     GridShape,
 )
 from protograf.utils.structures import (

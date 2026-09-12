@@ -10,7 +10,8 @@ import random
 
 # third party
 
-# project
+# module
+from protograf import globals
 from protograf.utils import geoms, tools
 from protograf.utils.structures import (  # named tuples
     Point,

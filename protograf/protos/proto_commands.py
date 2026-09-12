@@ -8,13 +8,11 @@ Note:
 
 # lib
 import argparse
-from collections import namedtuple
 from contextlib import suppress
 from copy import copy
 from datetime import datetime
 import itertools
 import logging
-import math
 import os
 from pathlib import Path
 import random
@@ -28,11 +26,9 @@ from PIL import Image as PIL_Image
 import pymupdf
 from pymupdf import Rect as muRect, Archive
 
-# local
-from .bgg import BGGGame, BGGGameList
-from .base import BaseCanvas, GroupBase, WIDTH
-from .dice import Dice, DiceD4, DiceD6, DiceD8, DiceD10, DiceD12, DiceD20, DiceD100
-from .shapes import (
+# project
+from protograf.base import BaseCanvas, GroupBase, WIDTH
+from protograf.shapes import (
     BaseShape,
     ArcShape,
     ArrowShape,
@@ -61,9 +57,7 @@ from .shapes import (
     TrapezoidShape,
     TriangleShape,
     BandShape,
-)
-
-from .layouts import (
+    # layouts
     GridShape,
     DotGridShape,
     HexHexShape,
@@ -74,12 +68,14 @@ from .layouts import (
     RepeatShape,
     SequenceShape,
     TableShape,
+    # virtuals
+    DiamondLocations,  # used in user scripts
+    RectangularLocations,  # used in user scripts
+    TriangularLocations,  # used in user scripts
+    VirtualLocations,
 )
-from .globals import unit  # used in scripts
-from .groups import Switch, Lookup  # used in scripts
-from ._version import __version__
-
 from protograf.utils import colrs, geoms, loadr, tools, support
+from protograf.utils.bgg import BGGGame, BGGGameList
 from protograf.utils.constants import (
     DEFAULT_FONT,
     RGB_DEBUG_COLOR,
@@ -147,19 +143,27 @@ from protograf.utils.tools import (  # used in scripts
     uniques,
 )
 
+# local
+from .blueprint import Blueprint
+from. proto_cards import Deck
+from .proto_shapes import (
+    Dot,
+    Line,
+    rectangle,
+    Rectangle,
+    Rhombus,
+    Square,
+    Polygon,
+    Triangle,
+)
+
+from protograf._version import __version__
+
 from protograf import globals
 
+from . import utils  # globals_set, validate_globals, GRAYS
+
 log = logging.getLogger(__name__)
-globals_set = False
-
-GRAYS = ("0,0,0,25.5", "#BEBEBE")
-
-
-def validate_globals():
-    """Check that Create has been called to set initialise globals"""
-    global globals_set
-    if not globals_set:
-        feedback("Please ensure Create() command is called first!", True)
 
 
 # ---- page-related ====
@@ -250,13 +254,12 @@ def Create(**kwargs):
     - Will use argparse to process command-line keyword args
     - Allows shortcut creation of cards
     """
-    global globals_set
     # ---- set and confirm globals
     globals.initialize()
-    if globals_set:
+    if utils.globals_set:
         if not kwargs.get("globals_reset", False):
             feedback("Another document is already open or initialised", True)
-    globals_set = True
+    utils.globals_set = True
     # ---- units
     _units = kwargs.get("units", "cm")
     globals.units = support.to_units(_units)
@@ -438,12 +441,11 @@ def Load(**kwargs):
     - Will use argparse to process command-line keyword args
     - Allows shortcut creation of cards
     """
-    global globals_set
     # ---- set and confirm globals
     globals.initialize()
-    if globals_set:
+    if utils.globals_set:
         feedback("Another document is already open or initialised", True)
-    globals_set = True
+    utils.globals_set = True
     # ---- units
     _units = kwargs.get("units", globals.units)
     globals.units = support.to_units(_units)
@@ -578,7 +580,7 @@ def load(**kwargs):
 
 
 def Footer(**kwargs):
-    validate_globals()
+    utils.validate_globals()
 
     kwargs["paper"] = globals.paper
     if not kwargs.get("font_size"):
@@ -589,7 +591,7 @@ def Footer(**kwargs):
 
 
 def Header(**kwargs):
-    validate_globals()
+    utils.validate_globals()
     pass
 
 
@@ -601,7 +603,7 @@ def PageBreak(**kwargs):
     - footer (bool): should a Footer object be drawn before starting next page
 
     """
-    validate_globals()
+    utils.validate_globals()
 
     globals.canvas.commit()  # add all drawings (to current pymupdf Shape/"canvas")
     globals.page_count += 1
@@ -882,7 +884,7 @@ def Save(**kwargs):
       in a DeckOfCards object
     - Zones (defined in the Deck) are drawn before the Cards
     """
-    validate_globals()
+    utils.validate_globals()
 
     # ---- set local vars from kwargs
     dpi = support.to_int(kwargs.get("dpi", DEFAULT_DPI), "dpi")
@@ -1045,7 +1047,7 @@ def margins(**kwargs):
     - margin_right (float): size of right margin on the page
 
     """
-    validate_globals()
+    utils.validate_globals()
 
     kwargs["margin"] = kwargs.get("margin", globals.margins.margin)
     kwargs["margin_left"] = kwargs.get("margin_left", globals.margins.left)
@@ -1070,7 +1072,7 @@ def Font(name=None, **kwargs):
     - style (str): style, if available, for the Font e.g. "bold", "italic"
 
     """
-    validate_globals()
+    utils.validate_globals()
     _name, _path, _file = tools.get_font_file(name)
     globals.base.font_name = _name or DEFAULT_FONT
     globals.base.font_file = _file
@@ -1094,7 +1096,7 @@ def IconFont(name=None, **kwargs):
     - style (str): the style, if available, for the Font e.g. "bold", "italic"
 
     """
-    validate_globals()
+    utils.validate_globals()
     _name, _path, _file = tools.get_font_file(name)
     globals.base.icon_font_name = _name or DEFAULT_FONT
     globals.base.icon_font_file = _file
@@ -1406,7 +1408,7 @@ def Squares(rows=1, cols=1, **kwargs):
 
 def Layout(grid, **kwargs):
     """Draw shape(s) in locations, cols, & rows in a virtual layout"""
-    validate_globals()
+    utils.validate_globals()
 
     grid_classname = grid.__class__.__name__ if grid else ""
     kwargs = kwargs
@@ -1912,7 +1914,7 @@ def Track(track=None, **kwargs):
                 True,
             )
 
-    validate_globals()
+    utils.validate_globals()
 
     kwargs = kwargs
     angles = kwargs.get("angles", [])
