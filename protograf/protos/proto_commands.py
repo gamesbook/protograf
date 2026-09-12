@@ -145,7 +145,6 @@ from protograf.utils.tools import (  # used in scripts
 
 # local
 from .blueprint import Blueprint
-from. proto_cards import Deck
 from .proto_shapes import (
     Dot,
     Line,
@@ -884,6 +883,8 @@ def Save(**kwargs):
       in a DeckOfCards object
     - Zones (defined in the Deck) are drawn before the Cards
     """
+    from .proto_cards import Deck
+
     utils.validate_globals()
 
     # ---- set local vars from kwargs

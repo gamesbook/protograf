@@ -8,7 +8,8 @@ import logging
 import math
 
 # third party
-# local
+
+# project
 from protograf import globals
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (

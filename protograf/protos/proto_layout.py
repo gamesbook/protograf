@@ -14,6 +14,7 @@ import logging
 # third party
 
 # project
+from protograf import globals
 from protograf.base import BaseShape, WIDTH
 from protograf.utils import colrs, tools
 from protograf.utils.messaging import feedback
@@ -34,10 +35,9 @@ from .proto_shapes import (
     Rhombus,
     Triangle,
 )
+
 # local
 from . import utils  # globals_set, validate_globals, margins
-
-from protograf import globals
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +45,7 @@ log = logging.getLogger(__name__)
 def Layout(grid, **kwargs):
     """Draw shape(s) in locations, cols, & rows in a virtual layout"""
     from protograf.shapes.virtuals import VirtualLocations
+
     utils.validate_globals()
 
     grid_classname = grid.__class__.__name__ if grid else ""

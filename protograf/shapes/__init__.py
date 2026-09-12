@@ -1,6 +1,6 @@
 # protograf - shapes
 # import here for direct use by other modules
-from .cards import CardShape, CardFrame, CardOutline
+from .cards import CardShape, CardFrame, CardOutline, Lookup, Switch
 from .core import (
     BaseShape,
     ArcShape,

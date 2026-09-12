@@ -168,6 +168,7 @@ class Hexagons(ProtografGrid):
     def draw_layout_rectangle(self):
         """Layout of hexagons in a rectangle."""
         from protograf.protos import hexagon, Hexagon
+
         sequence = 0
         for row in range(self.rows):
             for col in range(self.cols):

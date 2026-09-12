@@ -8,7 +8,8 @@ protograf box-like shapes
 
 # third party
 
-# project
+# module
+from protograf import globals
 from protograf.base import BaseShape
 from protograf.shapes.utils import draw_line
 from protograf.utils import tools

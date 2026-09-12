@@ -9,7 +9,8 @@ import random
 # third party
 from pymupdf import Point as muPoint
 
-# project
+# module
+from protograf import globals
 from protograf.base import BaseShape
 from protograf.shapes import (
     HexShape,

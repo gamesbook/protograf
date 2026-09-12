@@ -23,37 +23,39 @@ header = Common(x=0, y=0, font_size=8, align="left")
 text = 'never gonna give you up'
 for squares in range(len(text) + 1):
     y = 5
-    z = 0.5
-    Blueprint()
-    Text(common=header, text="rolling")
+    z = -1
+    # Blueprint()
+    head = "rolling" + '.' * squares
+    Text(common=header, text=head)
     for t in range(squares):
-        z = z + 0.5
+        z = z + 0.9
         if text[t] == ' ':
             y = y - 1
-            z = 0.5
+            z = -1
             continue
-        Rectangle(side=0.5, rounding=0.1, x=z, y=y, label=text[t])
+        Rectangle(side=0.45, rounding=0.1, x=z, y=y, label=text[t])
     PageBreak()
 
 # ---- line 2
 text = 'never gonna let you down'
 for squares in range(len(text) + 1):
     y = 1
-    z = 0.5
-    Blueprint()
-    Text(common=header, text="rolling")
+    z = -1
+    # Blueprint()
+    head = "rolling" + '.' * squares
+    Text(common=header, text=head)
     for t in range(squares):
-        z = z + 0.5
+        z = z + 0.9
         if text[t] == ' ':
             y = y + 1
-            z = 0.5
+            z = -1
             continue
-        Rectangle(side=0.5, rounding=0.1, x=z, y=y, label=text[t])
+        Rectangle(side=0.55, rounding=0.1, x=z, y=y, label=text[t])
     PageBreak()
 
 Save(
     output='gif',
     directory="../docs/source/examples/images/various",
     dpi=300,
-    framerate=0.1,  # seconds-delay-per-frame
+    framerate=0.15,  # seconds-delay-per-frame
 )

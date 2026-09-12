@@ -57,7 +57,7 @@ python boards/abstract/octagons.py --no-png -d /tmp/demo
 python boards/abstract/snex.py --no-png -d /tmp/demo
 python boards/abstract/tictactoe.py --no-png -d /tmp/demo
 echo -e "\nCreating New Classic boards..."
-#python boards/abstract/new_classics.py --no-png -d /tmp/demo
+python boards/abstract/new_classics.py --no-png -d /tmp/demo
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py --no-png -d /tmp/demo

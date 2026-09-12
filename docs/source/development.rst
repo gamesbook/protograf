@@ -30,18 +30,24 @@ intended purpose.
   properties for such shapes can be stored in a common or default shape;
   or layout shapes for grid-based arrangements (actual or virtual)
 
-- *"protos""* : commands issued by the user to: deal with flow and files
+- *"protos"* : commands issued by the user to deal with flow and files
   |dash| create & save |dash|; create or draw shapes, objects,
   cards |dash| either singly or with repeats
 
-- *"objects""* : things made from compound, or customised, shapes; typically
+- *"objects"* : things made from compound, or customised, shapes; typically
   representing "real world" items such as dice, dominoes etc.
 
-- *"utils""* : support and helper functions used for calculations;
+- *"utils"* : support and helper functions used for calculations;
   for example, geometries
 
-- *"scripts""* : functions used for "quick start" setup of a **protograf**
+- *"scripts"* : functions used for "quick start" setup of a **protograf**
   script
+
+The "root" section contains the primary parent class for shape properties
+and functions shared across all shapes and many objects (``BaseShape``);
+as well as the ``global`` variables for the document, which are accessed
+and updated by various classes (especially the card-related ones).
+
 
 Coding
 ======
@@ -144,6 +150,10 @@ Update a patch / feature version (the most common case) via::
 
     poetry version patch
 
+
+protograf version updates
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Update a minor version via::
 
     poetry version minor
@@ -153,7 +163,7 @@ Update a major version via::
     poetry version major
 
 
-Examples:
+Examples of version updates:
 
 ===================== ====== ======
 command               before after
@@ -265,5 +275,5 @@ Some useful tools:
 - https://github.com/retext-project/retext - a reStructuredText editor
 - https://github.com/mgedmin/restview - a reStructuredText viewer in your browser;
   it currently does **not** support Sphinx directives
-- https://pypi.org/project/sphinx-view/ - a reStructuredText viewer in your browser
-  that **does** support Sphinx directives (but is quite dated)
+- https://pypi.org/project/sphinx-view/ - a reStructuredText viewer in your
+  browser that **does** support Sphinx directives (but is quite dated)

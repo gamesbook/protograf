@@ -20,9 +20,10 @@ from PIL import Image as PIL_Image
 import pymupdf
 from pymupdf import Rect as muRect
 
-# project
-# from protograf.protos import Switch
+# module
+from protograf import globals
 
+# from protograf.protos import Switch
 from protograf.base import BaseShape, BaseCanvas, GroupBase, WIDTH
 from protograf.shapes import (
     RectangleShape,
@@ -54,7 +55,8 @@ from protograf.utils.structures import (
 from protograf.utils.tools import _lower
 
 # local
-from .utils import globals_set, validate_globals, margins, GRAYS
+from .utils import validate_globals, margins, GRAYS
+from .proto_commands import page_setup
 
 log = logging.getLogger(__name__)
 
@@ -739,6 +741,7 @@ class DeckOfCards:
         def load_gutter_pages(is_landscape: bool, gutter_filename: str):
             """Insert gutter pages into primary document and reset globals."""
             from protograf.protos import PageBreak
+
             # ---- * save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
             try:
@@ -1551,7 +1554,7 @@ def S(test="", result=None, alternate=None) -> object:
     - alternate (str / element): OPTIONAL; returned if `test` evaluates to False;
       if not supplied, then defaults to None
     """
-    from protograf.protos import Switch
+    from protograf.shapes import Switch
 
     if globals.dataset and isinstance(globals.dataset, list):
         environment = jinja2.Environment()

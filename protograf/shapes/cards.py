@@ -18,10 +18,10 @@ from PIL import Image as PIL_Image
 import pymupdf
 from pymupdf import Rect as muRect
 
-# project
+# module
+from protograf import globals
 from protograf.protos.utils import GRAYS
-
-from protograf.base import BaseCanvas,  BaseShape, GroupBase, WIDTH
+from protograf.base import BaseCanvas, BaseShape, GroupBase, WIDTH
 from protograf.utils import colrs, tools, support
 from protograf.utils.constants import (
     DEFAULT_CARD_WIDTH,  # cm
@@ -173,6 +173,7 @@ class CardOutline(BaseShape):
     def get_outline(self, cnv, row, col, cid, label, **kwargs):
         """Get card outline."""
         from protograf.shapes import CircleShape, HexShape, RectangleShape
+
         outline = None
         # feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
         kwargs["height"] = self.height
@@ -370,7 +371,13 @@ class CardShape(BaseShape):
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
 
-        from protograf.shapes import ImageShape, SequenceShape, RepeatShape, GridShape, DotGridShape
+        from protograf.shapes import (
+            ImageShape,
+            SequenceShape,
+            RepeatShape,
+            GridShape,
+            DotGridShape,
+        )
         from protograf.protos import PageBreak, TemplatingType
 
         def draw_element(new_ele, cnv, off_x, off_y, ID, **kwargs):
@@ -916,6 +923,7 @@ class DeckOfCards:
     def gallery_overrides(self, gallery):
         """Reset document and page properties to handle NxM card layouts"""
         from protograf.protos import PageMargins, page_setup
+
         err = f'The gallery property must be a pair of numbers in (M, N) format; not "{
             gallery}".'
         if isinstance(gallery, tuple) and len(gallery) == 2:
@@ -1002,6 +1010,7 @@ class DeckOfCards:
         """Draw card bleed."""
         # ---- bleed area for page (default)
         from protograf.shapes import RectangleShape
+
         if self.bleed_fill:
             rect = RectangleShape(
                 canvas=cnv,
@@ -1320,6 +1329,7 @@ class DeckOfCards:
         def draw_gutter_cards() -> tuple:
             """Reset page size and associated globals."""
             from protograf.protos import PageMargins, page_setup
+
             self.prime_globals = tools.save_globals()
             globals_page = copy_object.copy(globals.page)
             gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
@@ -1394,6 +1404,7 @@ class DeckOfCards:
         def load_gutter_pages(is_landscape: bool, gutter_filename: str):
             """Insert gutter pages into primary document and reset globals."""
             from protograf.protos import PageBreak, page_setup
+
             # ---- * save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
             try:

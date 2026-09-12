@@ -364,10 +364,10 @@ sets of shapes, or to control how and where sets of shapes appear on a page.
 See:
 
 - :doc:`Core Shapes <core_shapes>`
-- :doc:`Object commands (specialised shapes) <objects>`
+- :doc:`Object commands (specialised shapes) <objects/index>`
 - :doc:`Deck and Card commands <card_decks>`
 - :doc:`Further script commands <additional_commands>`
-- :doc:`Layout <layouts>` commands
+- :doc:`Layout <layouts/index>` commands
 - :doc:`Hexagonal Grid <hexagonal_grids>` commands
 
 
@@ -483,7 +483,7 @@ The other way that elements can be laid out on a page is through a
 **grid layout** which can be derived from a built-in shape such ``Hexagons``
 or constructed using a defined set of properties.
 
-These are all described in the :doc:`Layouts <layouts>` section.
+These are all described in the :doc:`Layouts <layouts/index>` section.
 
 There is also a separate section on :doc:`Hexagonal Grids <hexagonal_grids>`
 which describes the variety of these types of grids, as well as some options
@@ -533,8 +533,8 @@ some occasions when you will see a feedback or warning message of some kind.
 
        WARNING:: Track needs at least one Shape assigned to shapes list
 
-  This is not an error, but does act as a reminder about what might still
-  be needed.
+   This is not an error, but does act as a reminder about what might still
+   be needed.
 6. **Missing part of template data** - these warnings can be issued when
    part of the data for a card's  :ref:`Template <the-template-command>` is
    missing or blank; for example, some cards may have images and some not, and

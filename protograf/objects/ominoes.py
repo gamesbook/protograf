@@ -8,7 +8,8 @@ import logging
 
 # third party
 
-# project
+# module
+from protograf import globals
 from protograf.shapes import (
     RectangleShape,
 )
