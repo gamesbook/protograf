@@ -95,14 +95,12 @@ def Layout(grid, **kwargs):
                 shape = corner[1]
                 if _lower(value) not in ["nw", "ne", "sw", "se", "*"]:
                     feedback(
-                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{
-                            value}")!',
+                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{value}")!',
                         True,
                     )
                 if not isinstance(shape, BaseShape):
                     feedback(
-                        f'The {grid_classname} corner item must be a shape (not "{
-                            shape}") !',
+                        f'The {grid_classname} corner item must be a shape (not "{shape}") !',
                         True,
                     )
                 if value == "*":
@@ -114,8 +112,7 @@ def Layout(grid, **kwargs):
                     corners_dict[value] = shape
             except Exception:
                 feedback(
-                    f'The {grid_classname} corners setting "{
-                        corner}" is not a valid list',
+                    f'The {grid_classname} corners setting "{corner}" is not a valid list',
                     True,
                 )
 

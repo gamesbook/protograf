@@ -16,6 +16,7 @@ from protograf.shapes import (
     CircleShape,
     # PolygonShape,
     # RectangleShape,
+    RectangularLocations,
 )
 from protograf.utils import tools, colrs
 from protograf.utils.messaging import feedback
@@ -39,7 +40,8 @@ class AbstractGameObject(BaseShape):
         self.set_unit_properties()
         # ---- custom properties
         self.name = kwargs.get("name", "grid")
-        self.colors = kwargs.get("colors", None)
+        self.fills = kwargs.get("fills", ["white"])
+        self.strokes = kwargs.get("strokes", ["black"])
         self.hairs = tools.as_bool(kwargs.get("hairs", False))
         self.labels = tools.as_bool(kwargs.get("labels", False))
         self.grid_align = tools.as_bool(kwargs.get("grid_align", False))
@@ -49,28 +51,51 @@ class AbstractGameObject(BaseShape):
         self._validate_choices()
         # ---- defaults
         self.pieces_type = None
+        self.cell_size = 1  # typically a "square" area
+        # ---- calculated properties
+        if not kwargs.get("width"):
+            self.width = (
+                globals.page.width - globals.margins.left - globals.margins.right
+            )
+        if not kwargs.get("height"):
+            self.height = (
+                globals.page.height - globals.margins.top - globals.margins.bottom
+            )
+        _available = min(self.height, self.width)
         # ---- conditional defaults
+        board_pattern = "default"
+        board_start = "NW"
+        board_direction = "east"
         match _lower(self.name):
             case "grid":  # default
                 self.pieces_type = "checkers"
-                if not self.colors:
-                    self.colors = ("white",)
+                if not self.fills:
+                    self.fills = ("white",)
+                if not self.strokes:
+                    self.strokes = ("black",)
                 if not self.cols:
                     self.rows = 8
                 if not self.cols:
                     self.cols = 8
+                _max_cells = max(self.rows, self.cols)
+                self.cell_size = _available / _max_cells
             case "chess":
                 self.pieces_type = "chess"
-                if not self.colors:
-                    self.colors = ("white", "gray")
+                if not self.fills:
+                    self.fills = ("black", "silver")
+                if not self.strokes:
+                    self.strokes = (None, None)
                 if not self.cols:
                     self.rows = 8
                 if not self.cols:
                     self.cols = 8
+                board_pattern = "snake"
             case "checkers" | "draughts":
                 self.pieces_type = "checkers"
-                if not self.colors:
-                    self.colors = ("white",)
+                if not self.fills:
+                    self.fills = ("white",)
+                if not self.strokes:
+                    self.strokes = ("black",)
                 if not self.cols:
                     self.rows = 8
                 if not self.cols:
@@ -78,8 +103,10 @@ class AbstractGameObject(BaseShape):
             case "go":
                 self.pieces_type = "go"
                 self.grid_align = True
-                if not self.colors:
-                    self.colors = ("white",)
+                if not self.fills:
+                    self.fills = ("#D9A359",)
+                if not self.strokes:
+                    self.strokes = ("black",)
                 if not self.cols:
                     self.rows = 18
                 if not self.cols:
@@ -101,11 +128,49 @@ class AbstractGameObject(BaseShape):
                     True,
                     True,
                 )
+        # ---- check filld and colors
+        if len(self.fills) != len(self.strokes):
+            feedback(
+                "The AbstractGame 'fills' and 'strokes' properties must be of equal length",
+                True,
+                True,
+            )
+        # ---- calculate cell_size
+        match _lower(self.name):
+            case "grid" | "chess" | "checkers" | "go":  # default
+                _max_cells = max(self.rows, self.cols)
+                self.cell_size = _available / _max_cells
+            case _:
+                feedback(
+                    "The AbstractGame 'name' property must be one of the following: "
+                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
+                    True,
+                    True,
+                )
         # ---- setup pieces
         self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
-        #      (board.cells should contain indexed centre locations; caculate labels)
-        print("TODO - setup board!")  # TODO - calculate board params
+        # board_layout.cells should contain indexed cell geometry; calculate labels
+        # TODO - calculate board labels
+        match _lower(self.name):
+            case "grid" | "chess" | "checkers" | "go":  # default
+                self.board_layout = RectangularLocations(
+                    cols=self.rows,
+                    rows=self.cols,
+                    x=self.x,
+                    y=self.y,
+                    interval=self.cell_size,
+                    start=board_start,
+                    direction=board_direction,
+                    pattern=board_pattern,
+                )
+            case _:
+                feedback(
+                    "The AbstractGame 'name' property must be one of the following: "
+                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
+                    True,
+                    True,
+                )
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
@@ -131,15 +196,15 @@ class AbstractGameObject(BaseShape):
                 True,
                 True,
             )
-        if self.colors:
-            if not isinstance(self.colors, (list, tuple)):
+        if self.fills:
+            if not isinstance(self.fills, (list, tuple)):
                 feedback(
-                    "The AbstractGame 'colors' property must be a list of colors, "
+                    "The AbstractGame 'fills' property must be a list of colors, "
                     f" not a '{type(self.name).__name__}'.",
                     True,
                     True,
                 )
-            for col in self.colors:
+            for col in self.fills:
                 colrs.get_color(col)
 
         return True
@@ -510,23 +575,31 @@ class AbstractStateObject(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
+        from protograf.protos import Layout, square
+
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- draw board
-        # TOOD - use the board.cells property - {{col,row}}=centre_point to draw piece
-        # e.g. Chess
-        # tstr = Common(side=0.5, stroke=None)
-        # rsq = square(common=tstr, fill=None)
-        # bsq = square(common=tstr, fill="black")
-        # wsq = square(common=tstr, fill="grey")
-        # chess = RectangularLocations(
-        #      cols=8, rows=8,
-        #      x=0, y=0,
-        #      interval=0.5,
-        #      # x_interval=0.0, y_interval=0.0,
-        #      start="NW", direction="east", pattern="snake")
-        # Layout(chess, shapes=[bsq, wsq])
+        _shapes = []
+        match _lower(self.board.name):
+            case "grid" | "chess" | "checkers" | "go":  # default is grid
+                for key, colr in enumerate(self.board.fills):
+                    _shapes.append(
+                        square(
+                            side=self.board.cell_size,
+                            stroke=self.board.strokes[key],
+                            fill=colr,
+                        )
+                    )
+                Layout(self.board.board_layout, shapes=_shapes)
+            case _:
+                feedback(
+                    "The AbstractGame 'name' property must be one of the following: "
+                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
+                    True,
+                    True,
+                )
 
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
