@@ -88,6 +88,10 @@ class AbstractGameObject(BaseShape):
                 raise NotImplementedError("Sorry, a hex board is not available yet.")
             case "hexhex":
                 raise NotImplementedError("Sorry, a hexhex board is not available yet.")
+            case "tri" | "triangle" | "triangular":
+                raise NotImplementedError(
+                    "Sorry, a triangular board is not available yet."
+                )
             case None:
                 pass  # can ignore the name for this AB
             case _:
@@ -100,8 +104,8 @@ class AbstractGameObject(BaseShape):
         # ---- setup pieces
         self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
-        print("TODO - setup board!")
-        # TODO - calculate board params
+        #      (board.cells should contain indexed centre locations; caculate labels)
+        print("TODO - setup board!")  # TODO - calculate board params
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
@@ -509,6 +513,21 @@ class AbstractStateObject(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- draw board
+        # TOOD - use the board.cells property - {{col,row}}=centre_point to draw piece
+        # e.g. Chess
+        # tstr = Common(side=0.5, stroke=None)
+        # rsq = square(common=tstr, fill=None)
+        # bsq = square(common=tstr, fill="black")
+        # wsq = square(common=tstr, fill="grey")
+        # chess = RectangularLocations(
+        #      cols=8, rows=8,
+        #      x=0, y=0,
+        #      interval=0.5,
+        #      # x_interval=0.0, y_interval=0.0,
+        #      start="NW", direction="east", pattern="snake")
+        # Layout(chess, shapes=[bsq, wsq])
+
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
             pass
@@ -530,6 +549,10 @@ class AbstractStateObject(BaseShape):
                 True,
                 True,
             )
-        # ---- draw moves
+        else:
+            pass
+        # TOOD - use the board.cells property - {{col,row}}=centre_point to draw piece
+        print("TODO: draw pieces")
 
         # ---- draw annotations
+        print("TODO: draw annotations")

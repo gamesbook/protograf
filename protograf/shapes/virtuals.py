@@ -42,6 +42,7 @@ class VirtualShape:
         self.start_y = None
         self.rows = self.to_int(rows, "rows")
         self.cols = self.to_int(cols, "cols")
+        # self.cells = {} - may be needed for some shapes e.g. HexHex
 
     def to_int(self, value, label="", maximum=None, minimum=None) -> int:
         """Set a value to an int; or stop if an invalid value."""
@@ -116,6 +117,7 @@ class HexHexLocations(VirtualShape):
                 self.kwargs = kwargs | kwargs["common"]._common_kwargs
         except AttributeError:
             pass  # ignore, for example, CommonShape
+        # ---- custom properties
         self.cx = tools.as_float(kwargs.get("cx", 1.0), "x")  # hexhex centre
         self.cy = tools.as_float(kwargs.get("cy", 1.0), "y")  # hexhex centre
         self.rings = tools.as_int(kwargs.get("rings", 1), "rings")
@@ -126,6 +128,7 @@ class HexHexLocations(VirtualShape):
         self.orientation = kwargs.get("orientation", "flat")
         self.common = kwargs.get("common", None)
         self.hexes = []
+        self.cells = {}  # store (ring,ring_counter) : Point(x,y) at centre of cell
         # ---- UPDATE SELF WITH COMMON
         if self.common:
             try:
@@ -282,6 +285,7 @@ class HexHexLocations(VirtualShape):
             orientation=self.ORIENTATION,
         )
         self.hexes.append(hex0)
+        self.cells[(hex0.ring, hex0.counter)] = hex0.centre
         # ---- iterate over all ring hexes
         chex = Point(cxu, cyu)
         hex_zero = Point(cxu, cyu)
@@ -326,7 +330,8 @@ class HexHexLocations(VirtualShape):
                 orientation=self.ORIENTATION,
             )
             self.hexes.append(_hex)
-            # next hex
+            self.cells[(_hex.ring, _hex.counter)] = _hex.centre
+            # ---- next hex
             ring_counter += 1
             if (location + 1) - spine_location == spine_interval:
                 # set values related to NEXT (upcoming hex)
@@ -356,7 +361,7 @@ class VirtualLocations(VirtualShape):
     Common properties and methods to define virtual Locations.
 
     Virtual Locations are not drawn on the canvas; they provide the
-    locations/points where user-defined shapes will be drawn.
+    locations/points where user-defined shapes can be drawn.
     """
 
     def __init__(self, rows, cols, **kwargs):
@@ -382,6 +387,8 @@ class VirtualLocations(VirtualShape):
         self.start = kwargs.get("start", None)
         self.stop = kwargs.get("stop", 0)
         self.label_style = kwargs.get("label_style", None)
+        # ---- locations
+        self.cells = {}  # store (col,row) : Point(x,y) at centre of cell
         # ----  check!
         self.validate()
 
@@ -531,7 +538,6 @@ class RectangularLocations(VirtualLocations):
         # ---- calculated values
         self.total_height = self.interval_x * (self.rows - 1)
         self.total_width = self.interval_y * (self.cols - 1)
-        self.cells = {}  # store (col,row) : Point(x,y)
 
     def rectangle_validate(self, **kwargs):
         """Check that settings for RectangularLocations are correct."""
@@ -618,7 +624,10 @@ class RectangularLocations(VirtualLocations):
             # TODO!  set actual x and y
             x = self.x + (col - 1) * self.interval_x
             y = self.y + (row - 1) * self.interval_y
-            self.cells[(col, row)] = Point(x, y)
+            self.cells[(col, row)] = Point(
+                x + self.interval_x / 2.0,
+                y + self.interval_y / 2.0,
+            )  # centre of cell
             # offset(s)
             if self.side:
                 if row & 1:
@@ -949,6 +958,9 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         x = self.x + dx + val * self.interval_x
+                        self.cells[(loc, key + 1)] = Point(
+                            x, y
+                        )  # TODO centre of cell ???
                         yield Locale(
                             loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
                         )
@@ -961,6 +973,9 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         x = self.x + dx + val * self.interval_x
+                        self.cells[(loc, key + 1)] = Point(
+                            x, y
+                        )  # TODO centre of cell ???
                         yield Locale(
                             loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
                         )
@@ -977,6 +992,9 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         y = self.y + dy + val * self.interval_y
+                        self.cells[(loc, key + 1)] = Point(
+                            x, y
+                        )  # TODO centre of cell ???
                         yield Locale(
                             key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
                         )
@@ -989,6 +1007,9 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         y = self.y + dy + val * self.interval_y
+                        self.cells[(loc, key + 1)] = Point(
+                            x, y
+                        )  # TODO centre of cell ???
                         yield Locale(
                             key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
                         )
@@ -1180,6 +1201,7 @@ class DiamondLocations(VirtualLocations):
                 key + 1,
                 corner,
             )
+            self.cells[(entry[0], entry[1])] = Point(x, y)  # TODO centre of cell ???
             yield _locale
 
 
