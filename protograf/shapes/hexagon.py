@@ -56,6 +56,7 @@ class HexShape(BaseShape):
         self.coord_text = None
         self.grid = None
         self.is_cards = False
+        self.bleed_radius = kwargs.get("bleed_radius", 0.0)
         # ---- check construction type
         self.use_diameter = self.is_kwarg("diameter")
         self.use_height = self.is_kwarg("height")
@@ -95,9 +96,9 @@ class HexShape(BaseShape):
     def geo(self) -> ShapeGeometry:
         """Geometry of Hexagon in user units."""
         _type = type(self)
+        vtcs = self._shape_vertexes  # also calculates self.x_d, self.y_d!
         cntr = Point(self.x_d, self.y_d)
         cntr_user = self.as_point(cntr, self.units, None, None)
-        vtcs = self._shape_vertexes
         # vertices and perbii vary by ORIENTATION!
         n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
         nnw, nne, sse, ssw = None, None, None, None  # pointy

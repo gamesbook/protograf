@@ -9,18 +9,22 @@ import math
 
 # third party
 
-# project
+# module
 from protograf import globals
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     Point,
     HexGeometry,
     HexOrientation,
+    ShapeGeometry,
     VirtualHex,
     Locale,
 )
 from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
+
+# locale
+from .hexagon import HexShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -42,7 +46,8 @@ class VirtualShape:
         self.start_y = None
         self.rows = self.to_int(rows, "rows")
         self.cols = self.to_int(cols, "cols")
-        # self.cells = {} - may be needed for some shapes e.g. HexHex
+        # ---- locations
+        self.cells = {}  # cellRef:cell.geo e.g.  (col,row) or (ring,ring_counter)
 
     def to_int(self, value, label="", maximum=None, minimum=None) -> int:
         """Set a value to an int; or stop if an invalid value."""
@@ -128,7 +133,6 @@ class HexHexLocations(VirtualShape):
         self.orientation = kwargs.get("orientation", "flat")
         self.common = kwargs.get("common", None)
         self.hexes = []
-        self.cells = {}  # store (ring,ring_counter) : Point(x,y) at centre of cell
         # ---- UPDATE SELF WITH COMMON
         if self.common:
             try:
@@ -285,7 +289,14 @@ class HexHexLocations(VirtualShape):
             orientation=self.ORIENTATION,
         )
         self.hexes.append(hex0)
-        self.cells[(hex0.ring, hex0.counter)] = hex0.centre
+        # ---- store hex geometry per cell
+        _cell_hex = HexShape(
+            radius=self.radius,
+            diameter=self.diameter,
+            height=self.height,
+            cxy=Point(self.cx, self.cy),
+        )
+        self.cells[(hex0.ring, hex0.counter)] = _cell_hex.geometry
         # ---- iterate over all ring hexes
         chex = Point(cxu, cyu)
         hex_zero = Point(cxu, cyu)
@@ -330,7 +341,14 @@ class HexHexLocations(VirtualShape):
                 orientation=self.ORIENTATION,
             )
             self.hexes.append(_hex)
-            self.cells[(_hex.ring, _hex.counter)] = _hex.centre
+            # ---- store hex geometry per cell
+            _cell_hex = HexShape(
+                radius=self.radius,
+                diameter=self.diameter,
+                height=self.height,
+                cxy=chex,
+            )
+            self.cells[(_hex.ring, _hex.counter)] = _cell_hex.geometry
             # ---- next hex
             ring_counter += 1
             if (location + 1) - spine_location == spine_interval:
@@ -387,8 +405,6 @@ class VirtualLocations(VirtualShape):
         self.start = kwargs.get("start", None)
         self.stop = kwargs.get("stop", 0)
         self.label_style = kwargs.get("label_style", None)
-        # ---- locations
-        self.cells = {}  # store (col,row) : Point(x,y) at centre of cell
         # ----  check!
         self.validate()
 
@@ -624,10 +640,17 @@ class RectangularLocations(VirtualLocations):
             # TODO!  set actual x and y
             x = self.x + (col - 1) * self.interval_x
             y = self.y + (row - 1) * self.interval_y
-            self.cells[(col, row)] = Point(
+            c = Point(
                 x + self.interval_x / 2.0,
                 y + self.interval_y / 2.0,
-            )  # centre of cell
+            )
+            self.cells[(col, row)] = ShapeGeometry(
+                centre=c,
+                center=c,
+                c=c,
+                height=self.interval_y,
+                width=self.interval_x,
+            )
             # offset(s)
             if self.side:
                 if row & 1:
@@ -958,9 +981,12 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         x = self.x + dx + val * self.interval_x
-                        self.cells[(loc, key + 1)] = Point(
-                            x, y
-                        )  # TODO centre of cell ???
+                        c = Point(x, y)  # TODO is this centre of cell ???
+                        self.cells[(loc, key + 1)] = ShapeGeometry(
+                            centre=c,
+                            center=c,
+                            c=c,
+                        )
                         yield Locale(
                             loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
                         )
@@ -1201,7 +1227,14 @@ class DiamondLocations(VirtualLocations):
                 key + 1,
                 corner,
             )
-            self.cells[(entry[0], entry[1])] = Point(x, y)  # TODO centre of cell ???
+            c = Point(x, y)  # TODO centre of cell ??
+            self.cells[(entry[0], entry[1])] = ShapeGeometry(
+                centre=c,
+                center=c,
+                c=c,
+                height=self.interval_y,
+                width=self.interval_x,
+            )
             yield _locale
 
 

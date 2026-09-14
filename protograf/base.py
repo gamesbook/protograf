@@ -2678,7 +2678,7 @@ class BaseShape:
         self,
         xy: Point,
         units: float,
-        center: Point,
+        center: Point | None = None,
         rotation: float | None = None,
     ) -> Point:
         """Create a Point in user units already offset from page margins."""
