@@ -9,14 +9,13 @@ import math
 
 # third party
 
-# module
+# module c
 from protograf import globals
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     Point,
     HexGeometry,
     HexOrientation,
-    ShapeGeometry,
     VirtualHex,
     Locale,
 )
@@ -25,6 +24,8 @@ from protograf.utils.tools import _lower
 
 # locale
 from .hexagon import HexShape
+from .core import TriangleShape
+from .rectangle import RectangleShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -644,13 +645,13 @@ class RectangularLocations(VirtualLocations):
                 x + self.interval_x / 2.0,
                 y + self.interval_y / 2.0,
             )
-            self.cells[(col, row)] = ShapeGeometry(
-                centre=c,
-                center=c,
-                c=c,
-                height=self.interval_y,
+            # ---- store rectangle geometry per cell
+            _cell_rect = RectangleShape(
                 width=self.interval_x,
+                height=self.interval_y,
+                cxy=c,
             )
+            self.cells[(col, row)] = _cell_rect.geometry
             # offset(s)
             if self.side:
                 if row & 1:
@@ -981,12 +982,12 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         x = self.x + dx + val * self.interval_x
-                        c = Point(x, y)  # TODO is this centre of cell ???
-                        self.cells[(loc, key + 1)] = ShapeGeometry(
-                            centre=c,
-                            center=c,
-                            c=c,
+                        # ---- store triangle geometry per cell
+                        _cell_tri = TriangleShape(
+                            height=self.interval_y,
+                            cxy=Point(x, y),  # TODO is this centre of cell ???
                         )
+                        self.cells[((loc, key + 1))] = _cell_tri.geometry
                         yield Locale(
                             loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
                         )
@@ -999,9 +1000,12 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         x = self.x + dx + val * self.interval_x
-                        self.cells[(loc, key + 1)] = Point(
-                            x, y
-                        )  # TODO centre of cell ???
+                        # ---- store triangle geometry per cell
+                        _cell_tri = TriangleShape(
+                            height=self.interval_y,
+                            cxy=Point(x, y),  # TODO is this centre of cell ???
+                        )
+                        self.cells[((loc, key + 1))] = _cell_tri.geometry
                         yield Locale(
                             loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
                         )
@@ -1018,9 +1022,12 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         y = self.y + dy + val * self.interval_y
-                        self.cells[(loc, key + 1)] = Point(
-                            x, y
-                        )  # TODO centre of cell ???
+                        # ---- store triangle geometry per cell
+                        _cell_tri = TriangleShape(
+                            height=self.interval_y,
+                            cxy=Point(x, y),  # TODO is this centre of cell ???
+                        )
+                        self.cells[((loc, key + 1))] = _cell_tri.geometry
                         yield Locale(
                             key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
                         )
@@ -1033,9 +1040,12 @@ class TriangularLocations(VirtualLocations):
                     for val, loc in enumerate(entry):
                         count += 1
                         y = self.y + dy + val * self.interval_y
-                        self.cells[(loc, key + 1)] = Point(
-                            x, y
-                        )  # TODO centre of cell ???
+                        # ---- store triangle geometry per cell
+                        _cell_tri = TriangleShape(
+                            height=self.interval_y,
+                            cxy=Point(x, y),  # TODO is this centre of cell ???
+                        )
+                        self.cells[((loc, key + 1))] = _cell_tri.geometry
                         yield Locale(
                             key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
                         )
@@ -1227,14 +1237,12 @@ class DiamondLocations(VirtualLocations):
                 key + 1,
                 corner,
             )
-            c = Point(x, y)  # TODO centre of cell ??
-            self.cells[(entry[0], entry[1])] = ShapeGeometry(
-                centre=c,
-                center=c,
-                c=c,
+            # ---- store diamond geometry per cell
+            _cell_tri = TriangleShape(
                 height=self.interval_y,
-                width=self.interval_x,
+                cxy=Point(x, y),  # TODO is this centre of cell ???
             )
+            self.cells[(entry[0], entry[1])] = _cell_tri.geometry
             yield _locale
 
 

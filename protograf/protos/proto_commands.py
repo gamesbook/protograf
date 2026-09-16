@@ -264,13 +264,16 @@ def Create(**kwargs):
     globals.units = support.to_units(_units)
     # ---- margins
     the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE / globals.units)
+    _debug = tools.as_bool(
+        kwargs.get("margin_debug", kwargs.get("show_margins", False))
+    )
     globals.margins = PageMargins(
         margin=the_margin,
         left=kwargs.get("margin_left", the_margin),
         top=kwargs.get("margin_top", the_margin),
         bottom=kwargs.get("margin_bottom", the_margin),
         right=kwargs.get("margin_right", the_margin),
-        debug=kwargs.get("margin_debug", False),
+        debug=_debug,
         units=globals.units,
         units_type=_units,
     )

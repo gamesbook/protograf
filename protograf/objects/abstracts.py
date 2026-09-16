@@ -35,6 +35,8 @@ class AbstractGameObject(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        from protograf.protos import Layout, square
+
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         self.set_unit_properties()
@@ -150,20 +152,38 @@ class AbstractGameObject(BaseShape):
         # ---- setup pieces
         self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
-        # board_layout.cells should contain indexed cell geometry; calculate labels
         # TODO - calculate board labels
+        top_x = self.x if kwargs.get("x") else self.cell_size / 2.0
+        top_y = self.y if kwargs.get("y") else self.cell_size / 2.0
         match _lower(self.name):
             case "grid" | "chess" | "checkers" | "go":  # default
                 self.board_layout = RectangularLocations(
                     cols=self.rows,
                     rows=self.cols,
-                    x=self.x,
-                    y=self.y,
+                    x=top_x,
+                    y=top_y,
                     interval=self.cell_size,
                     start=board_start,
                     direction=board_direction,
                     pattern=board_pattern,
                 )
+                _shapes = []
+                for key, colr in enumerate(self.fills):
+                    _shapes.append(
+                        square(
+                            side=self.cell_size,
+                            stroke=self.strokes[key],
+                            fill=colr,
+                        )
+                    )
+                Layout(self.board_layout, shapes=_shapes, _draw_grid=False)
+                # ---- set default label ID attributes
+                for row in range(self.rows, 0, -1):
+                    for col in range(1, self.cols + 1):
+                        col_id = tools.sheet_column(col, lower=True)
+                        setattr(
+                            self, f"{col_id}{row}", self.board_layout.cells[(col, row)]
+                        )
             case _:
                 feedback(
                     "The AbstractGame 'name' property must be one of the following: "
@@ -596,11 +616,21 @@ class AbstractStateObject(BaseShape):
             case _:
                 feedback(
                     "The AbstractGame 'name' property must be one of the following: "
-                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
+                    f" Chess, Go, Checkers, or grid (not '{self.board.name}').",
                     True,
                     True,
                 )
-
+        # ---- link board cell geometry to a label ID
+        # board.board_layout.cells should contain indexed cell geometry, after drawing!
+        # print('abstracts 612 cells', self.board.board_layout.cells)
+        for row in range(self.board.rows, 0, -1):
+            for col in range(1, self.board.cols + 1):
+                col_id = tools.sheet_column(col, lower=True)
+                setattr(
+                    self.board,
+                    f"{col_id}{row}",
+                    self.board.board_layout.cells[(col, row)],
+                )
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
             pass
@@ -628,4 +658,12 @@ class AbstractStateObject(BaseShape):
         print("TODO: draw pieces")
 
         # ---- draw annotations
-        print("TODO: draw annotations")
+        for anno in self.annotations:
+            if not isinstance(anno, BaseShape):
+                feedback(
+                    "The AbstractGame 'annotations' property must be a list of shapes, "
+                    f" not a '{type(self.board.pieces).__name__}'.",
+                    True,
+                    True,
+                )
+            anno.draw()

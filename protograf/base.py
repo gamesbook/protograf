@@ -183,13 +183,10 @@ class BaseCanvas:
         # ---- positions
         self.x = self.defaults.get("x", self.defaults.get("left", 1.0))
         self.y = self.defaults.get("y", self.defaults.get("top", 1.0))
-        self.xy = self.defaults.get(
-            "xy", self.defaults.get("xy", Point(self.x, self.y))
-        )
+        self.xy = self.defaults.get("xy", Point(self.x, self.y))
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.cxy = self.defaults.get("cxy", None)
-        self.xy1 = self.defaults.get("xy1", None)
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -400,6 +397,7 @@ class BaseCanvas:
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0.0)
         self.y_1 = self.defaults.get("y1", 0.0)
+        self.xy1 = self.defaults.get("xy1", None)  # will be set by BaseShape
         # ---- line / hex
         self.links = self.defaults.get("links", None)
         self.links_style = self.defaults.get("links_style", None)

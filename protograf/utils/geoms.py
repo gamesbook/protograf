@@ -902,9 +902,7 @@ def circle_angles(radius: float, chord: float) -> tuple:
     """Calculate interior angles of isosceles triangle formed inside a circle.
 
     Args:
-        radius (float): radius of circle    breakpoint()
-    print('!!!', pt0, pt1, pt2, pt3)
-    return pt0, pt1, pt2, pt3
+        radius (float): radius of circle
         chord (float): length of line between two points on circle
 
     Source:

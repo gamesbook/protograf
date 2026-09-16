@@ -1870,6 +1870,9 @@ class LineShape(BaseShape):
     Line on a given canvas.
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Line in user units."""
