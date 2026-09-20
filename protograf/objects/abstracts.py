@@ -45,7 +45,8 @@ class AbstractGameObject(BaseShape):
         self.fills = kwargs.get("fills", ["white"])
         self.strokes = kwargs.get("strokes", ["black"])
         self.hairs = tools.as_bool(kwargs.get("hairs", False))
-        self.labels = tools.as_bool(kwargs.get("labels", False))
+        self.labels_start = kwargs.get("labels_start", None)
+        self.labels_type = kwargs.get("labels_type", None)
         self.grid_align = tools.as_bool(kwargs.get("grid_align", False))
         self.pieces = None
         user_pieces = kwargs.get("pieces", [])
@@ -63,92 +64,19 @@ class AbstractGameObject(BaseShape):
             self.height = (
                 globals.page.height - globals.margins.top - globals.margins.bottom
             )
-        _available = min(self.height, self.width)
-        # ---- conditional defaults
+        # ---- game-based defaults
         board_pattern = "default"
         board_start = "NW"
         board_direction = "east"
-        match _lower(self.name):
-            case "grid":  # default
-                self.pieces_type = "checkers"
-                if not self.fills:
-                    self.fills = ("white",)
-                if not self.strokes:
-                    self.strokes = ("black",)
-                if not self.cols:
-                    self.rows = 8
-                if not self.cols:
-                    self.cols = 8
-                _max_cells = max(self.rows, self.cols)
-                self.cell_size = _available / _max_cells
-            case "chess":
-                self.pieces_type = "chess"
-                if not self.fills:
-                    self.fills = ("black", "silver")
-                if not self.strokes:
-                    self.strokes = (None, None)
-                if not self.cols:
-                    self.rows = 8
-                if not self.cols:
-                    self.cols = 8
-                board_pattern = "snake"
-            case "checkers" | "draughts":
-                self.pieces_type = "checkers"
-                if not self.fills:
-                    self.fills = ("white",)
-                if not self.strokes:
-                    self.strokes = ("black",)
-                if not self.cols:
-                    self.rows = 8
-                if not self.cols:
-                    self.cols = 8
-            case "go":
-                self.pieces_type = "go"
-                self.grid_align = True
-                if not self.fills:
-                    self.fills = ("#D9A359",)
-                if not self.strokes:
-                    self.strokes = ("black",)
-                if not self.cols:
-                    self.rows = 18
-                if not self.cols:
-                    self.cols = 18
-            case "hex":
-                raise NotImplementedError("Sorry, a hex board is not available yet.")
-            case "hexhex":
-                raise NotImplementedError("Sorry, a hexhex board is not available yet.")
-            case "tri" | "triangle" | "triangular":
-                raise NotImplementedError(
-                    "Sorry, a triangular board is not available yet."
-                )
-            case None:
-                pass  # can ignore the name for this AB
-            case _:
-                feedback(
-                    "The AbstractGame 'name' property must be one of the following: "
-                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
-                    True,
-                    True,
-                )
-        # ---- check filld and colors
+        self.set_options_by_game()
+        # ---- check fills and colors
         if len(self.fills) != len(self.strokes):
             feedback(
                 "The AbstractGame 'fills' and 'strokes' properties must be of equal length",
                 True,
                 True,
             )
-        # ---- calculate cell_size
-        match _lower(self.name):
-            case "grid" | "chess" | "checkers" | "go":  # default
-                _max_cells = max(self.rows, self.cols)
-                self.cell_size = _available / _max_cells
-            case _:
-                feedback(
-                    "The AbstractGame 'name' property must be one of the following: "
-                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
-                    True,
-                    True,
-                )
+
         # ---- setup pieces
         self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
@@ -185,15 +113,88 @@ class AbstractGameObject(BaseShape):
                             self, f"{col_id}{row}", self.board_layout.cells[(col, row)]
                         )
             case _:
-                feedback(
-                    "The AbstractGame 'name' property must be one of the following: "
-                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
-                    True,
-                    True,
+                self.game_name_error()
+
+    def game_name_error(self):
+        """Generate feedback if incorrect game name used."""
+        feedback(
+            "The AbstractGame 'name' property must be one of the following: "
+            f" Chess, Go, Checkers, or grid (not '{self.name}').",
+            True,
+            True,
+        )
+
+    def set_options_by_game(self):
+        """Set properties according to preset, known, game."""
+        _available = min(self.height, self.width)
+        # ---- calculate cell_size
+        match _lower(self.name):
+            case "grid" | "chess" | "checkers" | "go":  # default
+                _max_cells = max(self.rows, self.cols)
+                self.cell_size = _available / _max_cells
+            case _:
+                self.game_name_error()
+        match _lower(self.name):
+            case "grid":  # default
+                self.pieces_type = "checkers"
+                if not self.fills:
+                    self.fills = ("white",)
+                if not self.strokes:
+                    self.strokes = ("black",)
+                if not self.cols:
+                    self.rows = 8
+                if not self.cols:
+                    self.cols = 8
+                _max_cells = max(self.rows, self.cols)
+                self.cell_size = _available / _max_cells
+            case "chess":
+                self.pieces_type = "chess"
+                if not self.fills:
+                    self.fills = ("black", "silver")
+                if not self.strokes:
+                    self.strokes = (None, None)
+                if not self.cols:
+                    self.rows = 8
+                if not self.cols:
+                    self.cols = 8
+                self.board_pattern = "snake"
+            case "checkers" | "draughts":
+                self.pieces_type = "checkers"
+                if not self.fills:
+                    self.fills = ("white",)
+                if not self.strokes:
+                    self.strokes = ("black",)
+                if not self.cols:
+                    self.rows = 8
+                if not self.cols:
+                    self.cols = 8
+            case "go":
+                self.pieces_type = "go"
+                self.grid_align = True
+                if not self.fills:
+                    self.fills = ("#D9A359",)
+                if not self.strokes:
+                    self.strokes = ("black",)
+                if not self.cols:
+                    self.rows = 18
+                if not self.cols:
+                    self.cols = 18
+            case "hex":
+                raise NotImplementedError("Sorry, a hex board is not available yet.")
+            case "hexhex":
+                raise NotImplementedError("Sorry, a hexhex board is not available yet.")
+            case "tri" | "triangle" | "triangular":
+                raise NotImplementedError(
+                    "Sorry, a triangular board is not available yet."
                 )
+            case None:
+                pass  # can ignore the name for this AB
+            case _:
+                self.game_name_error()
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
+        # TODO - validate self.labels_start and self.labels_type
         if self.pieces is not None:
             if not isinstance(self.pieces, (list, tuple)):
                 feedback(

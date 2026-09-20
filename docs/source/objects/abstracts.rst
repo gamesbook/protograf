@@ -115,11 +115,11 @@ The properties that can be set for an AbstractGame are:
 * *labels_type*: the type of labels, drawn labels along board edges, which are
   used to identify rows and columns; this can be  either *alpha-numeric*,
   or *AN*, (the default) which is the labelling used for Chess boards;
-  or *numeric*, or *N*, which is the labelling used for Shogi boards.
+  or *numeric*, or *N*, which is the labelling used for Shogi boards
 * *labels_start*: the corner of the board at which the labelling starts; this
   can be one of *lower-left* (*LL*), *lower-right* (*LR*), *upper-left* (*UL*),
   *upper-right* (*UR*); Chess boards use *lower-left*, the default, while
-  Shogi boards use *upper-right*.
+  Shogi boards use *upper-right*
 * *cols*: if no game *name* is set |dash| each associated with a predefined
   number of columns |dash| then this is the number of cells in the horizontal
   direction for a regular grid; a default of  ``8`` is used
