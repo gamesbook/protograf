@@ -44,6 +44,7 @@ class Hexagons(ProtografGrid):
         self.hidden = None
         if kwargs.get("hidden"):
             self.hidden = tools.integer_pairs(kwargs.get("hidden"), "hidden")
+        self._draw_grid = kwargs.get("_draw_grid", False)
         self.hex_layout = kwargs.get("hex_layout", "")  # default to rectangular
         self.locales = []  # will be created by specific draw_* method
         self.draw_layout()
@@ -76,7 +77,7 @@ class Hexagons(ProtografGrid):
         self, rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True
     ):
         """Draw rows of hexagons for each column in `the_cols`"""
-        from protograf.protos import hexagon, Hexagon
+        from protograf.protos import hexagon
 
         locales = []
         sequence = 0
@@ -95,14 +96,16 @@ class Hexagons(ProtografGrid):
                 if self.hidden and (_row, ccol) in self.hidden:
                     pass
                 else:
+                    col = ccol - 1
                     hxgn = hexagon(
                         row=row,
-                        col=ccol - 1,
+                        col=col,
                         hex_rows=rows,
                         hex_cols=cols,
                         **self.kwargs,
                     )
-                    hxgn.draw()
+                    if self._draw_grid:
+                        hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
                     _locale = Locale(
                         col=ccol - 1,
@@ -117,6 +120,7 @@ class Hexagons(ProtografGrid):
                         page=globals.page_count + 1,
                     )
                     # print(f'$$$ locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
+                    self.cells[(col, row)] = hxgn.geometry
                     locales.append(_locale)
                     sequence += 1
 
@@ -167,7 +171,7 @@ class Hexagons(ProtografGrid):
 
     def draw_layout_rectangle(self):
         """Layout of hexagons in a rectangle."""
-        from protograf.protos import hexagon, Hexagon
+        from protograf.protos import hexagon
 
         sequence = 0
         for row in range(self.rows):
@@ -175,29 +179,40 @@ class Hexagons(ProtografGrid):
                 if self.hidden and (row + 1, col + 1) in self.hidden:
                     pass
                 else:
-                    hxgn = Hexagon(
+                    hxgn = hexagon(
                         row=row,
                         col=col,
                         hex_rows=self.rows,
                         hex_cols=self.cols,
                         **self.kwargs,
                     )
+                    if self._draw_grid:
+                        hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
+                    if hxgn.grid:
+                        _x = hxgn.grid.x
+                        _y = hxgn.grid.y
+                        _label = hxgn.grid.label
+                    else:
+                        _x = shape_geo.center.x
+                        _y = shape_geo.center.y
+                        _label = ""
                     _locale = Locale(
                         col=col,
                         row=row,
-                        x=hxgn.grid.x,
-                        y=hxgn.grid.y,
-                        cxy=Point(hxgn.grid.x, hxgn.grid.y),
+                        x=_x,
+                        y=_y,
+                        cxy=Point(_x, _y),
                         geo=shape_geo,
                         id=f"{col}:{row}",
                         sequence=sequence,
-                        label=hxgn.grid.label,
+                        label=_label,
                         page=globals.page_count + 1,
                     )
                     # print(
-                    #     f"$$$ Locale {id=} {col=} {row=} {hxgn.grid.x=} {hxgn.grid.y=}"
+                    #     f"$$$ Locale {id=} {col=} {row=} {hxgn.grid=}"
                     # )
+                    self.cells[(col + 1, row + 1)] = hxgn.geometry  # 1-based for cells
                     self.locales.append(_locale)
                     sequence += 1
 

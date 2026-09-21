@@ -35,12 +35,11 @@ class AbstractGameObject(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        from protograf.protos import Layout, square
 
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         self.set_unit_properties()
-        # ---- custom properties
+        # ---- user properties
         self.name = kwargs.get("name", "grid")
         self.fills = kwargs.get("fills", ["white"])
         self.strokes = kwargs.get("strokes", ["black"])
@@ -52,7 +51,7 @@ class AbstractGameObject(BaseShape):
         user_pieces = kwargs.get("pieces", [])
         self.pieces_resize = kwargs.get("pieces_resize", 0.8)
         self._validate_choices()
-        # ---- defaults
+        # ---- custom properties
         self.pieces_type = None
         self.cell_size = 1  # typically a "square" area
         # ---- calculated properties
@@ -64,10 +63,6 @@ class AbstractGameObject(BaseShape):
             self.height = (
                 globals.page.height - globals.margins.top - globals.margins.bottom
             )
-        # ---- game-based defaults
-        board_pattern = "default"
-        board_start = "NW"
-        board_direction = "east"
         self.set_options_by_game()
         # ---- check fills and colors
         if len(self.fills) != len(self.strokes):
@@ -80,46 +75,13 @@ class AbstractGameObject(BaseShape):
         # ---- setup pieces
         self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
-        # TODO - calculate board labels
-        top_x = self.x if kwargs.get("x") else self.cell_size / 2.0
-        top_y = self.y if kwargs.get("y") else self.cell_size / 2.0
-        match _lower(self.name):
-            case "grid" | "chess" | "checkers" | "go":  # default
-                self.board_layout = RectangularLocations(
-                    cols=self.rows,
-                    rows=self.cols,
-                    x=top_x,
-                    y=top_y,
-                    interval=self.cell_size,
-                    start=board_start,
-                    direction=board_direction,
-                    pattern=board_pattern,
-                )
-                _shapes = []
-                for key, colr in enumerate(self.fills):
-                    _shapes.append(
-                        square(
-                            side=self.cell_size,
-                            stroke=self.strokes[key],
-                            fill=colr,
-                        )
-                    )
-                Layout(self.board_layout, shapes=_shapes, _draw_grid=False)
-                # ---- set default label ID attributes
-                for row in range(self.rows, 0, -1):
-                    for col in range(1, self.cols + 1):
-                        col_id = tools.sheet_column(col, lower=True)
-                        setattr(
-                            self, f"{col_id}{row}", self.board_layout.cells[(col, row)]
-                        )
-            case _:
-                self.game_name_error()
+        self.setup_board()
 
     def game_name_error(self):
         """Generate feedback if incorrect game name used."""
         feedback(
             "The AbstractGame 'name' property must be one of the following: "
-            f" Chess, Go, Checkers, or grid (not '{self.name}').",
+            f" Chess, Go, Checkers, Shogi, or grid (not '{self.name}').",
             True,
             True,
         )
@@ -127,13 +89,6 @@ class AbstractGameObject(BaseShape):
     def set_options_by_game(self):
         """Set properties according to preset, known, game."""
         _available = min(self.height, self.width)
-        # ---- calculate cell_size
-        match _lower(self.name):
-            case "grid" | "chess" | "checkers" | "go":  # default
-                _max_cells = max(self.rows, self.cols)
-                self.cell_size = _available / _max_cells
-            case _:
-                self.game_name_error()
         match _lower(self.name):
             case "grid":  # default
                 self.pieces_type = "checkers"
@@ -179,6 +134,31 @@ class AbstractGameObject(BaseShape):
                     self.rows = 18
                 if not self.cols:
                     self.cols = 18
+            case "shogi":
+                self.pieces_type = "shogi"
+                if not self.fills:
+                    self.fills = ("white",)
+                if not self.strokes:
+                    self.strokes = ("black",)
+                if not self.cols:
+                    self.rows = 9
+                if not self.cols:
+                    self.cols = 9
+            case "hexagons":
+                if not self.cols:
+                    feedback(
+                        'Missing number of cols for AbstractBoard of type "hexagons"',
+                        True,
+                        True,
+                    )
+                if not self.rows:
+                    feedback(
+                        'Missing number of rows for AbstractBoard of type "hexagons"',
+                        True,
+                        True,
+                    )
+                _max_cells = max(self.rows, self.cols)
+                self.cell_size = _available / _max_cells
             case "hex":
                 raise NotImplementedError("Sorry, a hex board is not available yet.")
             case "hexhex":
@@ -191,6 +171,13 @@ class AbstractGameObject(BaseShape):
                 pass  # can ignore the name for this AB
             case _:
                 self.game_name_error()
+        # ---- calculate cell_size for gridded boards
+        match _lower(self.name):
+            case "grid" | "chess" | "checkers" | "go" | "shogi":
+                _max_cells = max(self.rows, self.cols)
+                self.cell_size = _available / _max_cells
+            case _:
+                pass
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
@@ -280,6 +267,69 @@ class AbstractGameObject(BaseShape):
             case _:
                 raise NotImplementedError(f"Piece type {piece_name} is not pre-defined")
 
+    def setup_board(self):
+        """Create board_layout for the required grid"""
+        from protograf.protos import Layout, square, Hexagons
+
+        # ---- game-based defaults
+        board_pattern = "default"
+        board_start = "NW"
+        board_direction = "east"
+        # TODO - calculate board labels
+        top_x = self.x if self.kwargs.get("x") else self.cell_size / 2.0
+        top_y = self.y if self.kwargs.get("y") else self.cell_size / 2.0
+        match _lower(self.name):
+            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default
+                self.board_layout = RectangularLocations(
+                    cols=self.rows,
+                    rows=self.cols,
+                    x=top_x,
+                    y=top_y,
+                    interval=self.cell_size,
+                    start=board_start,
+                    direction=board_direction,
+                    pattern=board_pattern,
+                )
+                _shapes = []
+                for key, colr in enumerate(self.fills):
+                    _shapes.append(
+                        square(
+                            side=self.cell_size,
+                            stroke=self.strokes[key],
+                            fill=colr,
+                        )
+                    )
+                Layout(self.board_layout, shapes=_shapes, _draw_grid=False)
+                # ---- set default label ID attributes
+                for row in range(self.rows, 0, -1):
+                    for col in range(1, self.cols + 1):
+                        col_id = tools.sheet_column(col, lower=True)
+                        setattr(
+                            self, f"{col_id}{row}", self.board_layout.cells[(col, row)]
+                        )
+            case "hex":
+                self.game_name_error()
+            case "hexhex":
+                self.game_name_error()
+            case "hexagons":
+                self.board_layout = Hexagons(
+                    cols=self.rows,
+                    rows=self.cols,
+                    x=top_x,
+                    y=top_y,
+                    orientation="pointy",
+                    _draw_grid=False,
+                )
+                # ---- set default label ID attributes
+                for row in range(self.rows, 0, -1):
+                    for col in range(1, self.cols + 1):
+                        col_id = tools.sheet_column(col, lower=True)
+                        setattr(
+                            self, f"{col_id}{row}", self.board_layout.cells[(col, row)]
+                        )
+            case _:
+                self.game_name_error()
+
     def setup_pieces(self, pieces_type: str = None, pieces_list: list = None) -> dict:
         """Return pieces mapped as character:shape(s)."""
         if pieces_type is None and not pieces_list:
@@ -292,14 +342,57 @@ class AbstractGameObject(BaseShape):
                     "W": self.character_map("cW"),
                 }
             case "chess":
-                pg_pieces = {  # TODO - load images from resources
+                pg_pieces = {  # TODO - load ALL images from resources
                     "B": self.character_map("B"),
                     "b": self.character_map("b"),
+                    "K": self.character_map("K"),
+                    "k": self.character_map("k"),
+                    "N": self.character_map("N"),
+                    "n": self.character_map("n"),
+                    "P": self.character_map("P"),
+                    "p": self.character_map("p"),
+                    "Q": self.character_map("Q"),
+                    "q": self.character_map("q"),
+                    "R": self.character_map("R"),
+                    "r": self.character_map("r"),
                 }
             case "go":
                 pg_pieces = {  # TODO - load images from resources
                     "B": self.character_map("gB"),
                     "W": self.character_map("gW"),
+                }
+            case "shogi":
+                pg_pieces = {  # TODO - load images from resources
+                    "A": self.character_map("sA"),
+                    "a": self.character_map("sa"),
+                    "B": self.character_map("sB"),
+                    "b": self.character_map("sb"),
+                    "D": self.character_map("sD"),
+                    "d": self.character_map("sd"),
+                    "G": self.character_map("sG"),
+                    "g": self.character_map("sg"),
+                    "H": self.character_map("sH"),
+                    "h": self.character_map("sh"),
+                    "J": self.character_map("sJ"),
+                    "j": self.character_map("sj"),
+                    "K": self.character_map("sK"),
+                    "k": self.character_map("sk"),
+                    "l": self.character_map("sl"),
+                    "L": self.character_map("sL"),
+                    "N": self.character_map("sN"),
+                    "n": self.character_map("sn"),
+                    "P": self.character_map("sP"),
+                    "p": self.character_map("sp"),
+                    "R": self.character_map("sR"),
+                    "r": self.character_map("sr"),
+                    "S": self.character_map("sS"),
+                    "s": self.character_map("ss"),
+                    "T": self.character_map("sT"),
+                    "t": self.character_map("st"),
+                    "V": self.character_map("sV"),
+                    "v": self.character_map("sv"),
+                    "W": self.character_map("sW"),
+                    "w": self.character_map("sw"),
                 }
             case None:
                 pass  # no defauls
@@ -406,6 +499,14 @@ class AbstractGameObject(BaseShape):
                                     pg_pieces[piece_id] = self.character_map("gB")
                                 case "white":
                                     pg_pieces[piece_id] = self.character_map("bW")
+                        case _:
+                            feedback(
+                                "The AbstractGame named for piece must be"
+                                " from one of the following games: "
+                                f" Chess, Go, or Checkers (not '{self.name}').",
+                                True,
+                                True,
+                            )
 
             else:
                 # user-defined piece; could be single shape or list of shapes
@@ -596,7 +697,7 @@ class AbstractStateObject(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
-        from protograf.protos import Layout, square
+        from protograf.protos import Layout, square, Hexagons
 
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
@@ -604,7 +705,7 @@ class AbstractStateObject(BaseShape):
         # ---- draw board
         _shapes = []
         match _lower(self.board.name):
-            case "grid" | "chess" | "checkers" | "go":  # default is grid
+            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default is grid
                 for key, colr in enumerate(self.board.fills):
                     _shapes.append(
                         square(
@@ -614,10 +715,12 @@ class AbstractStateObject(BaseShape):
                         )
                     )
                 Layout(self.board.board_layout, shapes=_shapes)
+            case "hexagons":
+                self.board.board_layout._draw_grid = True
+                self.board.board_layout.draw_layout()
             case _:
                 feedback(
-                    "The AbstractGame 'name' property must be one of the following: "
-                    f" Chess, Go, Checkers, or grid (not '{self.board.name}').",
+                    f"The AbstractState 'board' property '{self.board.name}' cannot be drawn.",
                     True,
                     True,
                 )

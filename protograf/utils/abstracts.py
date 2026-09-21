@@ -21,6 +21,7 @@ class ProtografGrid(ABC):
         self.cols = cols
         self.kwargs = kwargs
         self.locales = []  # should be list of Locale namedtuples
+        self.cells = {}  # store ShapeGeometry keyed on location
 
     @abstractmethod
     def cell(self):

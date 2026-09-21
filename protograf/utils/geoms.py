@@ -14,7 +14,7 @@ from typing import Any, List
 # local
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import Point
-from protograf.utils.support import numbers, round_tiny_float
+from protograf.utils.support import numbers, round_tiny_float, excel_column
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -1128,7 +1128,70 @@ def circle_to_chord(radius: float, chord: float) -> float:
     >>> circle_to_chord(15.0, 24.0)
     6.0
     """
-    return radius - math.sqrt(radius**2 - (chord / 2) ** 2)
+    return radius - math.sqrt(radius**2 - (chord / 2.0) ** 2)
+
+
+def hexgrid_diagonal_coords(
+    col: int,
+    row: int,
+    direction: str = "se",
+    offset_type: str = "even-row",
+    col_lower: str = True,
+    col_upper: str = False,
+):
+    """
+    Translates standard (col, row) hexgrid identifiers into row-diagonal identifiers.
+
+    Parameters:
+    - row (int): The current row index.
+    - col (int): The current column index.
+    - direction (str): 'se' for South-East (//) or 'sw' for South-West (\\).
+    - offset_type (str):
+        'even-row' if even rows shifted right, 'odd-row' if odd rows shifted right.
+    - col_lower (bool): If True, convert column ID to lowercase Alpha
+    - col_upper (bool): If True, convert column ID to uppercase Alpha
+
+    Returns:
+    - (diag_col, diag_row): The transformed coordinate pair.
+
+    Doc Test:  # >>> print(rc)
+    >>> rc = hexgrid_diagonal_coords(row=2, col=3, direction="se")
+    >>> assert rc == ('b', 2)
+    >>> rc = hexgrid_diagonal_coords(row=2, col=3, direction="sw")
+    >>> assert rc == ('d', 2)
+    """
+    # 1. Normalize offset grid to a standardized axial coordinate base (r, q)
+    # This strips away the zig-zagging column index logic.
+    r = row
+    if offset_type == "even-row":
+        q = col - (row // 2)
+    elif offset_type == "odd-row":
+        q = col - ((row + 1) // 2)
+    else:
+        raise ValueError("Invalid hexgrid offset_type. Choose 'even-row' or 'odd-row'.")
+
+    # 2. Translate normalized coordinates to the chosen diagonal column slice direction
+    diag_row = r
+
+    if direction == "se": # Columns run cleanly along the south-east axis (q constant)
+        diag_col = q
+    elif direction == "sw":
+        # Columns run cleanly along the south-west axis (third cube axis s constant: q + r + s = 0)
+        # We define the column tracker tracking the opposite diagonal direction
+        diag_col = q + r
+    else:
+        raise ValueError("Invalid hexgrid direction. Choose 'se' or 'sw'.")
+
+    if col_lower and col_upper:
+        raise ValueError(
+            "Unable to set both col_lower and col_upper as True for hexgrid."
+        )
+    if col_upper:
+        diag_col = excel_column(diag_col, "hexgrid_col")
+    if col_lower:
+        diag_col = excel_column(diag_col, "hexgrid_col").lower()
+
+    return diag_col, diag_row
 
 
 def equilateral_height(side: Any) -> float:

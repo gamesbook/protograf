@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Create grids, repeats, sequences, and layouts for protograf
+
+NOTE:
+    * for rectangular hexagons in a grid, use proto_hexagons.Hexagons
 """
 
 # lib
