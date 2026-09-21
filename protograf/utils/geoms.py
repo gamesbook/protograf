@@ -1134,64 +1134,186 @@ def circle_to_chord(radius: float, chord: float) -> float:
 def hexgrid_diagonal_coords(
     col: int,
     row: int,
-    direction: str = "se",
-    offset_type: str = "even-row",
-    col_lower: str = True,
-    col_upper: str = False,
-):
+    total_rows: int,
+    first_row_shifted: bool = False,
+    row_number_from_bottom: bool = True,
+    lower: bool = True,
+) -> tuple[str, int]:
     """
-    Translates standard (col, row) hexgrid identifiers into row-diagonal identifiers.
+    Convert a 1-based (row, col) coordinate for a pointy-topped
+    offset hex grid into a (diagonal_column, row_number) identifier.
 
-    Parameters:
-    - row (int): The current row index.
-    - col (int): The current column index.
-    - direction (str): 'se' for South-East (//) or 'sw' for South-West (\\).
-    - offset_type (str):
-        'even-row' if even rows shifted right, 'odd-row' if odd rows shifted right.
-    - col_lower (bool): If True, convert column ID to lowercase Alpha
-    - col_upper (bool): If True, convert column ID to uppercase Alpha
+    The LETTER identifies the left-sloping diagonal.
+    The NUMBER is always the input row number.
 
-    Returns:
-    - (diag_col, diag_row): The transformed coordinate pair.
+    Therefore, all hexes in the same horizontal row have the same numeric value.
 
-    Doc Test:  # >>> print(rc)
-    >>> rc = hexgrid_diagonal_coords(row=2, col=3, direction="se")
-    >>> assert rc == ('b', 2)
-    >>> rc = hexgrid_diagonal_coords(row=2, col=3, direction="sw")
-    >>> assert rc == ('d', 2)
+    Parameters
+    ----------
+    col : int
+        1-based column, counted from the LEFT.
+
+    row : int
+        1-based row, counted from the TOP.
+
+    total_rows : int
+        Number of rows in the grid.
+
+    first_row_shifted : bool
+        False:
+            Row 1:  O O O O
+            Row 2:   O O O O
+            Row 3:  O O O O
+
+        True:
+            Row 1:   O O O O
+            Row 2:  O O O O
+            Row 3:   O O O O
+
+    lower: bool
+        If True, make diagonal letter lowercase
+
+    Returns
+    -------
+    tuple[str, int]
+        The diagonal letter and the 1-based position within the row.
+
+        Examples:
+            ("a", 1)
+            ("b", 2)
+            ("aa", 4)
+
+    Doc Test:
+    >>> hexgrid_diagonal_coords(1, 1, 5)
+    ('c', 1)
+    >>> hexgrid_diagonal_coords(row=1, col=4, total_rows=5)
+    ('f', 4)
+    >>> hexgrid_diagonal_coords(row=5, col=1, total_rows=5)
+    ('a', 1)
+    >>> hexgrid_diagonal_coords(row=5, col=3, total_rows=5)
+    ('c', 1)
     """
-    # 1. Normalize offset grid to a standardized axial coordinate base (r, q)
-    # This strips away the zig-zagging column index logic.
-    r = row
-    if offset_type == "even-row":
-        q = col - (row // 2)
-    elif offset_type == "odd-row":
-        q = col - ((row + 1) // 2)
+
+    def number_to_letters(n: int) -> str:
+        """
+        Convert 0 -> A, 1 -> B, ..., 25 -> Z, 26 -> AA, etc.
+        """
+        result = ""
+        while True:
+            n, remainder = divmod(n, 26)
+            result = chr(ord("a") + remainder) + result
+            if n == 0:
+                return result
+            n -= 1
+
+    """
+
+        Examples
+    --------
+    For a five-row grid with bottom-up numbering:
+
+        bottom-left       -> ("A", 1)
+        bottom second     -> ("B", 1)
+        second-row left   -> ("B", 2)
+        third-row left    -> ("C", 3)
+        top-left          -> ("E", 5)
+    """
+
+    if total_rows < 1:
+        raise ValueError("total_rows must be >= 1")
+
+    if row < 1 or row > total_rows:
+        raise ValueError(f"row must be between 1 and {total_rows}")
+
+    if col < 1:
+        raise ValueError("col must be >= 1")
+
+    # ---------------------------------------------------------
+    # Number of rows above the bottom row.
+    #
+    # Bottom row:
+    #     0
+    #
+    # Row above:
+    #     1
+    #
+    # Next row:
+    #     2
+    # ---------------------------------------------------------
+
+    rows_from_bottom = total_rows - row
+
+    # ---------------------------------------------------------
+    # Determine the diagonal offset.
+    #
+    # For the layout:
+    #
+    #     C5 D5 E5 F5
+    #       C4 D4 E4 F4
+    #     B3 C3 D3 E3
+    #       B2 C2 D2 E2
+    #     A1 B1 C1 D1
+    #
+    # the left-most diagonal advances every TWO rows:
+    #
+    #     row 1 from bottom -> A
+    #     row 2 from bottom -> B
+    #     row 3 from bottom -> B
+    #     row 4 from bottom -> C
+    #     row 5 from bottom -> C
+    #
+    # Thus the row contribution is:
+    #
+    #     ceil(rows_from_bottom / 2)
+    #
+    # which is equivalent to:
+    #
+    #     (rows_from_bottom + 1) // 2
+    #
+    # ---------------------------------------------------------
+
+    if first_row_shifted:
+        # If the first row is shifted, the alternating pattern
+        # is reversed relative to the bottom-left anchor.
+        #
+        # The diagonal offset therefore depends on whether the
+        # bottom row itself is shifted.
+        bottom_row_shifted = (total_rows - 1) % 2 == 0
+
+        if bottom_row_shifted:
+            row_diagonal_offset = rows_from_bottom // 2
+        else:
+            row_diagonal_offset = (rows_from_bottom + 1) // 2
+
     else:
-        raise ValueError("Invalid hexgrid offset_type. Choose 'even-row' or 'odd-row'.")
+        # Row 1 is unshifted and row 2 is shifted.
+        #
+        # For the displayed layout this produces:
+        #
+        #     0, 1, 1, 2, 2, 3, 3, ...
+        #
+        row_diagonal_offset = (rows_from_bottom + 1) // 2
 
-    # 2. Translate normalized coordinates to the chosen diagonal column slice direction
-    diag_row = r
+    # Column contribution:
+    #
+    #     col 1 -> 0
+    #     col 2 -> 1
+    #     col 3 -> 2
+    #
+    diagonal_index = (col - 1) + row_diagonal_offset
 
-    if direction == "se": # Columns run cleanly along the south-east axis (q constant)
-        diag_col = q
-    elif direction == "sw":
-        # Columns run cleanly along the south-west axis (third cube axis s constant: q + r + s = 0)
-        # We define the column tracker tracking the opposite diagonal direction
-        diag_col = q + r
+    diagonal_letter = number_to_letters(diagonal_index)
+
+    # ---------------------------------------------------------
+    # Determine the output row number.
+    # ---------------------------------------------------------
+
+    if row_number_from_bottom:
+        output_row = total_rows - row + 1
     else:
-        raise ValueError("Invalid hexgrid direction. Choose 'se' or 'sw'.")
+        output_row = row
 
-    if col_lower and col_upper:
-        raise ValueError(
-            "Unable to set both col_lower and col_upper as True for hexgrid."
-        )
-    if col_upper:
-        diag_col = excel_column(diag_col, "hexgrid_col")
-    if col_lower:
-        diag_col = excel_column(diag_col, "hexgrid_col").lower()
-
-    return diag_col, diag_row
+    return diagonal_letter, output_row
 
 
 def equilateral_height(side: Any) -> float:

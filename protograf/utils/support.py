@@ -453,7 +453,7 @@ def excel_column(value: int = 1, name: str = None) -> str:
     def converter(num):
         return (
             ""
-            if num == 0
+            if num <= 0
             else converter((num - 1) // 26) + string.ascii_uppercase[(num - 1) % 26]
         )
 

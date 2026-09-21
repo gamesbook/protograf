@@ -18,7 +18,7 @@ from protograf.shapes import (
     # RectangleShape,
     RectangularLocations,
 )
-from protograf.utils import tools, colrs
+from protograf.utils import tools, colrs, geoms
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (  # named tuples
     Point,
@@ -281,8 +281,8 @@ class AbstractGameObject(BaseShape):
         match _lower(self.name):
             case "grid" | "chess" | "checkers" | "go" | "shogi":  # default
                 self.board_layout = RectangularLocations(
-                    cols=self.rows,
-                    rows=self.cols,
+                    cols=self.cols,
+                    rows=self.rows,
                     x=top_x,
                     y=top_y,
                     interval=self.cell_size,
@@ -313,20 +313,29 @@ class AbstractGameObject(BaseShape):
                 self.game_name_error()
             case "hexagons":
                 self.board_layout = Hexagons(
-                    cols=self.rows,
-                    rows=self.cols,
+                    cols=self.cols,
+                    rows=self.rows,
                     x=top_x,
                     y=top_y,
                     orientation="pointy",
                     _draw_grid=False,
                 )
                 # ---- set default label ID attributes
-                for row in range(self.rows, 0, -1):
+                for row in range(1, self.rows + 1):
                     for col in range(1, self.cols + 1):
-                        col_id = tools.sheet_column(col, lower=True)
-                        setattr(
-                            self, f"{col_id}{row}", self.board_layout.cells[(col, row)]
+                        # assuming start at bottom row as 1
+                        col_row = geoms.hexgrid_diagonal_coords(
+                            col=col, row=row, total_rows=self.rows
                         )
+                        print(f"{col=} {row=}", col_row)
+                        try:
+                            setattr(
+                                self,
+                                f"{col_row[0]}{col_row[1]}",
+                                self.board_layout.cells[(col, row)],
+                            )
+                        except:
+                            print(col, row)
             case _:
                 self.game_name_error()
 
@@ -697,7 +706,7 @@ class AbstractStateObject(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
-        from protograf.protos import Layout, square, Hexagons
+        from protograf.protos import Layout, square
 
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
@@ -726,7 +735,7 @@ class AbstractStateObject(BaseShape):
                 )
         # ---- link board cell geometry to a label ID
         # board.board_layout.cells should contain indexed cell geometry, after drawing!
-        # print('abstracts 612 cells', self.board.board_layout.cells)
+        # print('abstracts 734 cells', self.board.board_layout.cells)
         for row in range(self.board.rows, 0, -1):
             for col in range(1, self.board.cols + 1):
                 col_id = tools.sheet_column(col, lower=True)
