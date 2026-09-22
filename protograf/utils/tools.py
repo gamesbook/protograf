@@ -1735,15 +1735,16 @@ def points(item, units: str | None = None, skip_none: bool = False, label: str =
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
         return None
-    _units = to_units(units) if units is not None else globals.unit
+    _units = to_units(units) if units is not None else globals.units
     try:
         _item = as_float(item, label)
+        # print("tools.py~points() - units %s :: item: %s", _units, _item)
         if _item is not None and _units is not None:
             return _item / _units
     except (TypeError, ValueError):
         _label = f" {label}" if label else ""
         feedback(
-            f"Unable to set points value for{_label}: {item}."
+            f"Unable to set unit-based value from points for{_label}: {item}."
             " Please check that this is a valid value.",
             stop=True,
         )

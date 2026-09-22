@@ -300,7 +300,7 @@ class HexHexLocations(VirtualShape):
             height=self.height,
             cxy=Point(self.cx, self.cy),
         )
-        self.cells[(hex0.ring, hex0.counter)] = _cell_hex.geometry
+        self.cells[(hex0.ring, hex0.counter)] = _cell_hex.geometry  # user units
         # ---- iterate over all ring hexes
         chex = Point(cxu, cyu)
         hex_zero = Point(cxu, cyu)
@@ -345,12 +345,13 @@ class HexHexLocations(VirtualShape):
                 orientation=self.ORIENTATION,
             )
             self.hexes.append(_hex)
-            # ---- store hex geometry per cell
+            # ---- store hex geometry - in user units - per cell
+            user_cxy = Point(tools.points(chex.x), tools.points(chex.y))
             _cell_hex = HexShape(
                 radius=self.radius,
                 diameter=self.diameter,
                 height=self.height,
-                cxy=chex,
+                cxy=user_cxy,
             )
             self.cells[(_hex.ring, _hex.counter)] = _cell_hex.geometry
             # ---- next hex

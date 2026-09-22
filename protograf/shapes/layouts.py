@@ -230,17 +230,27 @@ class HexHexShape(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.show_sequence = kwargs.get("show_sequence", False)
         self.show_counter = kwargs.get("show_counter", False)
-        # ---- create virtual grid
-        self.hexhex_locations = HexHexLocations(
-            cx=self.cx or self.x,  # no default value for cx
-            cy=self.cy or self.y,  # no default value for cy
-            radius=self.radius,
-            diameter=self.diameter,
-            height=self.height,
-            side=self.side,
-            rings=self.rings,
-            orientation=self.orientation,
-        )
+        # ---- access or setup virtual grid
+        self.hexhex_locations = kwargs.get("hexhex_locations", None)
+        if not self.hexhex_locations:
+            self.hexhex_locations = HexHexLocations(
+                cx=self.cx or self.x,  # no default value for cx
+                cy=self.cy or self.y,  # no default value for cy
+                radius=self.radius,
+                diameter=self.diameter,
+                height=self.height,
+                side=self.side,
+                rings=self.rings,
+                orientation=self.orientation,
+            )
+        else:
+            if not isinstance(self.hexhex_locations, HexHexLocations):
+                feedback(
+                    "HexHex 'hexhex_locations' property must be HexHexLocations,"
+                    f" not '{type(self.hexhex_locations)}'",
+                    True,
+                    True,
+                )
 
     def calculate_xy(self) -> tuple:
         """Calculate centre of grid."""

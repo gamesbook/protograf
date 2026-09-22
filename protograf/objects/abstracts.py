@@ -17,6 +17,8 @@ from protograf.shapes import (
     # PolygonShape,
     # RectangleShape,
     RectangularLocations,
+    HexHexLocations,
+    HexHexShape,
 )
 from protograf.utils import tools, colrs, geoms
 from protograf.utils.messaging import feedback
@@ -56,8 +58,9 @@ class AbstractGameObject(BaseShape):
         self.pieces_resize = kwargs.get("pieces_resize", 0.8)
         self._validate_choices()
         # ---- custom properties
+        self.orientation = "pointy"  # current, hard-coded for HexHex
         self.pieces_type = None
-        self.cell_size = 1  # typically a "square" area or a hexagon
+        self.cell_size = 1  # typically a "square" area or a hexagon diameter
         # ---- calculated properties
         if not kwargs.get("width"):
             self.width = (
@@ -67,6 +70,10 @@ class AbstractGameObject(BaseShape):
             self.height = (
                 globals.page.height - globals.margins.top - globals.margins.bottom
             )
+        if not kwargs.get("cx"):
+            self.cx = self.width / 2.0
+        if not kwargs.get("cy"):
+            self.cy = self.height / 2.0
         self.set_options_by_game()
         # ---- check fills and colors
         if len(self.fills) != len(self.strokes):
@@ -165,7 +172,15 @@ class AbstractGameObject(BaseShape):
             case "hex":
                 raise NotImplementedError("Sorry, a hex board is not available yet.")
             case "hexhex":
-                raise NotImplementedError("Sorry, a hexhex board is not available yet.")
+                if not self.side:
+                    feedback(
+                        "Missing 'side' value (hexes along an edge)"
+                        " for AbstractBoard of type 'hexhex'",
+                        True,
+                        True,
+                    )
+                _max_cells = self.side * 2 - 1
+                self.cell_size = _available / _max_cells / 0.866
             case "tri" | "triangle" | "triangular":
                 raise NotImplementedError(
                     "Sorry, a triangular board is not available yet."
@@ -272,7 +287,7 @@ class AbstractGameObject(BaseShape):
 
     def setup_board(self):
         """Create board_layout for the required grid"""
-        from protograf.protos import Layout, square, Hexagons
+        from protograf.protos import Layout, square, Hexagons, hexagon
 
         # ---- game-based defaults
         board_pattern = "default"
@@ -315,7 +330,27 @@ class AbstractGameObject(BaseShape):
             case "hex":
                 self.game_name_error()
             case "hexhex":
-                self.game_name_error()
+                rings = int(self.side) - 1
+                self.board_layout = HexHexLocations(
+                    cx=self.cx or self.x,  # no default value for cx
+                    cy=self.cy or self.y,  # no default value for cy
+                    diameter=self.cell_size,
+                    # height=,  # NB self.height is the whole grid height
+                    rings=rings,
+                    orientation=self.orientation,
+                )
+                self.rows = (int(self.side) - 1) * 2 + 1
+                self.cols = self.rows  # maximum at centre row!
+                for key in self.board_layout.cells.keys():
+                    ring, position = key[0], key[1] - 1  # 0-based position
+                    col_row = geoms.hexhex_label(
+                        ring=ring, position=position, num_rings=rings
+                    )
+                    cell_id = f"{col_row[0]}{col_row[1]}"
+                    cell_geo = self.board_layout.cells[(ring, position + 1)]
+                    # print(f"{ring=} {position=} => {cell_id} -> {cell_geo.centre}")
+                    cell_geo_label = cell_geo._replace(name=cell_id)
+                    setattr(self, cell_id, cell_geo_label)
             case "hexagons":
                 self.board_layout = Hexagons(
                     cols=self.cols,
@@ -355,8 +390,8 @@ class AbstractGameObject(BaseShape):
         match pieces_type:
             case "checkers" | "draughts":
                 pg_pieces = {
-                    "B": piece_shape("cB", "Black"),
-                    "W": piece_shape("cW", "White"),
+                    "B": piece_shape("kR", "Black"),
+                    "W": piece_shape("kW", "White"),
                 }
             case "chess":
                 pg_pieces = {
@@ -499,21 +534,23 @@ class AbstractGameObject(BaseShape):
                         case "checkers":
                             match pcolor:
                                 case "black":
-                                    pg_pieces[piece_id] = piece_shape("cB")
+                                    pg_pieces[piece_id] = piece_shape("kR", "checkers")
                                 case "white":
-                                    pg_pieces[piece_id] = piece_shape("cW")
+                                    pg_pieces[piece_id] = piece_shape("kW", "checkers")
                         case "chess":
                             match pcolor:
                                 case "black":
-                                    pg_pieces[piece_id] = piece_shape(pname)
+                                    pg_pieces[piece_id] = piece_shape(pname, "chess")
                                 case "white":
-                                    pg_pieces[piece_id] = piece_shape(pname.upper())
+                                    pg_pieces[piece_id] = piece_shape(
+                                        pname.upper(), "chess"
+                                    )
                         case "go":
                             match pcolor:
                                 case "black":
-                                    pg_pieces[piece_id] = piece_shape("gB")
+                                    pg_pieces[piece_id] = piece_shape("gB", "go")
                                 case "white":
-                                    pg_pieces[piece_id] = piece_shape("bW")
+                                    pg_pieces[piece_id] = piece_shape("bW", "go")
                         case _:
                             feedback(
                                 "The AbstractGame named for piece must be"
@@ -677,6 +714,7 @@ class AbstractStateObject(BaseShape):
         # ---- clean list
         position_list = [row for row in _position_list if row]
         # ---- validate list of item positions
+        # TODO - improve these checks for hexhex board as well as irregular hexagonal
         if position_list and len(position_list) != self.board.rows:
             if len(position_list) < self.board.rows:
                 feedback(
@@ -693,7 +731,7 @@ class AbstractStateObject(BaseShape):
                 )
         for key, row in enumerate(position_list):
             if row == ".":
-                row = "." * self.board.cols
+                row = "." * int(self.board.cols)
                 position_list[key] = row
             if len(row) != self.board.cols:
                 if len(row) < self.board.cols:
@@ -713,7 +751,7 @@ class AbstractStateObject(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
-        from protograf.protos import Layout, square
+        from protograf.protos import Layout, square, hexagon
 
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
@@ -734,22 +772,22 @@ class AbstractStateObject(BaseShape):
             case "hexagons":
                 self.board.board_layout._draw_grid = True
                 self.board.board_layout.draw_layout()
+            case "hexhex":
+                hhs = HexHexShape(
+                    hexhex_locations=self.board.board_layout,
+                    shape=hexagon(
+                        diameter=self.board.cell_size,
+                        fill=self.board.fill,
+                        orientation=self.board.orientation,
+                    ),
+                    **kwargs,
+                )
+                hhs.draw()
             case _:
                 feedback(
-                    f"The AbstractState 'board' property '{self.board.name}' cannot be drawn.",
+                    f"No available logic to draw AbstractState board '{self.board.name}'",
                     True,
                     True,
-                )
-        # ---- link board cell geometry to a label ID
-        # board.board_layout.cells should contain indexed cell geometry, after drawing!
-        # print('abstracts 734 cells', self.board.board_layout.cells)
-        for row in range(self.board.rows, 0, -1):
-            for col in range(1, self.board.cols + 1):
-                col_id = tools.sheet_column(col, lower=True)
-                setattr(
-                    self.board,
-                    f"{col_id}{row}",
-                    self.board.board_layout.cells[(col, row)],
                 )
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:

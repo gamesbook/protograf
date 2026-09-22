@@ -26,7 +26,7 @@ the :doc:`Customised Shapes <../customised_shapes>`.
 
 Overview
 ========
-`^ <abstractIndex_>`_
+`↑ <abstractIndex_>`_
 
 Abstract games are the ancestors of many modern games.  They continue to be
 played and appreciated by gamers of all ages across many societies.
@@ -36,8 +36,9 @@ The aim of the ``AbstractGame`` and ``AbstractState`` commands is to allow
 diagrams for such games to be readily created.
 
 The ``AbstractGame`` command allows for the details of the board and pieces
-for such a game to be specified.   However, such an object is **not** designed
-to be drawn |dash| it can be thought of as the game being "still in the box".
+for such a game to be specified and, optionally, annotated and/or labelled.
+However, such an object is **not** designed to be drawn |dash| it can be
+thought of as the game being "still in the box".
 
 The ``AbstractState`` command will, when supplied with a previously defined
 ``AbstractGame``, allow for a position in the game |dash| at any point from
@@ -59,7 +60,7 @@ intended use of the ``AbstractState`` command.
 
 AbstractGame Command
 ====================
-`^ <abstractIndex_>`_
+`↑ <abstractIndex_>`_
 
 The ``AbstractGame()`` command defines the parts of an abstract game; primarily
 the type of board and pieces that it uses.
@@ -73,29 +74,23 @@ with |dash| for example, Chess, Checkers (aka Draughts), or Go. It is also
 possible to create completely unique pieces by using one or more of
 *protograf* shapes and/or images.
 
-.. NOTE::
+- `AbstractGame Properties`_
+- `AbstractGame Board`_
+- `AbstractGame Pieces`_
+- `AbstractGame Annotations`_
+- `AbstractGame Examples`_
 
-    The default settings for an AbstractGame are:
-
-    * *name*: ``grid``
-    * *rows*: ``8`` (the same as Chess or Checkers board)
-    * *cols*: ``8`` (the same as Chess or Checkers board)
-    * *pieces*: ``checkers`` (simple black and white circles)
-
-    Note also that the definitions of the board and pieces are **not** the
-    determinants of where the pieces get placed; how many pieces there are,
-    or what the rules are for their movement!
 
 .. _abstractGameProperties:
 
 AbstractGame Properties
 -----------------------
+`^ <abstractgame-command_>`_
 
 The properties that can be set for an AbstractGame are:
 
-* *name*: the name of a type of board; which can chosen from
-  one of: ``chess``, ``checkers``, ``go``; if omitted, the
-  type is a simply a ``grid``
+* *name*: the name of a type of board; which can chosen from  one of:
+  ``chess``, ``checkers``, ``go``; if omitted, the default is a ``grid``
 * *pieces*: details of pieces that will be placed on the board; the piece set
   can |dash| **independantly** of the board name |dash| be chosen from a
   pre-existing set: ``chess``, ``checkers`` (the default), ``go`` or a
@@ -133,10 +128,25 @@ The properties that can be set for an AbstractGame are:
 * *annotations*: a list of AbstractGame annotations; see below for details
 
 
+.. NOTE::
+
+    The default settings for an AbstractGame are:
+
+    * *name*: ``grid``
+    * *rows*: ``8`` (the same as Chess or Checkers board)
+    * *cols*: ``8`` (the same as Chess or Checkers board)
+    * *pieces*: ``checkers`` (simple black and white circles)
+
+    Note also that the definitions of the board and pieces are **not** the
+    determinants of where the pieces get placed; how many pieces there are,
+    or what the rules are for their movement!
+
+
 .. _abstractGameBoard:
 
 AbstractGame Board
 ------------------
+`^ <abstractgame-command_>`_
 
 A basic AbstractGame board is just a square grid and, depending on the game,
 will contain either an equal or unequal number of rows and columms.
@@ -150,35 +160,47 @@ or on their intersection points |dash| **protograf** terms these locations
 
 AbstractGame Pieces
 -------------------
+`^ <abstractgame-command_>`_
+
 
 
 .. _abstractGameAnnotations:
 
 AbstractGame Annotations
 ------------------------
+`^ <abstractgame-command_>`_
 
 
 .. _abstractGameExamples:
 
 AbstractGame Examples
 ----------------------
+`^ <abstractgame-command_>`_
+
+
 
 
 .. _abstractstate-command:
 
 AbstractState Command
 =====================
-`^ <abstractIndex_>`_
+`↑ <abstractIndex_>`_
 
 The ``AbstractState()`` command will create a display of a board and its pieces
 that have been defined in an :ref:`AbstractGame <abstractgame-command>`. This
 display represents a given point in an abstract game |dash| a situation commonly
 referred to as "the game state".
 
+- `AbstractState Properties`_
+- `AbstractState Positions`_
+- `AbstractState Annotations`_
+- `AbstractState Examples`_
+
 .. _AbstractStateProperties:
 
 AbstractState Properties
 ------------------------
+`^ <abstractstate-command_>`_
 
 The properties that can be set for an AbstractState command are:
 
@@ -194,6 +216,7 @@ The properties that can be set for an AbstractState command are:
 
 AbstractState Positions
 -----------------------
+`^ <abstractstate-command_>`_
 
 The *positions* property of an AbstractState indicates where the pieces |dash|
 as defined for the AbstractGame by the shapes, icons or images associated with
@@ -256,6 +279,7 @@ If row is entirely blank, it can be shown with a single ``.``.
 
 AbstractState Annotations
 -------------------------
+`^ <abstractstate-command_>`_
 
 <TBD>
 
@@ -264,6 +288,7 @@ AbstractState Annotations
 
 AbstractState Examples
 ----------------------
+`^ <abstractstate-command_>`_
 
 
 .. _abstract-resources:
@@ -271,7 +296,7 @@ AbstractState Examples
 
 Abstract Resources
 ==================
-`^ <abstractIndex_>`_
+`↑ <abstractIndex_>`_
 
 Chess
 -----
@@ -341,9 +366,10 @@ The following are the SVG images, sourced from Wikipedia Commons, available
 for use in constructing abstract games.  The pieces are referenced, using the
 notation described above, via the letter in the last column of the table.
 
-In Japanese the two opposing sides are called Sente ("earlier move") and Gote
-("later move"), but in English they are referred to as Black and White,
-with Black being the first to play.
+In Japanese the two opposing sides are called *Sente* ("earlier move") and
+*Gote* ("later move"), but in English they are referred to as Black and White,
+with Black being the first to play, with pieces shown as upright, on the
+nearer/closer side of the board.
 
 As in Chess, uppercase letters are used for White pieces; lowercase letters
 for Black.
@@ -351,63 +377,63 @@ for Black.
  .. |icon-osho| image:: ../../../protograf/resources/abstracts/shogi/Shogi_osho(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  ōshō  (king general)
+       :alt:  ōshō (king - champion; general)
  .. |icon-gyokusho| image:: ../../../protograf/resources/abstracts/shogi/Shogi_gyokusho(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  gyokushō  (jeweled general)
+       :alt:  gyokushō (king - challenger; jeweled general)
  .. |icon-hisha| image:: ../../../protograf/resources/abstracts/shogi/Shogi_hisha(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  hisha  (flying chariot)
+       :alt:  hisha (rook; flying chariot)
  .. |icon-ryuo| image:: ../../../protograf/resources/abstracts/shogi/Shogi_ryuo(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  ryūō  (dragon king)
+       :alt:  ryūō (promoted rook; dragon king)
  .. |icon-kakugyo| image:: ../../../protograf/resources/abstracts/shogi/Shogi_kakugyo(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  kakugyō  (angle mover)
+       :alt:  kakugyō (bishop; angle mover)
  .. |icon-ryuma| image:: ../../../protograf/resources/abstracts/shogi/Shogi_ryuma(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  ryūma / ryūme  (dragon horse)
+       :alt:  ryūma / ryūme (promoted bishop; dragon horse)
  .. |icon-kinsho| image:: ../../../protograf/resources/abstracts/shogi/Shogi_kinsho(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  kinshō  (gold general)
+       :alt:  kinshō (gold general)
  .. |icon-ginsho| image:: ../../../protograf/resources/abstracts/shogi/Shogi_ginsho(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  ginshō  (silver general)
+       :alt:  ginshō (silver general)
  .. |icon-narigin| image:: ../../../protograf/resources/abstracts/shogi/Shogi_narigin(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  narigin  (promoted silver)
+       :alt:  narigin (promoted silver general)
  .. |icon-keima| image:: ../../../protograf/resources/abstracts/shogi/Shogi_keima(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  keima  (horse)
+       :alt:  keima (knight; horse)
  .. |icon-narikei| image:: ../../../protograf/resources/abstracts/shogi/Shogi_narikei(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  narikei  (promoted cassia)
+       :alt:  narikei (promoted knight; cassia)
  .. |icon-kyosha| image:: ../../../protograf/resources/abstracts/shogi/Shogi_kyosha(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  kyōsha  (chariot)
+       :alt:  kyōsha (lance; chariot)
  .. |icon-narikyo| image:: ../../../protograf/resources/abstracts/shogi/Shogi_narikyo(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  narikyō  (promoted incense)
+       :alt:  narikyō (promoted lance; incense)
  .. |icon-fuhyo| image:: ../../../protograf/resources/abstracts/shogi/Shogi_fuhyo(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  fuhyō  (foot soldier)
+       :alt:  fuhyō (pawn; foot soldier)
  .. |icon-tokin| image:: ../../../protograf/resources/abstracts/shogi/Shogi_tokin(svg).svg
        :width: 35px
        :height: 35px
-       :alt:  tokin  (reaches gold)
+       :alt:  tokin (promoted pawn; reaches gold)
 
 .. list-table:: Shogi Pieces
    :widths: 30 10 20 20 10 10

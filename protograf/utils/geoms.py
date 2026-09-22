@@ -1132,6 +1132,113 @@ def circle_to_chord(radius: float, chord: float) -> float:
     return radius - math.sqrt(radius**2 - (chord / 2.0) ** 2)
 
 
+def hexhex_label(ring, position, num_rings, rows_from="bottom", lower=True):
+    """
+    Convert ring/position to a column-row label.
+
+    Parameters
+    ----------
+    ring : int
+        Ring number. 0 is the centre.
+
+    position : int
+        Position around the ring.
+        Position 0 is the north-east hex.
+        Positions increase clockwise.
+
+    num_rings : int
+        Number of rings outside the centre.
+
+    rows_from : str, optional
+        "bottom" (default): bottom row is row 1.
+        "top": top row is row 1.
+
+    Returns
+    -------
+    str
+        A label such as "A1", "D4", or "G7".
+
+    The south-west corner is A1 when rows_from="bottom".
+    The north-west corner is A1 when rows_from="top".
+    """
+
+    def number_to_letters(n):
+        """
+        Convert zero-based column number to spreadsheet-style letters:
+        0 -> A, 1 -> B, ..., 25 -> Z, 26 -> AA, etc.
+        """
+        result = ""
+
+        while True:
+            n, remainder = divmod(n, 26)
+            result = chr(ord("A") + remainder) + result
+
+            if n == 0:
+                break
+
+            n -= 1
+
+        return result
+
+    if not 0 <= ring <= num_rings:
+        raise ValueError(f"ring must be between 0 and {num_rings}")
+
+    if rows_from not in ("bottom", "top"):
+        raise ValueError("rows_from must be either 'bottom' or 'top'")
+
+    if ring == 0:
+        if position != 0:
+            raise ValueError("The centre hex has position 0 only")
+
+        col_offset = 0
+        row_offset = 0
+
+    else:
+        if not 0 <= position < 6 * ring:
+            raise ValueError(f"position must be between 0 and {6 * ring - 1}")
+
+        # Position 0 = north-east corner.
+        col_offset = ring
+        row_offset = ring
+
+        # Clockwise directions around the ring.
+        directions = [
+            (0, -1),  # NE -> E
+            (-1, -1),  # E  -> SE
+            (-1, 0),  # SE -> SW
+            (0, 1),  # SW -> W
+            (1, 1),  # W  -> NW
+            (1, 0),  # NW -> NE
+        ]
+
+        side, offset = divmod(position, ring)
+
+        # Move around completed sides.
+        for i in range(side):
+            dc, dr = directions[i]
+            col_offset += dc * ring
+            row_offset += dr * ring
+
+        # Move along current side.
+        dc, dr = directions[side]
+        col_offset += dc * offset
+        row_offset += dr * offset
+
+    # Column numbering is always left-to-right.
+    column_index = num_rings + col_offset
+    column = number_to_letters(column_index)
+    if lower:
+        column = column.lower()
+
+    # Row numbering can run in either direction.
+    if rows_from == "bottom":
+        row = num_rings + row_offset + 1
+    else:
+        row = num_rings - row_offset + 1
+
+    return column, row
+
+
 def hexgrid_diagonal_coords(
     col: int,
     row: int,
@@ -1178,7 +1285,7 @@ def hexgrid_diagonal_coords(
     ('c', 1)
     """
 
-    def number_to_letters(n: int) -> str:
+    def numbers_to_letters(n: int) -> str:
         """
         Convert 0 -> A, 1 -> B, ..., 25 -> Z, 26 -> AA, etc.
         """
@@ -1248,7 +1355,7 @@ def hexgrid_diagonal_coords(
     #     col 2 -> 1
     #     col 3 -> 2
     diagonal_index = (col - 1) + row_diagonal_offset
-    diagonal_letter = number_to_letters(diagonal_index)
+    diagonal_letter = numbers_to_letters(diagonal_index)
     if lower:
         diagonal_letter = diagonal_letter.lower()
 
