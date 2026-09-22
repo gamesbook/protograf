@@ -7,14 +7,16 @@ Mathematical utility functions for protograf
 import cmath
 import logging
 import math
-import numpy as np
 import sys
 from typing import Any, List
+
+# third party
+import numpy as np
 
 # local
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import Point
-from protograf.utils.support import numbers, round_tiny_float, excel_column
+from protograf.utils.support import numbers, round_tiny_float
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -155,6 +157,7 @@ def compass_to_angle(direction: str) -> tuple:
         rotation = (450 - compass) % 360.0
         # print(f'compass-angle fn: {compass=}, {rotation=}')
         return round_tiny_float(compass), round_tiny_float(rotation)
+    return None, None
 
 
 def point_in_polygon(point: Point, vertices: List[Point], valid_border=False) -> bool:
@@ -366,9 +369,8 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
         x = math.cos(theta) * radius + point_centre.x
         y = point_centre.y - math.sin(theta) * radius  # + point_centre.y
     except Exception as exc:
-        raise ValueError(
-            f"Cannot calculate point on circle for: {point_centre}, {radius} and {angle}"
-        ) from exc
+        raise ValueError(f"Cannot calculate point on circle for: {
+                point_centre}, {radius} and {angle}") from exc
     return Point(x, y)
 
 
@@ -889,13 +891,12 @@ def bezier_arc_points(
             Point(pt2[0].item(), 2 * invert - pt2[1].item()),
             Point(pt3[0].item(), 2 * invert - pt3[1].item()),
         )
-    else:
-        return (
-            Point(pt0[0].item(), pt0[1].item()),
-            Point(pt1[0].item(), pt1[1].item()),
-            Point(pt2[0].item(), pt2[1].item()),
-            Point(pt3[0].item(), pt3[1].item()),
-        )
+    return (
+        Point(pt0[0].item(), pt0[1].item()),
+        Point(pt1[0].item(), pt1[1].item()),
+        Point(pt2[0].item(), pt2[1].item()),
+        Point(pt3[0].item(), pt3[1].item()),
+    )
 
 
 def circle_angles(radius: float, chord: float) -> tuple:
@@ -1143,45 +1144,28 @@ def hexgrid_diagonal_coords(
     Convert a 1-based (row, col) coordinate for a pointy-topped
     offset hex grid into a (diagonal_column, row_number) identifier.
 
-    The LETTER identifies the left-sloping diagonal.
-    The NUMBER is always the input row number.
+    The column identifies the left-sloping diagonal. All hexes in the same
+    horizontal row have the same numeric value.
 
-    Therefore, all hexes in the same horizontal row have the same numeric value.
+    Args:
+    - col (int):  1-based column, counted from the LEFT.
+    - row (int): 1-based row, counted from the TOP.
+    - total_rows (int): Number of rows in the grid.
+    - lower (bool): if True, make diagonal letter lowercase
+    - first_row_shifted (bool):
+          False:
+              Row 1:  O O O O
+              Row 2:   O O O O
+              Row 3:  O O O O
 
-    Parameters
-    ----------
-    col : int
-        1-based column, counted from the LEFT.
+          True:
+              Row 1:   O O O O
+              Row 2:  O O O O
+              Row 3:   O O O O
 
-    row : int
-        1-based row, counted from the TOP.
 
-    total_rows : int
-        Number of rows in the grid.
-
-    first_row_shifted : bool
-        False:
-            Row 1:  O O O O
-            Row 2:   O O O O
-            Row 3:  O O O O
-
-        True:
-            Row 1:   O O O O
-            Row 2:  O O O O
-            Row 3:   O O O O
-
-    lower: bool
-        If True, make diagonal letter lowercase
-
-    Returns
-    -------
-    tuple[str, int]
-        The diagonal letter and the 1-based position within the row.
-
-        Examples:
-            ("a", 1)
-            ("b", 2)
-            ("aa", 4)
+    Returns:
+        tuple[str, int]: diagonal letter and the 1-based position of the row
 
     Doc Test:
     >>> hexgrid_diagonal_coords(1, 1, 5)
@@ -1201,45 +1185,17 @@ def hexgrid_diagonal_coords(
         result = ""
         while True:
             n, remainder = divmod(n, 26)
-            result = chr(ord("a") + remainder) + result
+            result = chr(ord("A") + remainder) + result
             if n == 0:
                 return result
             n -= 1
 
-    """
-
-        Examples
-    --------
-    For a five-row grid with bottom-up numbering:
-
-        bottom-left       -> ("A", 1)
-        bottom second     -> ("B", 1)
-        second-row left   -> ("B", 2)
-        third-row left    -> ("C", 3)
-        top-left          -> ("E", 5)
-    """
-
     if total_rows < 1:
         raise ValueError("total_rows must be >= 1")
-
     if row < 1 or row > total_rows:
         raise ValueError(f"row must be between 1 and {total_rows}")
-
     if col < 1:
         raise ValueError("col must be >= 1")
-
-    # ---------------------------------------------------------
-    # Number of rows above the bottom row.
-    #
-    # Bottom row:
-    #     0
-    #
-    # Row above:
-    #     1
-    #
-    # Next row:
-    #     2
-    # ---------------------------------------------------------
 
     rows_from_bottom = total_rows - row
 
@@ -1269,45 +1225,34 @@ def hexgrid_diagonal_coords(
     # which is equivalent to:
     #
     #     (rows_from_bottom + 1) // 2
-    #
     # ---------------------------------------------------------
 
     if first_row_shifted:
         # If the first row is shifted, the alternating pattern
         # is reversed relative to the bottom-left anchor.
-        #
         # The diagonal offset therefore depends on whether the
         # bottom row itself is shifted.
         bottom_row_shifted = (total_rows - 1) % 2 == 0
-
         if bottom_row_shifted:
             row_diagonal_offset = rows_from_bottom // 2
         else:
             row_diagonal_offset = (rows_from_bottom + 1) // 2
-
     else:
         # Row 1 is unshifted and row 2 is shifted.
-        #
         # For the displayed layout this produces:
-        #
         #     0, 1, 1, 2, 2, 3, 3, ...
-        #
         row_diagonal_offset = (rows_from_bottom + 1) // 2
 
     # Column contribution:
-    #
     #     col 1 -> 0
     #     col 2 -> 1
     #     col 3 -> 2
-    #
     diagonal_index = (col - 1) + row_diagonal_offset
-
     diagonal_letter = number_to_letters(diagonal_index)
+    if lower:
+        diagonal_letter = diagonal_letter.lower()
 
-    # ---------------------------------------------------------
-    # Determine the output row number.
-    # ---------------------------------------------------------
-
+    # Determine the output row number
     if row_number_from_bottom:
         output_row = total_rows - row + 1
     else:

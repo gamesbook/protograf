@@ -26,6 +26,9 @@ from protograf.utils.structures import (  # named tuples
 )
 from protograf.utils.tools import _lower
 
+# local
+from .abstracts_pieces import piece_shape
+
 
 class AbstractGameObject(BaseShape):
     """Create an AbstractGame for a given canvas.
@@ -44,6 +47,7 @@ class AbstractGameObject(BaseShape):
         self.fills = kwargs.get("fills", ["white"])
         self.strokes = kwargs.get("strokes", ["black"])
         self.hairs = tools.as_bool(kwargs.get("hairs", False))
+        self.hex_pattern = kwargs.get("hex_pattern", None)  # TODO - process this!
         self.labels_start = kwargs.get("labels_start", None)
         self.labels_type = kwargs.get("labels_type", None)
         self.grid_align = tools.as_bool(kwargs.get("grid_align", False))
@@ -53,7 +57,7 @@ class AbstractGameObject(BaseShape):
         self._validate_choices()
         # ---- custom properties
         self.pieces_type = None
-        self.cell_size = 1  # typically a "square" area
+        self.cell_size = 1  # typically a "square" area or a hexagon
         # ---- calculated properties
         if not kwargs.get("width"):
             self.width = (
@@ -71,7 +75,6 @@ class AbstractGameObject(BaseShape):
                 True,
                 True,
             )
-
         # ---- setup pieces
         self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
@@ -300,13 +303,15 @@ class AbstractGameObject(BaseShape):
                         )
                     )
                 Layout(self.board_layout, shapes=_shapes, _draw_grid=False)
-                # ---- set default label ID attributes
+                # ---- set default cell attributes (plus label)
+                # TODO  - changes this for shogi !! (numbers only from TR)
                 for row in range(self.rows, 0, -1):
                     for col in range(1, self.cols + 1):
                         col_id = tools.sheet_column(col, lower=True)
-                        setattr(
-                            self, f"{col_id}{row}", self.board_layout.cells[(col, row)]
-                        )
+                        cell_id = f"{col_id}{row}"
+                        cell_geo = self.board_layout.cells[(col, row)]
+                        cell_geo_label = cell_geo._replace(name=cell_id)
+                        setattr(self, cell_id, cell_geo_label)
             case "hex":
                 self.game_name_error()
             case "hexhex":
@@ -320,22 +325,25 @@ class AbstractGameObject(BaseShape):
                     orientation="pointy",
                     _draw_grid=False,
                 )
-                # ---- set default label ID attributes
+                # ---- set default cell attributes (plus label)
                 for row in range(1, self.rows + 1):
                     for col in range(1, self.cols + 1):
-                        # assuming start at bottom row as 1
-                        col_row = geoms.hexgrid_diagonal_coords(
-                            col=col, row=row, total_rows=self.rows
-                        )
-                        print(f"{col=} {row=}", col_row)
                         try:
-                            setattr(
-                                self,
-                                f"{col_row[0]}{col_row[1]}",
-                                self.board_layout.cells[(col, row)],
+                            # TODO - pass in settings to this function!
+                            col_row = geoms.hexgrid_diagonal_coords(
+                                col=col, row=row, total_rows=self.rows
                             )
-                        except:
-                            print(col, row)
+                            cell_id = f"{col_row[0]}{col_row[1]}"
+                            cell_geo = self.board_layout.cells[(col, row)]
+                            # print(f"{col=} {row=}", col_row, cell_geo)
+                            cell_geo_label = cell_geo._replace(name=cell_id)
+                            setattr(self, cell_id, cell_geo_label)
+                        except Exception as err:
+                            feedback(
+                                f"Unable to set properties for {col=}/{row=} ({err})",
+                                True,
+                                True,
+                            )
             case _:
                 self.game_name_error()
 
@@ -347,61 +355,61 @@ class AbstractGameObject(BaseShape):
         match pieces_type:
             case "checkers" | "draughts":
                 pg_pieces = {
-                    "B": self.character_map("cB"),
-                    "W": self.character_map("cW"),
+                    "B": piece_shape("cB", "Black"),
+                    "W": piece_shape("cW", "White"),
                 }
             case "chess":
-                pg_pieces = {  # TODO - load ALL images from resources
-                    "B": self.character_map("B"),
-                    "b": self.character_map("b"),
-                    "K": self.character_map("K"),
-                    "k": self.character_map("k"),
-                    "N": self.character_map("N"),
-                    "n": self.character_map("n"),
-                    "P": self.character_map("P"),
-                    "p": self.character_map("p"),
-                    "Q": self.character_map("Q"),
-                    "q": self.character_map("q"),
-                    "R": self.character_map("R"),
-                    "r": self.character_map("r"),
+                pg_pieces = {
+                    "B": piece_shape("B", "White Bishop"),
+                    "b": piece_shape("b", "Black Bishop"),
+                    "K": piece_shape("K", "White King"),
+                    "k": piece_shape("k", "Black King"),
+                    "N": piece_shape("N", "White Knight"),
+                    "n": piece_shape("n", "Black Knight"),
+                    "P": piece_shape("P", "White Pawn"),
+                    "p": piece_shape("p", "Black Pawn"),
+                    "Q": piece_shape("Q", "White Queen"),
+                    "q": piece_shape("q", "Black Queen"),
+                    "R": piece_shape("R", "White Rook"),
+                    "r": piece_shape("r", "Black Rook"),
                 }
             case "go":
-                pg_pieces = {  # TODO - load images from resources
-                    "B": self.character_map("gB"),
-                    "W": self.character_map("gW"),
+                pg_pieces = {
+                    "B": piece_shape("gB", "Black Stone"),
+                    "W": piece_shape("gW", "White Stone"),
                 }
             case "shogi":
-                pg_pieces = {  # TODO - load images from resources
-                    "A": self.character_map("sA"),
-                    "a": self.character_map("sa"),
-                    "B": self.character_map("sB"),
-                    "b": self.character_map("sb"),
-                    "D": self.character_map("sD"),
-                    "d": self.character_map("sd"),
-                    "G": self.character_map("sG"),
-                    "g": self.character_map("sg"),
-                    "H": self.character_map("sH"),
-                    "h": self.character_map("sh"),
-                    "J": self.character_map("sJ"),
-                    "j": self.character_map("sj"),
-                    "K": self.character_map("sK"),
-                    "k": self.character_map("sk"),
-                    "l": self.character_map("sl"),
-                    "L": self.character_map("sL"),
-                    "N": self.character_map("sN"),
-                    "n": self.character_map("sn"),
-                    "P": self.character_map("sP"),
-                    "p": self.character_map("sp"),
-                    "R": self.character_map("sR"),
-                    "r": self.character_map("sr"),
-                    "S": self.character_map("sS"),
-                    "s": self.character_map("ss"),
-                    "T": self.character_map("sT"),
-                    "t": self.character_map("st"),
-                    "V": self.character_map("sV"),
-                    "v": self.character_map("sv"),
-                    "W": self.character_map("sW"),
-                    "w": self.character_map("sw"),
+                pg_pieces = {
+                    "A": piece_shape("sA", "White Lance: Promoted"),
+                    "a": piece_shape("sa", "Black Lance: Promoted"),
+                    "B": piece_shape("sB", "White Bishop"),
+                    "b": piece_shape("sb", "Black Bishop"),
+                    "D": piece_shape("sD", "White Rook: Promoted (Dragon)"),
+                    "d": piece_shape("sd", "Black Rook: Promoted (Dragon)"),
+                    "G": piece_shape("sG", "White Gold General"),
+                    "g": piece_shape("sg", "Black Gold General"),
+                    "H": piece_shape("sH", "White Bishop: Promoted (Horse)"),
+                    "h": piece_shape("sh", "Black Bishop: Promoted (Horse)"),
+                    "J": piece_shape("sJ", "White King (challenger)"),
+                    "j": piece_shape("sj", "Black King (challenger)"),
+                    "K": piece_shape("sK", "White King (champion)"),
+                    "k": piece_shape("sk", "Black King (champion)"),
+                    "l": piece_shape("sl", "Black Lance"),
+                    "L": piece_shape("sL", "White Lance"),
+                    "N": piece_shape("sN", "White Knight"),
+                    "n": piece_shape("sn", "Black Knight"),
+                    "P": piece_shape("sP", "White Pawn"),
+                    "p": piece_shape("sp", "Black Pawn"),
+                    "R": piece_shape("sR", "White Rook"),
+                    "r": piece_shape("sr", "Black Rook"),
+                    "S": piece_shape("sS", "White Silver General"),
+                    "s": piece_shape("ss", "Black Silver General"),
+                    "T": piece_shape("sT", "White Knight: Promoted"),
+                    "t": piece_shape("st", "Black Knight: Promoted"),
+                    "W": piece_shape("sV", "White Pawn: Promoted"),
+                    "w": piece_shape("sv", "Black Pawn: Promoted"),
+                    "V": piece_shape("sW", "White Silver General: Promoted"),
+                    "v": piece_shape("sw", "Black Silver General: Promoted"),
                 }
             case None:
                 pass  # no defauls
@@ -491,23 +499,21 @@ class AbstractGameObject(BaseShape):
                         case "checkers":
                             match pcolor:
                                 case "black":
-                                    pg_pieces[piece_id] = self.character_map("cB")
+                                    pg_pieces[piece_id] = piece_shape("cB")
                                 case "white":
-                                    pg_pieces[piece_id] = self.character_map("cW")
+                                    pg_pieces[piece_id] = piece_shape("cW")
                         case "chess":
                             match pcolor:
                                 case "black":
-                                    pg_pieces[piece_id] = self.character_map(pname)
+                                    pg_pieces[piece_id] = piece_shape(pname)
                                 case "white":
-                                    pg_pieces[piece_id] = self.character_map(
-                                        pname.upper()
-                                    )
+                                    pg_pieces[piece_id] = piece_shape(pname.upper())
                         case "go":
                             match pcolor:
                                 case "black":
-                                    pg_pieces[piece_id] = self.character_map("gB")
+                                    pg_pieces[piece_id] = piece_shape("gB")
                                 case "white":
-                                    pg_pieces[piece_id] = self.character_map("bW")
+                                    pg_pieces[piece_id] = piece_shape("bW")
                         case _:
                             feedback(
                                 "The AbstractGame named for piece must be"
@@ -538,12 +544,43 @@ class AbstractStateObject(BaseShape):
         # ---- custom properties
         self.board = kwargs.get("board", None)
         self.positions = kwargs.get("positions", ".")
+        self.setup = tools.as_bool(kwargs.get("setup", False))
         self.moves = kwargs.get("moves", None)
         self.annotations = kwargs.get("annotations", None)
         self.position_shapes = []
         self._validate_choices()
         # ---- set positions
+        self.positions = self.initialise_pieces()
         self.position_matrix = self.process_positions()
+
+    def initialise_pieces(self) -> str:
+        """Create initial positions."""
+        if self.setup:
+            match _lower(self.board.name):
+                case "chess":
+                    return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+                case "checkers":
+                    return "1B1B1B1B/B1B1B1B1/1B1B1B1B/8/8/W1W1W1W1/1W1W1W1w/W1W1W1W1"
+                case "go":
+                    return ""
+                case "shogi":
+                    return "LNSGKGSNL/1R5B1/PPPPPPPPP/9/9/9/ppppppppp/1b5r1/lnsgkgsnl/123456789"
+                case _:
+                    if self.board.name:
+                        feedback(
+                            "The AbstractGame does not have a setup for '{self.board.name}'.",
+                            True,
+                            True,
+                        )
+                    else:
+                        feedback(
+                            "The AbstractGame does not have the 'name' property set;"
+                            " so no predefined setup can be used.",
+                            True,
+                            True,
+                        )
+                    return ""
+        return self.positions  # leave "as set by user" for processing
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
@@ -593,36 +630,6 @@ class AbstractStateObject(BaseShape):
                     True,
                     True,
                 )
-        # ---- handle special positions
-        match _lower(self.positions):
-            case "setup":
-                match _lower(self.board.name):
-                    case "chess":
-                        self.positions = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-                    case "checkers":
-                        self.positions = (
-                            "1B1B1B1B/B1B1B1B1/1B1B1B1B/8/8/W1W1W1W1/1W1W1W1w/W1W1W1W1"
-                        )
-                    case "go":
-                        self.positions = ""
-                    case _:
-                        if self.board.name:
-                            feedback(
-                                "The AbstractGame does not have a setup for '{self.board.name}'.",
-                                True,
-                                True,
-                            )
-                        else:
-                            feedback(
-                                "The AbstractGame does not have the 'name' property set;"
-                                " so no predefined setup can be determined.",
-                                True,
-                                True,
-                            )
-            case "clear":
-                self.positions = ""
-            case _:
-                pass  # leave "as is" for processing
         return True
 
     @property

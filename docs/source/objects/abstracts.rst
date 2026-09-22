@@ -186,6 +186,8 @@ The properties that can be set for an AbstractState command are:
   AbstractState object cannot be displayed without it
 * *positions*: details of where an AbstractGame's pieces go on the board;
   see below for details
+* *setup*: if set to True, and the game is one whose initial position is
+  stored in *protograf*, then the pieces will be assigned to the board
 * *annotations*: a list of AbstractState annotations; see below for details
 
 .. _abstractStatePositions:
