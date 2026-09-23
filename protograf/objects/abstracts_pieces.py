@@ -11,6 +11,59 @@ from importlib.resources import files
 # module
 from protograf.utils.messaging import feedback
 
+NAMED_CHESS_BLACK = {
+    "pawn": "cp",
+    "queen": "cq",
+    "king": "ck",
+    "rook": "cr",
+    "bishop": "cb",
+    "knight": "cn",
+}
+NAMED_CHESS_WHITE = {
+    "pawn": "cP",
+    "queen": "cQ",
+    "king": "cK",
+    "rook": "cR",
+    "bishop": "cB",
+    "knight": "cN",
+}
+NAMED_SHOGI_BLACK = {
+    "osho": "sk",
+    "gyokusho": "sj",
+    "hisha": "sr",
+    "ryuo": "sd",
+    "kakugyo": "sb",
+    "ryuma": "sh",
+    "ryume": "sh",
+    "kinsho": "sg",
+    "ginsho": "ss",
+    "narigin": "sv",
+    "keima": "sn",
+    "narikei": "st",
+    "kyosha": "sl",
+    "narikyo": "sa",
+    "fuhyo": "sp",
+    "tokin": "sw",
+}
+NAMED_SHOGI_WHITE = {
+    "osho": "sK",
+    "gyokusho": "sJ",
+    "hisha": "sR",
+    "ryuo": "sD",
+    "kakugyo": "sB",
+    "ryuma": "sH",
+    "ryume": "sH",
+    "kinsho": "sG",
+    "ginsho": "sS",
+    "narigin": "sV",
+    "keima": "sN",
+    "narikei": "sT",
+    "kyosha": "sL",
+    "narikyo": "sA",
+    "fuhyo": "sP",
+    "tokin": "sW",
+}
+
 
 def piece_shape(key: str, game: str, name: str = "") -> object:
     """Return the shape matching a named piece."""
@@ -18,12 +71,14 @@ def piece_shape(key: str, game: str, name: str = "") -> object:
 
     # TODO - load ALL images from resources
     all_pieces = {
+        # ---- generic
         "B": circle(fill_stroke="black"),
         "W": circle(fill="white", stroke="black"),
-        # checkers - contrasts with black squares
+        # ---- checkers
+        # colors contrast with black squares
         "kR": circle(fill_stroke="red"),
         "kW": circle(fill_stroke="white"),
-        # chess
+        # ---- chess
         "cK": image(
             files("protograf").joinpath("resources/abstracts/chess/Chess_klt45.svg")
         ),
@@ -60,9 +115,8 @@ def piece_shape(key: str, game: str, name: str = "") -> object:
         "cp": image(
             files("protograf").joinpath("resources/abstracts/chess/Chess_pdk45.svg")
         ),
-        # shogi
-        # * black/lowercase - pointing up - Lower side of board)
-        # * white/uppercase - pointing down - Upper side of board)
+        # ---- shogi
+        # ---- * black/lowercase - pointing up - Lower side of board)
         "sk": image(
             files("protograf").joinpath("resources/abstracts/shogi/Shogi_osho(svg).svg")
         ),
@@ -134,6 +188,7 @@ def piece_shape(key: str, game: str, name: str = "") -> object:
                 "resources/abstracts/shogi/Shogi_tokin(svg).svg"
             )
         ),
+        # ---- * white/uppercase - pointing down - Upper side of board)
         # white image is rotated by 180 degrees
         "sK": image(
             files("protograf").joinpath(
@@ -225,7 +280,7 @@ def piece_shape(key: str, game: str, name: str = "") -> object:
             ),
             rotation=180,
         ),
-        # test
+        # ---- test
         "z": image(files("protograf").joinpath("resources/abstracts/test/black.png")),
         "Z": image(files("protograf").joinpath("resources/abstracts/test/white.png")),
     }

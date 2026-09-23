@@ -29,7 +29,13 @@ from protograf.utils.structures import (  # named tuples
 from protograf.utils.tools import _lower
 
 # local
-from .abstracts_pieces import piece_shape
+from .abstracts_pieces import (
+    piece_shape,
+    NAMED_CHESS_BLACK,
+    NAMED_CHESS_WHITE,
+    NAMED_SHOGI_BLACK,
+    NAMED_SHOGI_WHITE,
+)
 
 
 class AbstractGameObject(BaseShape):
@@ -395,18 +401,18 @@ class AbstractGameObject(BaseShape):
                 }
             case "chess":
                 pg_pieces = {
-                    "B": piece_shape("B", "White Bishop"),
-                    "b": piece_shape("b", "Black Bishop"),
-                    "K": piece_shape("K", "White King"),
-                    "k": piece_shape("k", "Black King"),
-                    "N": piece_shape("N", "White Knight"),
-                    "n": piece_shape("n", "Black Knight"),
-                    "P": piece_shape("P", "White Pawn"),
-                    "p": piece_shape("p", "Black Pawn"),
-                    "Q": piece_shape("Q", "White Queen"),
-                    "q": piece_shape("q", "Black Queen"),
-                    "R": piece_shape("R", "White Rook"),
-                    "r": piece_shape("r", "Black Rook"),
+                    "B": piece_shape("cB", "White Bishop"),
+                    "b": piece_shape("cb", "Black Bishop"),
+                    "K": piece_shape("cK", "White King"),
+                    "k": piece_shape("ck", "Black King"),
+                    "N": piece_shape("cN", "White Knight"),
+                    "n": piece_shape("cn", "Black Knight"),
+                    "P": piece_shape("cP", "White Pawn"),
+                    "p": piece_shape("cp", "Black Pawn"),
+                    "Q": piece_shape("cQ", "White Queen"),
+                    "q": piece_shape("cq", "Black Queen"),
+                    "R": piece_shape("cR", "White Rook"),
+                    "r": piece_shape("cr", "Black Rook"),
                 }
             case "go":
                 pg_pieces = {
@@ -517,19 +523,7 @@ class AbstractGameObject(BaseShape):
                     )
                 if len(parts) > 2:
                     pname = _lower(parts[2])
-                    if pname not in (
-                        "pawn",
-                        "queen",
-                        "king",
-                        "rook",
-                        "bishop",
-                        "knight",
-                    ):
-                        feedback(
-                            f"A named piece's Chess name cannot be '{parts[2]}'.",
-                            True,
-                            True,
-                        )
+
                     match game:
                         case "checkers":
                             match pcolor:
@@ -538,19 +532,63 @@ class AbstractGameObject(BaseShape):
                                 case "white":
                                     pg_pieces[piece_id] = piece_shape("kW", "checkers")
                         case "chess":
+                            if pname not in (
+                                "pawn",
+                                "queen",
+                                "king",
+                                "rook",
+                                "bishop",
+                                "knight",
+                            ):
+                                feedback(
+                                    f"A named piece's Chess name cannot be '{parts[2]}'.",
+                                    True,
+                                    True,
+                                )
                             match pcolor:
                                 case "black":
-                                    pg_pieces[piece_id] = piece_shape(pname, "chess")
+                                    pcode = NAMED_CHESS_BLACK[pname]
+                                    pg_pieces[piece_id] = piece_shape(pcode, "chess")
                                 case "white":
-                                    pg_pieces[piece_id] = piece_shape(
-                                        pname.upper(), "chess"
-                                    )
+                                    pcode = NAMED_CHESS_WHITE[pname]
+                                    pg_pieces[piece_id] = piece_shape(pcode, "chess")
                         case "go":
                             match pcolor:
                                 case "black":
                                     pg_pieces[piece_id] = piece_shape("gB", "go")
                                 case "white":
-                                    pg_pieces[piece_id] = piece_shape("bW", "go")
+                                    pg_pieces[piece_id] = piece_shape("gW", "go")
+                        case "shogi":
+                            if pname not in (
+                                "osho",
+                                "gyokusho",
+                                "hisha",
+                                "ryuo",
+                                "kakugyo",
+                                "ryuma",
+                                "ryume",
+                                "kinsho",
+                                "ginsho",
+                                "narigin",
+                                "keima",
+                                "narikei",
+                                "kyosha",
+                                "narikyo",
+                                "fuhyo",
+                                "tokin",
+                            ):
+                                feedback(
+                                    f"A named piece's Shogi name cannot be '{parts[2]}'.",
+                                    True,
+                                    True,
+                                )
+                            match pcolor:
+                                case "black":
+                                    pcode = NAMED_SHOGI_BLACK[pname]
+                                    pg_pieces[piece_id] = piece_shape(pcode, "shogi")
+                                case "white":
+                                    pcode = NAMED_SHOGI_WHITE[pname]
+                                    pg_pieces[piece_id] = piece_shape(pcode, "shogi")
                         case _:
                             feedback(
                                 "The AbstractGame named for piece must be"
