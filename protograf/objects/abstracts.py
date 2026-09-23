@@ -55,10 +55,10 @@ class AbstractGameObject(BaseShape):
         self.fills = kwargs.get("fills", ["white"])
         self.strokes = kwargs.get("strokes", ["black"])
         self.hairs = tools.as_bool(kwargs.get("hairs", False))
+        self.intersections = tools.as_bool(kwargs.get("intersections", False))
         self.hex_pattern = kwargs.get("hex_pattern", None)  # TODO - process this!
-        self.labels_start = kwargs.get("labels_start", None)
-        self.labels_type = kwargs.get("labels_type", None)
-        self.grid_align = tools.as_bool(kwargs.get("grid_align", False))
+        self.label_start = kwargs.get("label_start", None)
+        self.label_type = kwargs.get("label_type", None)
         self.pieces = None
         user_pieces = kwargs.get("pieces", [])
         self.pieces_resize = kwargs.get("pieces_resize", 0.8)
@@ -141,7 +141,7 @@ class AbstractGameObject(BaseShape):
                     self.cols = 8
             case "go":
                 self.pieces_type = "go"
-                self.grid_align = True
+                self.intersections = True
                 if not self.fills:
                     self.fills = ("#D9A359",)
                 if not self.strokes:
@@ -205,7 +205,7 @@ class AbstractGameObject(BaseShape):
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
-        # TODO - validate self.labels_start and self.labels_type
+        # TODO - validate self.label_start and self.label_type
         if self.pieces is not None:
             if not isinstance(self.pieces, (list, tuple)):
                 feedback(
@@ -316,16 +316,19 @@ class AbstractGameObject(BaseShape):
                 )
                 _shapes = []
                 for key, colr in enumerate(self.fills):
-                    _shapes.append(
-                        square(
-                            side=self.cell_size,
-                            stroke=self.strokes[key],
-                            fill=colr,
+                    if self.intersections:
+                        Layout(self.board_layout, draw_lines=True, _draw_grid=False)
+                    else:
+                        _shapes.append(
+                            square(
+                                side=self.cell_size,
+                                stroke=self.strokes[key],
+                                fill=colr,
+                            )
                         )
-                    )
-                Layout(self.board_layout, shapes=_shapes, _draw_grid=False)
+                        Layout(self.board_layout, shapes=_shapes, _draw_grid=False)
                 # ---- set default cell attributes (plus label)
-                # TODO  - changes this for shogi !! (numbers only from TR)
+                # TODO  - change this for shogi !! (numbers only; start at TR)
                 for row in range(self.rows, 0, -1):
                     for col in range(1, self.cols + 1):
                         col_id = tools.sheet_column(col, lower=True)
@@ -797,16 +800,21 @@ class AbstractStateObject(BaseShape):
         # ---- draw board
         _shapes = []
         match _lower(self.board.name):
-            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default is grid
-                for key, colr in enumerate(self.board.fills):
-                    _shapes.append(
-                        square(
-                            side=self.board.cell_size,
-                            stroke=self.board.strokes[key],
-                            fill=colr,
-                        )
+            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default name is grid
+                if self.board.intersections:
+                    Layout(
+                        self.board.board_layout, shapes=None, draw_lines=True, **kwargs
                     )
-                Layout(self.board.board_layout, shapes=_shapes)
+                else:
+                    for key, colr in enumerate(self.board.fills):
+                        _shapes.append(
+                            square(
+                                side=self.board.cell_size,
+                                stroke=self.board.strokes[key],
+                                fill=colr,
+                            )
+                        )
+                    Layout(self.board.board_layout, shapes=_shapes, **kwargs)
             case "hexagons":
                 self.board.board_layout._draw_grid = True
                 self.board.board_layout.draw_layout()

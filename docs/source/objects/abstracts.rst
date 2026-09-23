@@ -91,10 +91,14 @@ The properties that can be set for an AbstractGame are:
 
 * *name*: the name of a type of board; which can chosen from  one of:
   ``chess``, ``checkers``, ``go``; if omitted, the default is a ``grid``
-* *pieces*: details of pieces that will be placed on the board; the piece set
-  can |dash| **independantly** of the board name |dash| be chosen from a
-  pre-existing set: ``chess``, ``checkers`` (the default), ``go`` or a
-  customised list; see below for `AbstractGame Pieces`_
+* *pieces*: details of pieces that will be placed on the board; the set
+  of pieces can either be:
+
+  * chosen |dash| **independantly** of the board name |dash| from a
+    pre-existing set: ``chess``, ``checkers`` (the default), ``go``,
+    ``shogi``; or
+  * defined with a customised list of piece names and shapes; see below
+    for `AbstractGame Pieces`_
 * *colors*: a list of one or more :ref:`colors <basic-color>`  in which to draw
   alternating board spaces; the default is to draw all squares ``white`` (or
   the board's *fill* color)
@@ -102,8 +106,8 @@ The properties that can be set for an AbstractGame are:
   gridlines; these lines are one-quarter of the length of a board cell, for
   example, if the board had squares of side 1 inch, then the hairs would be
   one-quarter of an inch long
-* *grid_align*: if ``True``, draw pieces on grid intersections, not grid spaces,
-  and label lines, not spaces
+* *intersections*: if ``True``, draw pieces on grid intersections, not grid
+  spaces, and label the lines, not the spaces
 * *pieces_resize*: a fractional value by which to resize the built-in piece
   shapes or images; this defaults to ``1`` |dash| note that this does **not**
   apply to custom-made shapes

@@ -43,7 +43,7 @@ log = logging.getLogger(__name__)
 
 
 class LayoutGrid:
-    """Draw shape(s) in locations, cols, & rows in a virtual layout"""
+    """Draw shape(s) or lines in locations, cols, & rows in a virtual layout"""
 
     def __init__(self, grid, **kwargs):
         utils.validate_globals()
@@ -53,6 +53,8 @@ class LayoutGrid:
         kwargs = kwargs
         shapes = kwargs.get("shapes", [])  # shapes or Places
         corners = kwargs.get("corners", [])  # shapes or Places for corners only!
+        # set this property if location centres should be joined with lines
+        self.lines = tools.as_bool(kwargs.get("draw_lines", False))
         rotations = kwargs.get("rotations", [])  # rotations for an edge
         if kwargs.get("masked") and isinstance(kwargs.get("masked"), str):
             self.masked = tools.sequence_split(kwargs.get("masked"), "masked")
@@ -82,10 +84,14 @@ class LayoutGrid:
         self.layout_grid_transparency = kwargs.get("gridlines_transparency", None)
         # ---- process grid
         corners_dict = self.validate_inputs(shapes, corners)
-        self.draw_the_grid()
+        if self._draw_grid:
+            self.draw_the_grid()
         _locations = self.process_locations()
         rotation_sequence = self.process_rotations(rotations)
-        self.draw_shapes(shapes, _locations, rotation_sequence, corners_dict)
+        if self.lines and self._draw_grid:
+            self.draw_lines(_locations)
+        if shapes:
+            self.draw_shapes(shapes, _locations, rotation_sequence, corners_dict)
 
     def validate_inputs(self, shapes, corners):
         from protograf.shapes.virtuals import VirtualLocations
@@ -139,8 +145,87 @@ class LayoutGrid:
                     )
         return corners_dict
 
+    def max_cols_max_rows(self, locations: list) -> tuple:
+        """Get the maximum column and row values from a list of locations"""
+        """
+            Locale(
+                col=loc[1].col,
+                row=loc[1].row,
+                x=loc[1].x,
+                y=loc[1].y,
+                xy=Point(loc[1].x, loc[1].y),
+                id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
+                sequence=key,
+                corner=loc[1].corner,
+                page=globals.page_count + 1,
+            ),
+        """
+        row, col = 0, 0
+        for loc in locations:
+            _loc = loc[1]
+            col = _loc.col if _loc.col > col else col
+            row = _loc.row if _loc.row > row else row
+        return col, row
+
+    def locale_by_col_and_row(self, locations: list, col: int, row: int) -> Locale:
+        """Get a Locale by its column and row value from a list of locations"""
+        for loc in locations:
+            _loc = loc[1]
+            if _loc.col == col and _loc.row == row:
+                return _loc
+        return None
+
+    def draw_lines(self, _locations: list):
+        """Draw gridlines between location centres"""
+        if self.lines:
+            match self.grid_classname:
+                case "DiamondLocations":
+                    raise NotImplementedError(
+                        "DiamondLocations cannot be connected with lines"
+                    )
+                case "TriangularLocations":
+                    raise NotImplementedError(
+                        "TriangularLocations cannot be connected with lines"
+                    )
+                case "RectangularLocations":
+                    max_cols, max_rows = self.max_cols_max_rows(_locations)
+                    for row in range(1, max_rows):
+                        for col in range(1, max_cols):
+                            loc = self.locale_by_col_and_row(_locations, col, row)
+                            if loc.col == max_cols:
+                                continue  # skip locations in the end column
+                            if loc.row == max_rows:
+                                continue  # skip locations in the end row
+                            next_col_loc = self.locale_by_col_and_row(
+                                _locations, col + 1, row
+                            )
+                            next_row_loc = self.locale_by_col_and_row(
+                                _locations, col, row + 1
+                            )
+                            height = next_row_loc.y - loc.y
+                            width = next_col_loc.x - loc.x
+                            cxy = Point(loc.x + width / 2.0, loc.y + height / 2.0)
+                            Rectangle(
+                                x=loc.x,
+                                y=loc.y,
+                                # cxy=cxy,
+                                height=height,
+                                width=width,
+                                stroke=self.layout_grid_stroke,
+                                stroke_width=self.layout_grid_stroke_width,
+                                stroke_ends=self.layout_grid_ends,
+                                dotted=self.layout_grid_dotted,
+                                dashed=self.layout_grid_dashed,
+                                fill=self.layout_grid_fill,
+                            )
+                case _:
+                    feedback(
+                        f"The grid type '{self.grid_classname}' does not support gridlines!",
+                        True,
+                    )
+
     def draw_the_grid(self):
-        """draw grid (using a regular Shape)"""
+        """Draw the grid (using a regular Shape)"""
         if self.layout_grid:
             self.layout_grid_centroid = self.grid.grid_centroid  # calculated in layouts
             match self.grid_classname:
