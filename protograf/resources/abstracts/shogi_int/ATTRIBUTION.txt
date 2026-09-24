@@ -1,0 +1,3 @@
+https://github.com/Kadagaden/shogi-pieces/tree/master/international
+
+* Recolored from yellow to white fill

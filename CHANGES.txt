@@ -4,6 +4,7 @@ protograf Changes
 2026-00-00 (0.5.9)
 ------------------
 - Add AbstractBoard and AbstractGame objects
+- Add sets of SVG files for Chess and Shogi pieces
 - Major code restructure; better use of namespaces
 - [PLANNED-1] Expand geo coverage for minor shapes
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line

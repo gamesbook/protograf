@@ -1644,7 +1644,7 @@ def is_url_valid(url: str, qualifying=MIN_ATTRIBUTES):
     >>> is_url_valid('http://localhost:8080')
     True
     """
-    tokens = urlparse(url)
+    tokens = urlparse(str(url))
     if tokens.scheme and tokens.scheme not in ["http", "https"]:
         return False
     if tokens.netloc:

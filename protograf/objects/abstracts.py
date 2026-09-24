@@ -35,6 +35,9 @@ from .abstracts_pieces import (
     NAMED_CHESS_WHITE,
     NAMED_SHOGI_BLACK,
     NAMED_SHOGI_WHITE,
+    NAMED_SHOGI_INT_WHITE,
+    NAMED_SHOGI_INT_BLACK,
+    SHOGI_NAMES,
 )
 
 
@@ -262,35 +265,6 @@ class AbstractGameObject(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
 
-    def character_map(self, piece_name: str) -> object:
-        """Return predefined shape or Image associated with a known piece character."""
-
-        def chess_piece(name):
-            # lookup image and return Image
-            print(f"Chess {name}")
-            return None
-
-        def go_stone(name):
-            # lookup image and return Image
-            print(f"Go {name}")
-            return None
-
-        match piece_name:
-            case "cB":
-                return CircleShape(canvas=self.canvas, fill="black", stroke="black")
-            case "cW":
-                return CircleShape(canvas=self.canvas, fill="white", stroke="black")
-            case "gB":
-                return go_stone("black")
-            case "gW":
-                return go_stone("white")
-            case "b":
-                return chess_piece("bishop_black")
-            case "B":
-                return chess_piece("bishop_white")
-            case _:
-                raise NotImplementedError(f"Piece type {piece_name} is not pre-defined")
-
     def setup_board(self):
         """Create board_layout for the required grid"""
         from protograf.protos import Layout, square, Hexagons, hexagon
@@ -455,6 +429,39 @@ class AbstractGameObject(BaseShape):
                     "V": piece_shape("sW", "White Silver General: Promoted"),
                     "v": piece_shape("sw", "Black Silver General: Promoted"),
                 }
+            case "shogi_int":
+                pg_pieces = {
+                    "A": piece_shape("iA", "White Lance: Promoted"),
+                    "a": piece_shape("ia", "Black Lance: Promoted"),
+                    "B": piece_shape("iB", "White Bishop"),
+                    "b": piece_shape("ib", "Black Bishop"),
+                    "D": piece_shape("iD", "White Rook: Promoted (Dragon)"),
+                    "d": piece_shape("id", "Black Rook: Promoted (Dragon)"),
+                    "G": piece_shape("iG", "White Gold General"),
+                    "g": piece_shape("ig", "Black Gold General"),
+                    "H": piece_shape("iH", "White Bishop: Promoted (Horse)"),
+                    "h": piece_shape("ih", "Black Bishop: Promoted (Horse)"),
+                    "J": piece_shape("iJ", "White King (challenger)"),
+                    "j": piece_shape("ij", "Black King (challenger)"),
+                    "K": piece_shape("iK", "White King (champion)"),
+                    "k": piece_shape("ik", "Black King (champion)"),
+                    "l": piece_shape("il", "Black Lance"),
+                    "L": piece_shape("iL", "White Lance"),
+                    "N": piece_shape("iN", "White Knight"),
+                    "n": piece_shape("in", "Black Knight"),
+                    "P": piece_shape("iP", "White Pawn"),
+                    "p": piece_shape("ip", "Black Pawn"),
+                    "R": piece_shape("iR", "White Rook"),
+                    "r": piece_shape("ir", "Black Rook"),
+                    "S": piece_shape("iS", "White Silver General"),
+                    "s": piece_shape("is", "Black Silver General"),
+                    "T": piece_shape("iT", "White Knight: Promoted"),
+                    "t": piece_shape("it", "Black Knight: Promoted"),
+                    "W": piece_shape("iV", "White Pawn: Promoted"),
+                    "w": piece_shape("iv", "Black Pawn: Promoted"),
+                    "V": piece_shape("iW", "White Silver General: Promoted"),
+                    "v": piece_shape("iw", "Black Silver General: Promoted"),
+                }
             case None:
                 pass  # no defauls
             case _:
@@ -562,24 +569,7 @@ class AbstractGameObject(BaseShape):
                                 case "white":
                                     pg_pieces[piece_id] = piece_shape("gW", "go")
                         case "shogi":
-                            if pname not in (
-                                "osho",
-                                "gyokusho",
-                                "hisha",
-                                "ryuo",
-                                "kakugyo",
-                                "ryuma",
-                                "ryume",
-                                "kinsho",
-                                "ginsho",
-                                "narigin",
-                                "keima",
-                                "narikei",
-                                "kyosha",
-                                "narikyo",
-                                "fuhyo",
-                                "tokin",
-                            ):
+                            if pname not in SHOGI_NAMES:
                                 feedback(
                                     f"A named piece's Shogi name cannot be '{parts[2]}'.",
                                     True,
@@ -591,6 +581,20 @@ class AbstractGameObject(BaseShape):
                                     pg_pieces[piece_id] = piece_shape(pcode, "shogi")
                                 case "white":
                                     pcode = NAMED_SHOGI_WHITE[pname]
+                                    pg_pieces[piece_id] = piece_shape(pcode, "shogi")
+                        case "shogi_int":
+                            if pname not in SHOGI_NAMES:
+                                feedback(
+                                    f"A named piece's Shogi name cannot be '{parts[2]}'.",
+                                    True,
+                                    True,
+                                )
+                            match pcolor:
+                                case "black":
+                                    pcode = NAMED_SHOGI_INT_BLACK[pname]
+                                    pg_pieces[piece_id] = piece_shape(pcode, "shogi")
+                                case "white":
+                                    pcode = NAMED_SHOGI_INT_WHITE[pname]
                                     pg_pieces[piece_id] = piece_shape(pcode, "shogi")
                         case _:
                             feedback(
@@ -635,13 +639,13 @@ class AbstractStateObject(BaseShape):
         """Create initial positions."""
         if self.setup:
             match _lower(self.board.name):
-                case "chess":
+                case "chess":  # white at the bottom
                     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
                 case "checkers":
                     return "1B1B1B1B/B1B1B1B1/1B1B1B1B/8/8/W1W1W1W1/1W1W1W1w/W1W1W1W1"
                 case "go":
                     return ""
-                case "shogi":
+                case "shogi":  # white at the top
                     return "LNSGKGSNL/1R5B1/PPPPPPPPP/9/9/9/ppppppppp/1b5r1/lnsgkgsnl/123456789"
                 case _:
                     if self.board.name:
@@ -790,6 +794,37 @@ class AbstractStateObject(BaseShape):
                     )
         return position_list
 
+    def draw_pieces(self):
+        """Draw the piece shapes on a given canvas using their character IDs."""
+        if not self.board.pieces or not isinstance(self.board.pieces, dict):
+            feedback(
+                "The board's pieces have not been setup correctly!",
+                True,
+                True,
+            )
+        for row_no, row in enumerate(self.position_matrix):
+            for col_no, col in enumerate(row):
+                # print(f'&&& AbstractStateObject {row_no=},{col_no=} :', col)
+                if col == ".":
+                    continue  # no piece here; move along, move along
+                piece_shape = self.board.pieces.get(col, None)
+                if piece_shape is None:
+                    feedback(
+                        f"Unable to find the piece named '{col}'; "
+                        " please check the set for '{self.board.name}'.",
+                        True,
+                        True,
+                    )
+                else:
+                    cell = self.board.board_layout.cells.get((col_no + 1, row_no + 1))
+                    cntr = cell.centre
+                    # print(f'&&& AbstractStateObject {row_no=},{col_no=} :', cntr)
+                    kwargs = {
+                        "_abs_cx": tools.unit(cntr.x),
+                        "_abs_cy": tools.unit(cntr.y),
+                    }
+                    piece_shape.draw(**kwargs)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
         from protograf.protos import Layout, square, hexagon
@@ -805,6 +840,8 @@ class AbstractStateObject(BaseShape):
                     Layout(
                         self.board.board_layout, shapes=None, draw_lines=True, **kwargs
                     )
+                    # draw square to "fill in" board with color
+                    # warning if setting colors for board cells?
                 else:
                     for key, colr in enumerate(self.board.fills):
                         _shapes.append(
@@ -837,7 +874,7 @@ class AbstractStateObject(BaseShape):
                 )
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
-            pass
+            self.draw_pieces()
         elif self.board.pieces and not self.position_matrix:
             feedback(
                 "To draw an AbstractState requires the 'positions' for the pieces",
@@ -857,17 +894,18 @@ class AbstractStateObject(BaseShape):
                 True,
             )
         else:
-            pass
-        # TOOD - use the board.cells property - {{col,row}}=centre_point to draw piece
-        print("TODO: draw pieces")
+            raise ValueError(
+                "Unexpected error handling position_matrix and board.pieces!"
+            )
 
         # ---- draw annotations
-        for anno in self.annotations:
-            if not isinstance(anno, BaseShape):
-                feedback(
-                    "The AbstractGame 'annotations' property must be a list of shapes, "
-                    f" not a '{type(self.board.pieces).__name__}'.",
-                    True,
-                    True,
-                )
-            anno.draw()
+        if self.annotations:
+            for anno in self.annotations:
+                if not isinstance(anno, BaseShape):
+                    feedback(
+                        "The AbstractGame 'annotations' property must be a list of shapes, "
+                        f" not a '{type(self.board.pieces).__name__}'.",
+                        True,
+                        True,
+                    )
+                anno.draw()

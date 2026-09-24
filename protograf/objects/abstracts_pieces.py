@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-protograf Abstract games pieces shape definitions
+protograf Abstract games pieces shape definitions and/files
 """
 
 # lib
@@ -63,6 +63,60 @@ NAMED_SHOGI_WHITE = {
     "fuhyo": "sP",
     "tokin": "sW",
 }
+NAMED_SHOGI_INT_BLACK = {
+    "osho": "ik",
+    "gyokusho": "ij",
+    "hisha": "ir",
+    "ryuo": "id",
+    "kakugyo": "ib",
+    "ryuma": "ih",
+    "ryume": "ih",
+    "kinsho": "ig",
+    "ginsho": "is",
+    "narigin": "iv",
+    "keima": "in",
+    "narikei": "it",
+    "kyosha": "il",
+    "narikyo": "ia",
+    "fuhyo": "ip",
+    "tokin": "iw",
+}
+NAMED_SHOGI_INT_WHITE = {
+    "osho": "iK",
+    "gyokusho": "iJ",
+    "hisha": "iR",
+    "ryuo": "iD",
+    "kakugyo": "iB",
+    "ryuma": "iH",
+    "ryume": "iH",
+    "kinsho": "iG",
+    "ginsho": "iS",
+    "narigin": "iV",
+    "keima": "iN",
+    "narikei": "iT",
+    "kyosha": "iL",
+    "narikyo": "iA",
+    "fuhyo": "iP",
+    "tokin": "iW",
+}
+SHOGI_NAMES = [
+    "osho",
+    "gyokusho",
+    "hisha",
+    "ryuo",
+    "kakugyo",
+    "ryuma",
+    "ryume",
+    "kinsho",
+    "ginsho",
+    "narigin",
+    "keima",
+    "narikei",
+    "kyosha",
+    "narikyo",
+    "fuhyo",
+    "tokin",
+]
 
 
 def piece_shape(key: str, game: str, name: str = "") -> object:
@@ -98,22 +152,22 @@ def piece_shape(key: str, game: str, name: str = "") -> object:
             files("protograf").joinpath("resources/abstracts/chess/Chess_plt45.svg")
         ),
         "ck": image(
-            files("protograf").joinpath("resources/abstracts/chess/Chess_kdk45.svg")
+            files("protograf").joinpath("resources/abstracts/chess/Chess_kdt45.svg")
         ),
         "cq": image(
-            files("protograf").joinpath("resources/abstracts/chess/Chess_qdk45.svg")
+            files("protograf").joinpath("resources/abstracts/chess/Chess_qdt45.svg")
         ),
         "cb": image(
-            files("protograf").joinpath("resources/abstracts/chess/Chess_bdk45.svg")
+            files("protograf").joinpath("resources/abstracts/chess/Chess_bdt45.svg")
         ),
         "cn": image(
-            files("protograf").joinpath("resources/abstracts/chess/Chess_ndk45.svg")
+            files("protograf").joinpath("resources/abstracts/chess/Chess_ndt45.svg")
         ),
         "cr": image(
-            files("protograf").joinpath("resources/abstracts/chess/Chess_rdk45.svg")
+            files("protograf").joinpath("resources/abstracts/chess/Chess_rdt45.svg")
         ),
         "cp": image(
-            files("protograf").joinpath("resources/abstracts/chess/Chess_pdk45.svg")
+            files("protograf").joinpath("resources/abstracts/chess/Chess_pdt45.svg")
         ),
         # ---- shogi
         # ---- * black/lowercase - pointing up - Lower side of board)
@@ -279,6 +333,99 @@ def piece_shape(key: str, game: str, name: str = "") -> object:
                 "resources/abstracts/shogi/Shogi_tokin(svg).svg"
             ),
             rotation=180,
+        ),
+        # ---- shogi international
+        # ---- * black/lowercase - pointing up - Lower side of board)
+        "ik": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0OU.svg")
+        ),
+        "ij": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0GY.svg")
+        ),
+        "ir": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0HI.svg")
+        ),
+        "id": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0RY.svg")
+        ),
+        "ib": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0KA.svg")
+        ),
+        "ih": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0RY.svg")
+        ),
+        "ig": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0KI.svg")
+        ),
+        "is": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0GI.svg")
+        ),
+        "iv": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0NG.svg")
+        ),
+        "in": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0KE.svg")
+        ),
+        "it": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0NK.svg")
+        ),
+        "il": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0KY.svg")
+        ),
+        "ia": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0NY.svg")
+        ),
+        "ip": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0FU.svg")
+        ),
+        "iw": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/0TO.svg")
+        ),
+        # ---- * white/uppercase - pointing down - Upper side of board)
+        "iK": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1OU.svg"),
+        ),
+        "iJ": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1GY.svg"),
+        ),
+        "iR": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1HI.svg"),
+        ),
+        "iD": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1RY.svg"),
+        ),
+        "iB": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1KA.svg"),
+        ),
+        "iH": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1RY.svg"),
+        ),
+        "iG": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1KI.svg"),
+        ),
+        "iS": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1GI.svg"),
+        ),
+        "iV": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1NG.svg"),
+        ),
+        "iN": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1KE.svg"),
+        ),
+        "iT": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1NK.svg"),
+        ),
+        "iL": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1KY.svg"),
+        ),
+        "iA": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1NY.svg"),
+        ),
+        "iP": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1FU.svg"),
+        ),
+        "iW": image(
+            files("protograf").joinpath("resources/abstracts/shogi_int/1TO.svg"),
         ),
         # ---- test
         "z": image(files("protograf").joinpath("resources/abstracts/test/black.png")),

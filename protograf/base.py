@@ -2208,6 +2208,7 @@ class BaseShape:
 
         img = None
         image_local = image_location
+        image_local = str(image_local)  # convert PosixPath, if needed
 
         if cache_directory:
             if tools.is_url_valid(image_location):
@@ -2249,7 +2250,9 @@ class BaseShape:
                 img = get_image_from_svg(image_local)
             except Exception:
                 feedback(
-                    f'Unable to open and process the image "{image_location}"', True
+                    f'Unable to open and process the image "{image_location}" as SVG',
+                    True,
+                    True,
                 )
                 return None, None
         except IsADirectoryError:
