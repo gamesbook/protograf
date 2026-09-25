@@ -108,6 +108,7 @@ class CircleShape(BaseShape):
             # length
             perimeter=perim,
             radius=radius,
+            r=radius,
             diameter=2 * radius,
             # other
             area=area,

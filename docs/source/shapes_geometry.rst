@@ -200,17 +200,20 @@ In general, size properties are associated with regular, enclosed shapes.
 * ``area`` - the area of the shape
 * ``perimeter`` - the length of the line around the shape
 * ``radius`` - the radius of the shape, where applicable
+* ``r`` - an abbreviation for the radius of the shape, where applicable
 * ``diameter`` - the diameter of the shape, where applicable
 * ``side`` - the length of a side of the shape (if all sides are equal)
 * ``length`` - the length of the shape (if it has a single length)
 * ``width`` - the width of the shape  (if it has a single width)
+* ``wd`` - an abbreviation for the width of the shape  (if it has a single width)
 * ``height`` - the height of the shape (if it has a single height)
+* ``ht`` - an abbreviation for the height of the shape (if it has a single height)
 * ``sides`` - the number of sides of the shape (if all sides are of equal length)
 
 .. WARNING::
 
     Be aware that calculations are **not** yet in place for some, or all, of
-    these calculated values, or that the calculations themselves may still
+    these values for all shapes, or that the calculations themselves may still
     only be approximations |dash| use these properties with caution for now!
 
 Non-Numeric Properties

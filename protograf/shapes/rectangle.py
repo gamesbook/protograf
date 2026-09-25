@@ -123,8 +123,11 @@ class RectangleShape(BaseShape):
             # dimensions
             perimeter=perim,
             radius=radius,
+            r=radius,
             height=self.height,
+            ht=self.height,
             width=self.width,
+            wd=self.width,
             # other
             area=area,
             sides=4,

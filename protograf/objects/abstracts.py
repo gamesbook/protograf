@@ -370,97 +370,103 @@ class AbstractGameObject(BaseShape):
         if pieces_type is None and not pieces_list:
             pieces_type = "checkers"  # Default!
         pg_pieces = {}
+        kwargs = {}
+        breakpoint()
+        kwargs["height"] = self.cell_size
+        kwargs["width"] = self.cell_size
+        kwargs["radius"] = self.cell_size / 2.0 * 0.9
+        # ---- pre-defined piece types
         match pieces_type:
             case "checkers" | "draughts":
                 pg_pieces = {
-                    "B": piece_shape("kR", "Black"),
-                    "W": piece_shape("kW", "White"),
+                    "R": piece_shape("kR", "Red", **kwargs),
+                    "W": piece_shape("kW", "White", **kwargs),
                 }
             case "chess":
                 pg_pieces = {
-                    "B": piece_shape("cB", "White Bishop"),
-                    "b": piece_shape("cb", "Black Bishop"),
-                    "K": piece_shape("cK", "White King"),
-                    "k": piece_shape("ck", "Black King"),
-                    "N": piece_shape("cN", "White Knight"),
-                    "n": piece_shape("cn", "Black Knight"),
-                    "P": piece_shape("cP", "White Pawn"),
-                    "p": piece_shape("cp", "Black Pawn"),
-                    "Q": piece_shape("cQ", "White Queen"),
-                    "q": piece_shape("cq", "Black Queen"),
-                    "R": piece_shape("cR", "White Rook"),
-                    "r": piece_shape("cr", "Black Rook"),
+                    "B": piece_shape("cB", "White Bishop", **kwargs),
+                    "b": piece_shape("cb", "Black Bishop", **kwargs),
+                    "K": piece_shape("cK", "White King", **kwargs),
+                    "k": piece_shape("ck", "Black King", **kwargs),
+                    "N": piece_shape("cN", "White Knight", **kwargs),
+                    "n": piece_shape("cn", "Black Knight", **kwargs),
+                    "P": piece_shape("cP", "White Pawn", **kwargs),
+                    "p": piece_shape("cp", "Black Pawn", **kwargs),
+                    "Q": piece_shape("cQ", "White Queen", **kwargs),
+                    "q": piece_shape("cq", "Black Queen", **kwargs),
+                    "R": piece_shape("cR", "White Rook", **kwargs),
+                    "r": piece_shape("cr", "Black Rook", **kwargs),
                 }
             case "go":
                 pg_pieces = {
-                    "B": piece_shape("gB", "Black Stone"),
-                    "W": piece_shape("gW", "White Stone"),
+                    "B": piece_shape("gB", "Black Stone", **kwargs),
+                    "W": piece_shape("gW", "White Stone", **kwargs),
                 }
             case "shogi":
                 pg_pieces = {
-                    "A": piece_shape("sA", "White Lance: Promoted"),
-                    "a": piece_shape("sa", "Black Lance: Promoted"),
-                    "B": piece_shape("sB", "White Bishop"),
-                    "b": piece_shape("sb", "Black Bishop"),
-                    "D": piece_shape("sD", "White Rook: Promoted (Dragon)"),
-                    "d": piece_shape("sd", "Black Rook: Promoted (Dragon)"),
-                    "G": piece_shape("sG", "White Gold General"),
-                    "g": piece_shape("sg", "Black Gold General"),
-                    "H": piece_shape("sH", "White Bishop: Promoted (Horse)"),
-                    "h": piece_shape("sh", "Black Bishop: Promoted (Horse)"),
-                    "J": piece_shape("sJ", "White King (challenger)"),
-                    "j": piece_shape("sj", "Black King (challenger)"),
-                    "K": piece_shape("sK", "White King (champion)"),
-                    "k": piece_shape("sk", "Black King (champion)"),
-                    "l": piece_shape("sl", "Black Lance"),
-                    "L": piece_shape("sL", "White Lance"),
-                    "N": piece_shape("sN", "White Knight"),
-                    "n": piece_shape("sn", "Black Knight"),
-                    "P": piece_shape("sP", "White Pawn"),
-                    "p": piece_shape("sp", "Black Pawn"),
-                    "R": piece_shape("sR", "White Rook"),
-                    "r": piece_shape("sr", "Black Rook"),
-                    "S": piece_shape("sS", "White Silver General"),
-                    "s": piece_shape("ss", "Black Silver General"),
-                    "T": piece_shape("sT", "White Knight: Promoted"),
-                    "t": piece_shape("st", "Black Knight: Promoted"),
-                    "W": piece_shape("sV", "White Pawn: Promoted"),
-                    "w": piece_shape("sv", "Black Pawn: Promoted"),
-                    "V": piece_shape("sW", "White Silver General: Promoted"),
-                    "v": piece_shape("sw", "Black Silver General: Promoted"),
+                    "A": piece_shape("sA", "White Lance: Promoted", **kwargs),
+                    "a": piece_shape("sa", "Black Lance: Promoted", **kwargs),
+                    "B": piece_shape("sB", "White Bishop", **kwargs),
+                    "b": piece_shape("sb", "Black Bishop", **kwargs),
+                    "D": piece_shape("sD", "White Rook: Promoted (Dragon)", **kwargs),
+                    "d": piece_shape("sd", "Black Rook: Promoted (Dragon)", **kwargs),
+                    "G": piece_shape("sG", "White Gold General", **kwargs),
+                    "g": piece_shape("sg", "Black Gold General", **kwargs),
+                    "H": piece_shape("sH", "White Bishop: Promoted (Horse)", **kwargs),
+                    "h": piece_shape("sh", "Black Bishop: Promoted (Horse)", **kwargs),
+                    "J": piece_shape("sJ", "White King (challenger)", **kwargs),
+                    "j": piece_shape("sj", "Black King (challenger)", **kwargs),
+                    "K": piece_shape("sK", "White King (champion)", **kwargs),
+                    "k": piece_shape("sk", "Black King (champion)", **kwargs),
+                    "l": piece_shape("sl", "Black Lance", **kwargs),
+                    "L": piece_shape("sL", "White Lance", **kwargs),
+                    "N": piece_shape("sN", "White Knight", **kwargs),
+                    "n": piece_shape("sn", "Black Knight", **kwargs),
+                    "P": piece_shape("sP", "White Pawn", **kwargs),
+                    "p": piece_shape("sp", "Black Pawn", **kwargs),
+                    "R": piece_shape("sR", "White Rook", **kwargs),
+                    "r": piece_shape("sr", "Black Rook", **kwargs),
+                    "S": piece_shape("sS", "White Silver General", **kwargs),
+                    "s": piece_shape("ss", "Black Silver General", **kwargs),
+                    "T": piece_shape("sT", "White Knight: Promoted", **kwargs),
+                    "t": piece_shape("st", "Black Knight: Promoted", **kwargs),
+                    "W": piece_shape("sV", "White Pawn: Promoted", **kwargs),
+                    "w": piece_shape("sv", "Black Pawn: Promoted", **kwargs),
+                    "V": piece_shape("sW", "White Silver General: Promoted", **kwargs),
+                    "v": piece_shape("sw", "Black Silver General: Promoted", **kwargs),
                 }
             case "shogi_int":
                 pg_pieces = {
-                    "A": piece_shape("iA", "White Lance: Promoted"),
-                    "a": piece_shape("ia", "Black Lance: Promoted"),
-                    "B": piece_shape("iB", "White Bishop"),
-                    "b": piece_shape("ib", "Black Bishop"),
-                    "D": piece_shape("iD", "White Rook: Promoted (Dragon)"),
-                    "d": piece_shape("id", "Black Rook: Promoted (Dragon)"),
-                    "G": piece_shape("iG", "White Gold General"),
-                    "g": piece_shape("ig", "Black Gold General"),
-                    "H": piece_shape("iH", "White Bishop: Promoted (Horse)"),
-                    "h": piece_shape("ih", "Black Bishop: Promoted (Horse)"),
-                    "J": piece_shape("iJ", "White King (challenger)"),
-                    "j": piece_shape("ij", "Black King (challenger)"),
-                    "K": piece_shape("iK", "White King (champion)"),
-                    "k": piece_shape("ik", "Black King (champion)"),
-                    "l": piece_shape("il", "Black Lance"),
-                    "L": piece_shape("iL", "White Lance"),
-                    "N": piece_shape("iN", "White Knight"),
-                    "n": piece_shape("in", "Black Knight"),
-                    "P": piece_shape("iP", "White Pawn"),
-                    "p": piece_shape("ip", "Black Pawn"),
-                    "R": piece_shape("iR", "White Rook"),
-                    "r": piece_shape("ir", "Black Rook"),
-                    "S": piece_shape("iS", "White Silver General"),
-                    "s": piece_shape("is", "Black Silver General"),
-                    "T": piece_shape("iT", "White Knight: Promoted"),
-                    "t": piece_shape("it", "Black Knight: Promoted"),
-                    "W": piece_shape("iV", "White Pawn: Promoted"),
-                    "w": piece_shape("iv", "Black Pawn: Promoted"),
-                    "V": piece_shape("iW", "White Silver General: Promoted"),
-                    "v": piece_shape("iw", "Black Silver General: Promoted"),
+                    "A": piece_shape("iA", "White Lance: Promoted", **kwargs),
+                    "a": piece_shape("ia", "Black Lance: Promoted", **kwargs),
+                    "B": piece_shape("iB", "White Bishop", **kwargs),
+                    "b": piece_shape("ib", "Black Bishop", **kwargs),
+                    "D": piece_shape("iD", "White Rook: Promoted (Dragon)", **kwargs),
+                    "d": piece_shape("id", "Black Rook: Promoted (Dragon)", **kwargs),
+                    "G": piece_shape("iG", "White Gold General", **kwargs),
+                    "g": piece_shape("ig", "Black Gold General", **kwargs),
+                    "H": piece_shape("iH", "White Bishop: Promoted (Horse)", **kwargs),
+                    "h": piece_shape("ih", "Black Bishop: Promoted (Horse)", **kwargs),
+                    "J": piece_shape("iJ", "White King (challenger)", **kwargs),
+                    "j": piece_shape("ij", "Black King (challenger)", **kwargs),
+                    "K": piece_shape("iK", "White King (champion)", **kwargs),
+                    "k": piece_shape("ik", "Black King (champion)", **kwargs),
+                    "l": piece_shape("il", "Black Lance", **kwargs),
+                    "L": piece_shape("iL", "White Lance", **kwargs),
+                    "N": piece_shape("iN", "White Knight", **kwargs),
+                    "n": piece_shape("in", "Black Knight", **kwargs),
+                    "P": piece_shape("iP", "White Pawn", **kwargs),
+                    "p": piece_shape("ip", "Black Pawn", **kwargs),
+                    "R": piece_shape("iR", "White Rook", **kwargs),
+                    "r": piece_shape("ir", "Black Rook", **kwargs),
+                    "S": piece_shape("iS", "White Silver General", **kwargs),
+                    "s": piece_shape("is", "Black Silver General", **kwargs),
+                    "T": piece_shape("iT", "White Knight: Promoted", **kwargs),
+                    "t": piece_shape("it", "Black Knight: Promoted", **kwargs),
+                    "W": piece_shape("iV", "White Pawn: Promoted", **kwargs),
+                    "w": piece_shape("iv", "Black Pawn: Promoted", **kwargs),
+                    "V": piece_shape("iW", "White Silver General: Promoted", **kwargs),
+                    "v": piece_shape("iw", "Black Silver General: Promoted", **kwargs),
                 }
             case None:
                 pass  # no defauls
@@ -585,7 +591,7 @@ class AbstractGameObject(BaseShape):
                         case "shogi_int":
                             if pname not in SHOGI_NAMES:
                                 feedback(
-                                    f"A named piece's Shogi name cannot be '{parts[2]}'.",
+                                    f"A named piece's Shogi International name cannot be '{parts[2]}'.",
                                     True,
                                     True,
                                 )
@@ -598,9 +604,9 @@ class AbstractGameObject(BaseShape):
                                     pg_pieces[piece_id] = piece_shape(pcode, "shogi")
                         case _:
                             feedback(
-                                "The AbstractGame named for piece must be"
+                                "The AbstractGame name for the piece must be chosen"
                                 " from one of the following games: "
-                                f" Chess, Go, or Checkers (not '{self.name}').",
+                                f" Chess, Go, Shogi, or Checkers (not '{self.name}').",
                                 True,
                                 True,
                             )
@@ -641,11 +647,11 @@ class AbstractStateObject(BaseShape):
             match _lower(self.board.name):
                 case "chess":  # white at the bottom
                     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-                case "checkers":
+                case "checkers" | "draughts":
                     return "1B1B1B1B/B1B1B1B1/1B1B1B1B/8/8/W1W1W1W1/1W1W1W1w/W1W1W1W1"
                 case "go":
                     return ""
-                case "shogi":  # white at the top
+                case "shogi" | "shogi-int":  # white at the top
                     return "LNSGKGSNL/1R5B1/PPPPPPPPP/9/9/9/ppppppppp/1b5r1/lnsgkgsnl/123456789"
                 case _:
                     if self.board.name:

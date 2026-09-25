@@ -169,8 +169,10 @@ class HexShape(BaseShape):
             # length
             perimeter=perim,
             radius=radius,
+            r=radius,
             diameter=diameter,
             height=height,
+            ht=height,
             side=side,
             # other
             area=area,

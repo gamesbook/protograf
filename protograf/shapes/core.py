@@ -183,6 +183,8 @@ class ImageShape(BaseShape):
             # length
             width=width,
             height=height,
+            wd=width,
+            ht=height,
             perimeter=2.0 * width + 2.0 * height,
             # other
             area=width * height,
@@ -3574,6 +3576,7 @@ class StarShape(BaseShape):
         _type = type(self)
         cntr = self._shape_centre
         cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        radius = self.as_point(self._u.radius, self.units, self.as_point, 0)
         vtcs = self._shape_vertexes
         vtcs_user = [
             self.as_point(value, self.units, cntr, self.rotation) for value in vtcs
@@ -3588,6 +3591,8 @@ class StarShape(BaseShape):
             vertices=vtcs_user,
             # perbii
             # length
+            radius=radius,
+            r=radius,
             # other
             # meta
             t=_type,
@@ -3966,6 +3971,7 @@ class TextShape(BaseShape):
             # length
             perimeter=perim,
             radius=radius,
+            r=radius,
             # other
             area=area,
             # meta
