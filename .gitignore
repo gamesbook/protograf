@@ -168,3 +168,4 @@ Protograf
 projects
 # act tool
 bin/*
+.aider*

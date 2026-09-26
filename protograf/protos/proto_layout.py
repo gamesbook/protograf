@@ -90,8 +90,8 @@ class LayoutGrid:
         rotation_sequence = self.process_rotations(rotations)
         if self.lines and self._draw_grid:
             self.draw_lines(_locations)
-        if shapes:
-            self.draw_shapes(shapes, _locations, rotation_sequence, corners_dict)
+        # NOTE!  test for valid shapes and/or debug reside INSIDE the function!
+        self.draw_shapes(shapes, _locations, rotation_sequence, corners_dict)
 
     def validate_inputs(self, shapes, corners):
         from protograf.shapes.virtuals import VirtualLocations
@@ -519,7 +519,7 @@ class LayoutGrid:
         rotation_sequence: dict,
         corners_dict: dict,
     ):
-        """Iterate through locations & draw shape(s)"""
+        """Iterate through locations & draw shape(s) and debug IDs"""
         shape_id = 0
         for count, loc in _locations:
             # print("395: time to draw locs:", count, loc)
@@ -534,6 +534,7 @@ class LayoutGrid:
             if self.grid.pattern in ["o", "outer"]:  # Rectangle only?
                 if count + 1 > self.grid.rows * 2 + (self.grid.cols - 2) * 2:
                     break
+            # ---- draw shapes
             if shapes:
                 # ---- * extract shape data
                 rotation = rotation_sequence.get(count + 1, 0)  # default rotation

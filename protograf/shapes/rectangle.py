@@ -88,7 +88,7 @@ class RectangleShape(BaseShape):
         """Geometry of Rectangle in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        cntr_u = self.as_point(cntr, self.units, cntr, self.rotation)
         vtcs = self._shape_vertexes
         ne = self.as_point(vtcs[0], self.units, cntr, self.rotation)
         se = self.as_point(vtcs[1], self.units, cntr, self.rotation)
@@ -103,11 +103,15 @@ class RectangleShape(BaseShape):
         radius = (
             math.hypot(self.height, self.width) if self.height == self.width else None
         )
+        bbox = BBox(
+            tl=Point(cntr_u.x - self.height / 2.0, cntr_u.y - self.width / 2.0),
+            br=Point(cntr_u.x + self.height / 2.0, cntr_u.y + self.width / 2.0),
+        )
         return ShapeGeometry(
             # centre
-            centre=cntr_user,
-            center=cntr_user,
-            c=cntr_user,
+            centre=cntr_u,
+            center=cntr_u,
+            c=cntr_u,
             # vertices
             vertices=[ne, se, sw, nw],
             ne=ne,
@@ -129,6 +133,7 @@ class RectangleShape(BaseShape):
             width=self.width,
             wd=self.width,
             # other
+            bbox=bbox,
             area=area,
             sides=4,
             # meta

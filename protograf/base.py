@@ -1772,8 +1772,7 @@ class BaseShape:
         #  They are for internal use only and are not expected
         #  to be called by the user.
         #  If set, they should be used to ignore/bypass any other values
-        #  for calculating the starting point or centre point
-        #  for drawing a shape
+        #  for calculating the starting point (or centre) for drawing a shape.
         self._abs_x = kwargs.get("_abs_x", None)
         self._abs_y = kwargs.get("_abs_y", None)
         self._abs_x1 = kwargs.get("_abs_x1", None)

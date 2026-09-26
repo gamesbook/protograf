@@ -79,15 +79,19 @@ class CircleShape(BaseShape):
         """Geometry of Circle in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        cntr_u = self.as_point(cntr, self.units, cntr, self.rotation)  # user units
         perim = self.points_to_value(math.pi * 2.0 * self._u.radius)
         radius = self.points_to_value(self._u.radius)
         area = math.pi * self.points_to_value(self._u.radius) ** 2
+        bbox = BBox(
+            tl=Point(cntr_u.x - radius, cntr_u.y - radius),
+            br=Point(cntr_u.x + radius, cntr_u.y + radius),
+        )
         return ShapeGeometry(
             # centre
-            centre=cntr_user,
-            center=cntr_user,
-            c=cntr_user,
+            centre=cntr_u,
+            center=cntr_u,
+            c=cntr_u,
             # compass
             n=self.poc(90),
             s=self.poc(270),
@@ -111,6 +115,7 @@ class CircleShape(BaseShape):
             r=radius,
             diameter=2 * radius,
             # other
+            bbox=bbox,
             area=area,
             sides=1,
             # meta

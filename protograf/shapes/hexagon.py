@@ -18,6 +18,7 @@ from protograf.utils import colrs, geoms, tools
 from protograf.utils.tools import _lower
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
+    BBox,
     DirectionGroup,
     HexGeometry,
     HexOrientation,
@@ -98,11 +99,20 @@ class HexShape(BaseShape):
         _type = type(self)
         vtcs = self._shape_vertexes  # also calculates self.x_d, self.y_d!
         cntr = Point(self.x_d, self.y_d)
-        cntr_user = self.as_point(cntr, self.units, None, None)
+        cntr_u = self.as_point(cntr, self.units, None, None)
+        # ---- common geometry
+        hex_geom = self.get_geometry()
+        radius = self._p2v(hex_geom.radius)
+        diameter = self._p2v(hex_geom.diameter)
+        height = self._p2v(hex_geom.height_flat)
+        side = self._p2v(hex_geom.radius)
+        area = math.sqrt(3) * 3 / 2 * side**2
+        perim = 6 * side
         # vertices and perbii vary by ORIENTATION!
         n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
         nnw, nne, sse, ssw = None, None, None, None  # pointy
         wnw, ene, ese, wsw = None, None, None, None  # flat
+        # ---- pointy points
         if self.ORIENTATION == HexOrientation.POINTY:
             # vertices
             nw = self.as_point(vtcs[0], self.units, None, None)
@@ -118,6 +128,11 @@ class HexShape(BaseShape):
             nne = geoms.fraction_along_line(n, ne, 0.5)
             sse = geoms.fraction_along_line(s, se, 0.5)
             ssw = geoms.fraction_along_line(s, sw, 0.5)
+            # bbox
+            bbox = BBox(
+                tl=Point(e.x, e.y - height / 2.0), br=Point(w.x, w.y + height / 2.0)
+            )
+        # ---- flat points
         elif self.ORIENTATION == HexOrientation.FLAT:
             # vertices
             w = self.as_point(vtcs[0], self.units, None, None)
@@ -133,22 +148,19 @@ class HexShape(BaseShape):
             ene = geoms.fraction_along_line(e, ne, 0.5)
             ese = geoms.fraction_along_line(e, se, 0.5)
             wsw = geoms.fraction_along_line(w, sw, 0.5)
+            # bbox
+            bbox = BBox(
+                tl=Point(n.x - height / 2.0, n.y), br=Point(s.x + height / 2.0, s.y)
+            )
         else:
             feedback(
                 'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
             )
-        hex_geom = self.get_geometry()
-        radius = self._p2v(hex_geom.radius)
-        diameter = self._p2v(hex_geom.diameter)
-        height = self._p2v(hex_geom.height_flat)
-        side = self._p2v(hex_geom.radius)
-        area = math.sqrt(3) * 3 / 2 * side**2
-        perim = 6 * side
         return ShapeGeometry(
             # centre
-            centre=cntr_user,
-            center=cntr_user,
-            c=cntr_user,
+            centre=cntr_u,
+            center=cntr_u,
+            c=cntr_u,
             # vertices and perbii
             n=n,
             ne=ne,
@@ -175,6 +187,7 @@ class HexShape(BaseShape):
             ht=height,
             side=side,
             # other
+            bbox=bbox,
             area=area,
             # meta
             t=_type,

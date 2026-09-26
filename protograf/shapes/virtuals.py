@@ -649,11 +649,13 @@ class RectangularLocations(VirtualLocations):
                 x + self.interval_x / 2.0,
                 y + self.interval_y / 2.0,
             )
+            # print(f'{col=} {row=} {x=} {y=} {c=}')
             # ---- store rectangle geometry per cell
             _cell_rect = RectangleShape(
                 width=self.interval_x,
                 height=self.interval_y,
-                cxy=c,
+                # cxy=c,
+                cxy=Point(x, y),
             )
             self.cells[(col, row)] = _cell_rect.geometry
             # offset(s)

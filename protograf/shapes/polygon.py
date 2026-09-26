@@ -76,7 +76,7 @@ class PolygonShape(BaseShape):
         """Geometry of Polygon in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        cntr_u = self.as_point(cntr, self.units, cntr, self.rotation)
         perim = None
         radius = self._p2v(self._shape_radius)
         area = self._p2v(self._shape_area)
@@ -93,6 +93,11 @@ class PolygonShape(BaseShape):
             perbii_user.append(
                 geoms.fraction_along_line(vtcs_user[pb], vtcs_user[pb + 1], 0.5)
             )
+        # bbox
+        bbox = BBox(
+            tl=Point(cntr_u.x - radius, cntr_u.y - radius),
+            br=Point(cntr_u.x + radius, cntr_u.y + radius),
+        )
         # named vertices - for "regular" sides
         n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
         if self.sides == 3:  # triangle
@@ -114,9 +119,9 @@ class PolygonShape(BaseShape):
 
         return ShapeGeometry(
             # centre
-            centre=cntr_user,
-            center=cntr_user,
-            c=cntr_user,
+            centre=cntr_u,
+            center=cntr_u,
+            c=cntr_u,
             # named vertices (for some polygons only)
             n=n,
             ne=ne,
@@ -138,6 +143,7 @@ class PolygonShape(BaseShape):
             r=radius,
             diameter=2 * radius,
             # other
+            bbox=bbox,
             area=area,
             sides=self.sides,
             # meta

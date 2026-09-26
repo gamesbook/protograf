@@ -13,7 +13,8 @@ import re
 from protograf import globals
 from protograf.base import BaseShape
 from protograf.shapes import (
-    CircleShape,
+    ImageShape,
+    # CircleShape,
     # PolygonShape,
     # RectangleShape,
     RectangularLocations,
@@ -22,7 +23,8 @@ from protograf.shapes import (
 )
 from protograf.utils import tools, colrs, geoms
 from protograf.utils.messaging import feedback
-from protograf.utils.structures import (  # named tuples
+from protograf.utils.structures import (  # named tuples; enums
+    HexOrientationName,
     Point,
     ShapeGeometry,
 )
@@ -55,8 +57,11 @@ class AbstractGameObject(BaseShape):
         self.set_unit_properties()
         # ---- user properties
         self.name = kwargs.get("name", "grid")
-        self.fills = kwargs.get("fills", ["white"])
-        self.strokes = kwargs.get("strokes", ["black"])
+        self.fills = kwargs.get("fills", None)  # MUST be none; set by user OR game type
+        self.strokes = kwargs.get(
+            "strokes", None
+        )  # MUST be none; set by user OR game type
+        self.areas = kwargs.get("areas", None)  # MUST be none; set by user
         self.hairs = tools.as_bool(kwargs.get("hairs", False))
         self.intersections = tools.as_bool(kwargs.get("intersections", False))
         self.hex_pattern = kwargs.get("hex_pattern", None)  # TODO - process this!
@@ -64,25 +69,25 @@ class AbstractGameObject(BaseShape):
         self.label_type = kwargs.get("label_type", None)
         self.pieces = None
         user_pieces = kwargs.get("pieces", [])
-        self.pieces_resize = kwargs.get("pieces_resize", 0.8)
+        self.pieces_resize = tools.as_float(
+            kwargs.get("pieces_resize", 1.0), "pieces_resize"
+        )  # scaling??? # TODO - process this!
         self._validate_choices()
         # ---- custom properties
-        self.orientation = "pointy"  # current, hard-coded for HexHex
+        self.orientation = (
+            HexOrientationName.POINTY.value
+        )  # hard-coded for HexHex and Hex Grid
         self.pieces_type = None
-        self.cell_size = 1  # typically a "square" area or a hexagon diameter
+        self.cell_size = 1  # typically a "square" area; hexagon height; circle dia.
         # ---- calculated properties
-        if not kwargs.get("width"):
+        if not kwargs.get("width"):  # default to page width
             self.width = (
                 globals.page.width - globals.margins.left - globals.margins.right
             )
-        if not kwargs.get("height"):
+        if not kwargs.get("height"):  # default to page height
             self.height = (
                 globals.page.height - globals.margins.top - globals.margins.bottom
             )
-        if not kwargs.get("cx"):
-            self.cx = self.width / 2.0
-        if not kwargs.get("cy"):
-            self.cy = self.height / 2.0
         self.set_options_by_game()
         # ---- check fills and colors
         if len(self.fills) != len(self.strokes):
@@ -111,9 +116,9 @@ class AbstractGameObject(BaseShape):
         match _lower(self.name):
             case "grid":  # default
                 self.pieces_type = "checkers"
-                if not self.fills:
+                if self.fills is None:
                     self.fills = ("white",)
-                if not self.strokes:
+                if self.strokes is None:
                     self.strokes = ("black",)
                 if not self.cols:
                     self.rows = 8
@@ -123,9 +128,10 @@ class AbstractGameObject(BaseShape):
                 self.cell_size = _available / _max_cells
             case "chess":
                 self.pieces_type = "chess"
-                if not self.fills:
-                    self.fills = ("black", "silver")
-                if not self.strokes:
+                self.intersections = False
+                if self.fills is None:
+                    self.fills = ("white", "silver")
+                if self.strokes is None:
                     self.strokes = (None, None)
                 if not self.cols:
                     self.rows = 8
@@ -134,10 +140,11 @@ class AbstractGameObject(BaseShape):
                 self.board_pattern = "snake"
             case "checkers" | "draughts":
                 self.pieces_type = "checkers"
-                if not self.fills:
-                    self.fills = ("white",)
-                if not self.strokes:
-                    self.strokes = ("black",)
+                self.intersections = False
+                if self.fills is None:
+                    self.fills = ("red", "black")
+                if self.strokes is None:
+                    self.strokes = (None, None)
                 if not self.cols:
                     self.rows = 8
                 if not self.cols:
@@ -145,9 +152,9 @@ class AbstractGameObject(BaseShape):
             case "go":
                 self.pieces_type = "go"
                 self.intersections = True
-                if not self.fills:
+                if self.fills is None:
                     self.fills = ("#D9A359",)
-                if not self.strokes:
+                if self.strokes is None:
                     self.strokes = ("black",)
                 if not self.cols:
                     self.rows = 18
@@ -155,9 +162,10 @@ class AbstractGameObject(BaseShape):
                     self.cols = 18
             case "shogi":
                 self.pieces_type = "shogi"
-                if not self.fills:
+                self.intersections = False
+                if self.fills is None:
                     self.fills = ("white",)
-                if not self.strokes:
+                if self.strokes is None:
                     self.strokes = ("black",)
                 if not self.cols:
                     self.rows = 9
@@ -220,7 +228,7 @@ class AbstractGameObject(BaseShape):
         if not isinstance(self.pieces_resize, (type(None), float, int)):
             feedback(
                 "The AbstractGame 'pieces_resize' property must be a number, "
-                f" not a '{type(self.name).__name__}'.",
+                f" not a '{type(self.pieces_resize).__name__}'.",
                 True,
                 True,
             )
@@ -235,12 +243,28 @@ class AbstractGameObject(BaseShape):
             if not isinstance(self.fills, (list, tuple)):
                 feedback(
                     "The AbstractGame 'fills' property must be a list of colors, "
-                    f" not a '{type(self.name).__name__}'.",
+                    f" not a '{type(self.fills).__name__}'.",
                     True,
                     True,
                 )
             for col in self.fills:
                 colrs.get_color(col)
+        if self.areas:
+            if not isinstance(self.areas, (list, tuple)):
+                feedback(
+                    "The AbstractGame 'areas' property must be a list of shapes, "
+                    f" not a '{type(self.areas).__name__}'.",
+                    True,
+                    True,
+                )
+            for area in self.areas:
+                if not isinstance(area, BaseShape):
+                    feedback(
+                        "The AbstractGame 'areas' property must contain a list of shapes, "
+                        f" it cannot contain a '{type(area).__name__}'.",
+                        True,
+                        True,
+                    )
 
         return True
 
@@ -267,18 +291,24 @@ class AbstractGameObject(BaseShape):
 
     def setup_board(self):
         """Create board_layout for the required grid"""
-        from protograf.protos import Layout, square, Hexagons, hexagon
+        from protograf.protos import Layout, rectangle, Hexagons
+
+        # TODO - calculate board labels
 
         # ---- game-based defaults
-        board_pattern = "default"
+        match _lower(self.name):
+            case "chess":
+                board_pattern = "snake"
+            case _:
+                board_pattern = "default"
         board_start = "NW"
         board_direction = "east"
-        # TODO - calculate board labels
+        # Point(top_x, top_x) is the top-left point of the VirtualLocations (grid points)
         top_x = self.x if self.kwargs.get("x") else self.cell_size / 2.0
         top_y = self.y if self.kwargs.get("y") else self.cell_size / 2.0
         match _lower(self.name):
             case "grid" | "chess" | "checkers" | "go" | "shogi":  # default
-                self.board_layout = RectangularLocations(
+                self.board_layout = RectangularLocations(  # VirtualLocations
                     cols=self.cols,
                     rows=self.rows,
                     x=top_x,
@@ -288,19 +318,23 @@ class AbstractGameObject(BaseShape):
                     direction=board_direction,
                     pattern=board_pattern,
                 )
-                _shapes = []
-                for key, colr in enumerate(self.fills):
-                    if self.intersections:
-                        Layout(self.board_layout, draw_lines=True, _draw_grid=False)
+                if self.intersections:
+                    Layout(self.board_layout, draw_lines=True, _draw_grid=False)
+                else:
+                    if self.areas:
+                        pass
                     else:
-                        _shapes.append(
-                            square(
-                                side=self.cell_size,
-                                stroke=self.strokes[key],
-                                fill=colr,
+                        self.areas = []
+                        for key, colr in enumerate(self.fills):
+                            self.areas.append(
+                                rectangle(
+                                    height=self.cell_size,
+                                    width=self.cell_size,
+                                    stroke=self.strokes[key],
+                                    fill=colr,
+                                )
                             )
-                        )
-                        Layout(self.board_layout, shapes=_shapes, _draw_grid=False)
+                    Layout(self.board_layout, shapes=self.areas, _draw_grid=False)
                 # ---- set default cell attributes (plus label)
                 # TODO  - change this for shogi !! (numbers only; start at TR)
                 for row in range(self.rows, 0, -1):
@@ -340,7 +374,7 @@ class AbstractGameObject(BaseShape):
                     rows=self.rows,
                     x=top_x,
                     y=top_y,
-                    orientation="pointy",
+                    orientation=HexOrientationName.POINTY.value,  # hard-coded: HexGrid
                     _draw_grid=False,
                 )
                 # ---- set default cell attributes (plus label)
@@ -371,7 +405,6 @@ class AbstractGameObject(BaseShape):
             pieces_type = "checkers"  # Default!
         pg_pieces = {}
         kwargs = {}
-        breakpoint()
         kwargs["height"] = self.cell_size
         kwargs["width"] = self.cell_size
         kwargs["radius"] = self.cell_size / 2.0 * 0.9
@@ -814,6 +847,7 @@ class AbstractStateObject(BaseShape):
                 if col == ".":
                     continue  # no piece here; move along, move along
                 piece_shape = self.board.pieces.get(col, None)
+                kwargs = {}
                 if piece_shape is None:
                     feedback(
                         f"Unable to find the piece named '{col}'; "
@@ -823,12 +857,31 @@ class AbstractStateObject(BaseShape):
                     )
                 else:
                     cell = self.board.board_layout.cells.get((col_no + 1, row_no + 1))
-                    cntr = cell.centre
-                    # print(f'&&& AbstractStateObject {row_no=},{col_no=} :', cntr)
-                    kwargs = {
-                        "_abs_cx": tools.unit(cntr.x),
-                        "_abs_cy": tools.unit(cntr.y),
-                    }
+                    if isinstance(piece_shape, ImageShape):
+                        bbox = cell.bbox  # geo ~ user units ~ relative to margin
+                        if bbox:
+                            # define absolute position on page
+                            kwargs = {
+                                "_abs_x": tools.unit(bbox.tl.x + globals.margins.left),
+                                "_abs_y": tools.unit(bbox.tl.y + globals.margins.top),
+                            }
+                        else:
+                            feedback(
+                                "Unable to properly draw Images on the board;"
+                                " no BoundingBox is provided!",
+                                True,
+                                True,
+                            )
+                    elif isinstance(piece_shape, BaseShape):
+                        cntr = cell.centre  # geo ~ user units ~ relative to margin
+                        kwargs = {
+                            "_abs_cx": tools.unit(cntr.x - globals.margins.left),
+                            "_abs_cy": tools.unit(cntr.y - globals.margins.top),
+                        }
+                    else:
+                        raise NotImplementedError(
+                            f'Unable to draw a piece of type "{type(piece_shape)}"'
+                        )
                     piece_shape.draw(**kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -846,18 +899,15 @@ class AbstractStateObject(BaseShape):
                     Layout(
                         self.board.board_layout, shapes=None, draw_lines=True, **kwargs
                     )
-                    # draw square to "fill in" board with color
-                    # warning if setting colors for board cells?
+                    # TODO - draw a square (rows*cols) to "fill in" board with color
+                    # warning if setting colors for board cells as they do not show?
                 else:
-                    for key, colr in enumerate(self.board.fills):
-                        _shapes.append(
-                            square(
-                                side=self.board.cell_size,
-                                stroke=self.board.strokes[key],
-                                fill=colr,
-                            )
-                        )
-                    Layout(self.board.board_layout, shapes=_shapes, **kwargs)
+                    Layout(
+                        self.board.board_layout,
+                        shapes=self.board.areas,
+                        # debug="colrow",  (for testing only!)
+                        **kwargs,
+                    )
             case "hexagons":
                 self.board.board_layout._draw_grid = True
                 self.board.board_layout.draw_layout()
@@ -881,6 +931,7 @@ class AbstractStateObject(BaseShape):
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
             self.draw_pieces()
+            # print("PIECES DISABELD")
         elif self.board.pieces and not self.position_matrix:
             feedback(
                 "To draw an AbstractState requires the 'positions' for the pieces",

@@ -69,6 +69,11 @@ class HexOrientation(Enum):
     POINTY = 2
 
 
+class HexOrientationName(Enum):
+    FLAT = "flat"
+    POINTY = "pointy"
+
+
 class TriangleType(Enum):
     EQUILATERAL = 1
     ISOSCELES = 2
@@ -292,6 +297,34 @@ UnitProperties = namedtuple(
     ],
 )
 
+# ---- Parent DATACLASS
+
+
+@dataclass
+class BBox:
+    """Spatial bounding box.
+
+    Properties:
+
+    - `tl` is minimum x,y point
+    - `br` is maximum x,y point
+
+    Notes:
+        * Y-values start at top-left of co-ordinate system
+    """
+
+    tl: Point
+    br: Point
+
+    @property
+    def height(self):
+        return self.br.y - self.tl.y
+
+    @property
+    def width(self):
+        return self.br.x - self.tl.x
+
+
 # ---- NAMEDTUPLE CLASS
 
 
@@ -353,13 +386,17 @@ class ShapeGeometry(NamedTuple):
     vertices: list | None = None
     p: Point | None = None
     perbii: list | None = None
+    bbox: BBox | None = None
     # lengths
     radius: float | None = None
+    r: float | None = None  # alias for radius
     diameter: float | None = None
     side: float | None = None
     length: float | None = None
     width: float | None = None
+    wd: float | None = None  # alias for width
     height: float | None = None
+    ht: float | None = None  # alias for height
     perimeter: float | None = None
     # other
     area: float | None = None
@@ -396,32 +433,7 @@ class Locale(NamedTuple):
     page: int | None = None
 
 
-# ---- DATACLASS
-
-
-@dataclass
-class BBox:
-    """Spatial bounding box.
-
-    Properties:
-
-    - `tl` is minimum x,y point
-    - `br` is maximum x,y point
-
-    Notes:
-        * Y-values start at top-left of co-ordinate system
-    """
-
-    tl: Point
-    br: Point
-
-    @property
-    def height(self):
-        return self.br.y - self.tl.y
-
-    @property
-    def width(self):
-        return self.br.x - self.tl.x
+# ---- DATACLASSES
 
 
 @dataclass

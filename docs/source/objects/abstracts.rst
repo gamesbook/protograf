@@ -166,6 +166,27 @@ AbstractGame Pieces
 -------------------
 `^ <abstractgame-command_>`_
 
+Built-in Pieces
+~~~~~~~~~~~~~~~
+
+There are a number of shapes of pieces from well-known games available within
+ *protograf's* library.  They can be used as set or indiviually. If you have
+ already chosen a "named" game, the default set of pieces corresponding to that
+ game will automatically have been selected.
+
+
+Custom Pieces
+~~~~~~~~~~~~~
+
+You can supply your own set of shapes to be used with a game.
+
+Shapes can either be designed with *protograf's* built-in shapes, or with a
+pre-create image.
+
+.. NOTE::
+
+    If you use an image for a shape, ensure that it is square to fit into a
+    standard grid cell |dash| square or hexagon.
 
 
 .. _abstractGameAnnotations:

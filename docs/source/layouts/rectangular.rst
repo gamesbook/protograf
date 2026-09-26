@@ -604,7 +604,8 @@ Example 10. Debug
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, x=0.5, y=0.5)
+            cols=3, rows=4,
+            x=0.5, y=0.5)
         Layout(rect, debug='none')
 
       In this case, setting the *debug* property to ``none`` simply
@@ -625,7 +626,8 @@ Example 10. Debug
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, x=0.5, y=0.5)
+            cols=3, rows=4,
+            x=0.5, y=0.5)
         Layout(rect, debug='sequence')
 
       In this case, setting the *debug* property to ``sequence``
@@ -647,10 +649,11 @@ Example 10. Debug
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, x=0.5, y=0.5)
+            cols=3, rows=4,
+            x=0.5, y=0.5)
         Layout(rect, debug='colrow')
 
-      In this case, setting the *debug* property to ``sequence``
+      In this case, setting the *debug* property to ``colrow``
       causes a small, blue dot to be shown at all of the locations, as
       well the matching column and row numbers (on either side of the dot).
 
