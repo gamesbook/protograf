@@ -775,7 +775,7 @@ class AbstractStateObject(BaseShape):
         """Convert positions into a list structure."""
         if self.positions is None or self.positions == "":
             return []
-        if "/" in self.positions and "/n" in self.positions:
+        if "/" in self.positions and "\n" in self.positions:
             feedback(
                 "Do not mix '/' and line-breaks for AbstractState 'positions'.",
                 True,
@@ -786,8 +786,8 @@ class AbstractStateObject(BaseShape):
         if "/" in self.positions:
             position_std = re.sub(r"\d", lambda m: "." * int(m.group()), self.positions)
             _position_list = position_std.split("/")
-        elif "/n" in self.positions:
-            _position_list = self.positions.split("/")
+        elif "\n" in self.positions:
+            _position_list = self.positions.split("\n")
         else:
             feedback(
                 "Neither '/' or line-break were specified for AbstractState 'positions',"
@@ -796,7 +796,8 @@ class AbstractStateObject(BaseShape):
             )
             _position_list = self.positions
         # ---- clean list
-        position_list = [row for row in _position_list if row]
+        position_list = [row.strip() for row in _position_list if row]
+        position_list = [row for row in position_list if row]
         # ---- validate list of item positions
         # TODO - improve these checks for hexhex board as well as irregular hexagonal
         if position_list and len(position_list) != self.board.rows:
@@ -841,19 +842,22 @@ class AbstractStateObject(BaseShape):
                 True,
                 True,
             )
+        # print(f'&&& {self.position_matrix=}')
         for row_no, row in enumerate(self.position_matrix):
             for col_no, col in enumerate(row):
                 # print(f'&&& AbstractStateObject {row_no=},{col_no=} :', col)
                 if col == ".":
+                    # print(f'&&& AbstractStateObject {row_no=},{col_no=} : BLANK')
                     continue  # no piece here; move along, move along
-                piece_shape = self.board.pieces.get(col, None)
                 kwargs = {}
+                piece_shape = self.board.pieces.get(col, None)
                 if piece_shape is None:
                     feedback(
-                        f"Unable to find the piece named '{col}'; "
-                        " please check the set for '{self.board.name}'.",
-                        True,
-                        True,
+                        item = f"Unable to find the piece named '{col}'; "
+                        f" please check the 'positions' for '{self.board.name}'.",
+                        warn=False,
+                        alert=True,
+                        stop=True,
                     )
                 else:
                     cell = self.board.board_layout.cells.get((col_no + 1, row_no + 1))
@@ -882,6 +886,7 @@ class AbstractStateObject(BaseShape):
                         raise NotImplementedError(
                             f'Unable to draw a piece of type "{type(piece_shape)}"'
                         )
+                    # print(f'&&& AbstractStateObject {row_no=},{col_no=} :', type(piece_shape))
                     piece_shape.draw(**kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):

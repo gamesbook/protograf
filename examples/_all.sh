@@ -31,6 +31,7 @@ python core/layouts/layouts_sequence.py
 python core/layouts/layouts_tracks.py
 python core/layouts/layouts_repeat.py
 # ---- examples: objects
+python objects/abstracts.py
 python objects/cardbox.py
 python objects/cubes.py
 python objects/dice_d6.py
