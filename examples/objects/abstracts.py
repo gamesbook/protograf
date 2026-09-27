@@ -74,6 +74,38 @@ agcb = AbstractGame(
 )
 AbstractState(board=agcb, setup=True)
 
+PageBreak()
+
+# ---- Shogi - setup
+Text("Shogi Game: Setup", common=header)
+agss = AbstractGame(name="shogi")
+AbstractState(board=agss, setup=True)
+PageBreak()
+
+# ---- Shogi - positions
+Text("Shogi Game: Positions", common=header)
+agcp = AbstractGame(name="shogi")
+AbstractState(
+    board=agcp,
+    positions="""
+    R..R..K..
+    P.S.NnB.P
+    B..PN.P.P
+    .........
+    ...s.....
+    ....p....
+    p....pb.p
+    bp...n.p.
+    r...r.k..
+    """
+)
+PageBreak()
+
+# ---- Checkers - setup
+Text("Checkers Game: Setup", common=header)
+agks = AbstractGame(name="checkers")
+AbstractState(board=agks, setup=True)
+# PageBreak()
 
 Save(
     output='png',
@@ -84,5 +116,8 @@ Save(
         'abstracts_chess_setup',
         'abstracts_chess_positions',
         'abstracts_chess_custom_board',
+        'abstracts_shogi_setup',
+        'abstracts_shogi_positions',
+        'abstracts_checkers_setup',
     ]
 )

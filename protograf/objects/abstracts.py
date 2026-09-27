@@ -74,6 +74,7 @@ class AbstractGameObject(BaseShape):
         )  # scaling??? # TODO - process this!
         self._validate_choices()
         # ---- custom properties
+        self.board_pattern = "default"
         self.orientation = (
             HexOrientationName.POINTY.value
         )  # hard-coded for HexHex and Hex Grid
@@ -149,6 +150,7 @@ class AbstractGameObject(BaseShape):
                     self.rows = 8
                 if not self.cols:
                     self.cols = 8
+                self.board_pattern = "snake"
             case "go":
                 self.pieces_type = "go"
                 self.intersections = True
@@ -296,18 +298,13 @@ class AbstractGameObject(BaseShape):
         # TODO - calculate board labels
 
         # ---- game-based defaults
-        match _lower(self.name):
-            case "chess":
-                board_pattern = "snake"
-            case _:
-                board_pattern = "default"
         board_start = "NW"
         board_direction = "east"
         # Point(top_x, top_x) is the top-left point of the VirtualLocations (grid points)
         top_x = self.x if self.kwargs.get("x") else self.cell_size / 2.0
         top_y = self.y if self.kwargs.get("y") else self.cell_size / 2.0
         match _lower(self.name):
-            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default
+            case "grid" | "chess" | "checkers" | "draughts" | "go" | "shogi":  # default
                 self.board_layout = RectangularLocations(  # VirtualLocations
                     cols=self.cols,
                     rows=self.rows,
@@ -316,7 +313,7 @@ class AbstractGameObject(BaseShape):
                     interval=self.cell_size,
                     start=board_start,
                     direction=board_direction,
-                    pattern=board_pattern,
+                    pattern=self.board_pattern,
                 )
                 if self.intersections:
                     Layout(self.board_layout, draw_lines=True, _draw_grid=False)
@@ -681,11 +678,11 @@ class AbstractStateObject(BaseShape):
                 case "chess":  # white at the bottom
                     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
                 case "checkers" | "draughts":
-                    return "1B1B1B1B/B1B1B1B1/1B1B1B1B/8/8/W1W1W1W1/1W1W1W1w/W1W1W1W1"
+                    return "1R1R1R1R/R1R1R1R1/1R1R1R1R/8/8/W1W1W1W1/1W1W1W1W/W1W1W1W1"
                 case "go":
                     return ""
                 case "shogi" | "shogi-int":  # white at the top
-                    return "LNSGKGSNL/1R5B1/PPPPPPPPP/9/9/9/ppppppppp/1b5r1/lnsgkgsnl/123456789"
+                    return "LNSGKGSNL/1R5B1/PPPPPPPPP/9/9/9/ppppppppp/1b5r1/lnsgkgsnl"
                 case _:
                     if self.board.name:
                         feedback(
