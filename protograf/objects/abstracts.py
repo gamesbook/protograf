@@ -853,7 +853,7 @@ class AbstractStateObject(BaseShape):
                 piece_shape = self.board.pieces.get(col, None)
                 if piece_shape is None:
                     feedback(
-                        item = f"Unable to find the piece named '{col}'; "
+                        item=f"Unable to find the piece named '{col}'; "
                         f" please check the 'positions' for '{self.board.name}'.",
                         warn=False,
                         alert=True,
