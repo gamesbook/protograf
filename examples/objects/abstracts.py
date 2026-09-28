@@ -17,7 +17,7 @@ Create(
 header = Common(x=0, y=0, font_size=12, align="left")
 
 # ---- default Abstract Game Grid
-Text("Default Abstract Game Board", common=header)
+Text("Abstract Game: Default Board", common=header)
 agd = AbstractGame()
 AbstractState(board=agd)
 PageBreak()
@@ -32,7 +32,7 @@ PageBreak()
 Text("Chess Game: Positions and Colors", common=header)
 agcp = AbstractGame(
     name="chess",
-    fills=("#EAD7B4", "#AC8764")  # browns
+    fills=("#EAD7B4", "#D18B47")  # browns
 )
 AbstractState(
     board=agcp,

@@ -91,12 +91,13 @@ class AbstractGameObject(BaseShape):
             )
         self.set_options_by_game()
         # ---- check fills and colors
-        if len(self.fills) != len(self.strokes):
-            feedback(
-                "The AbstractGame 'fills' and 'strokes' properties must be of equal length",
-                True,
-                True,
-            )
+        if self.fills and self.strokes:
+            if len(self.fills) != len(self.strokes):
+                feedback(
+                    "The AbstractGame 'fills' and 'strokes' properties must be of equal length",
+                    True,
+                    True,
+                )
         # ---- setup pieces
         self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
@@ -321,13 +322,18 @@ class AbstractGameObject(BaseShape):
                     if self.areas:
                         pass
                     else:
+                        self.strokes = self.strokes if self.strokes else []
                         self.areas = []
                         for key, colr in enumerate(self.fills):
+                            try:
+                                stroke = self.strokes[key]
+                            except IndexError:
+                                stroke = "black"
                             self.areas.append(
                                 rectangle(
                                     height=self.cell_size,
                                     width=self.cell_size,
-                                    stroke=self.strokes[key],
+                                    stroke=stroke,
                                     fill=colr,
                                 )
                             )
@@ -404,7 +410,7 @@ class AbstractGameObject(BaseShape):
         kwargs = {}
         kwargs["height"] = self.cell_size
         kwargs["width"] = self.cell_size
-        kwargs["radius"] = self.cell_size / 2.0 * 0.9
+        kwargs["radius"] = self.cell_size / 2.0 * 0.8
         # ---- pre-defined piece types
         match pieces_type:
             case "checkers" | "draughts":
@@ -842,12 +848,13 @@ class AbstractStateObject(BaseShape):
         # print(f'&&& {self.position_matrix=}')
         for row_no, row in enumerate(self.position_matrix):
             for col_no, col in enumerate(row):
-                # print(f'&&& AbstractStateObject {row_no=},{col_no=} :', col)
+                # print(f'&&& AbstractState {row_no=},{col_no=} :', col)
                 if col == ".":
-                    # print(f'&&& AbstractStateObject {row_no=},{col_no=} : BLANK')
+                    # print(f'&&& AbstractState {row_no=},{col_no=} : BLANK')
                     continue  # no piece here; move along, move along
                 kwargs = {}
                 piece_shape = self.board.pieces.get(col, None)
+                # ---- NULL shape
                 if piece_shape is None:
                     feedback(
                         item=f"Unable to find the piece named '{col}'; "
@@ -856,8 +863,10 @@ class AbstractStateObject(BaseShape):
                         alert=True,
                         stop=True,
                     )
+
                 else:
                     cell = self.board.board_layout.cells.get((col_no + 1, row_no + 1))
+                    # ---- Image shape
                     if isinstance(piece_shape, ImageShape):
                         bbox = cell.bbox  # geo ~ user units ~ relative to margin
                         if bbox:
@@ -873,22 +882,23 @@ class AbstractStateObject(BaseShape):
                                 True,
                                 True,
                             )
+                    # ---- Other shape
                     elif isinstance(piece_shape, BaseShape):
                         cntr = cell.centre  # geo ~ user units ~ relative to margin
                         kwargs = {
-                            "_abs_cx": tools.unit(cntr.x - globals.margins.left),
-                            "_abs_cy": tools.unit(cntr.y - globals.margins.top),
+                            "_abs_cx": tools.unit(cntr.x + globals.margins.left),
+                            "_abs_cy": tools.unit(cntr.y + globals.margins.top),
                         }
                     else:
                         raise NotImplementedError(
                             f'Unable to draw a piece of type "{type(piece_shape)}"'
                         )
-                    # print(f'&&& AbstractStateObject {row_no=},{col_no=} :', type(piece_shape))
+                    # print(f'&&& AbstractState {row_no=},{col_no=} P:', type(piece_shape))
                     piece_shape.draw(**kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
-        from protograf.protos import Layout, square, hexagon
+        from protograf.protos import Layout, hexagon
 
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist

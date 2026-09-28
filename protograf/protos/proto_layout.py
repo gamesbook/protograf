@@ -591,8 +591,8 @@ class LayoutGrid:
                         _abs_cx=cx, _abs_cy=cy, rotation=rotation, locale=_locale
                     )
                 shape_id += 1
-            if shape_id > len(shapes) - 1:
-                shape_id = 0  # reset and start again
+                if shape_id > len(shapes) - 1:
+                    shape_id = 0  # reset and start again
             # ---- display debug
             if self.do_debug and self._draw_grid:
                 match _lower(self.do_debug):

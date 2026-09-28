@@ -134,7 +134,7 @@ def piece_shape(key: str, name: str = "", **kwargs) -> object:
         "W": circle(fill="white", stroke="black", **kwargs),
         # ---- checkers
         # colors contrast with black squares
-        "kR": circle(fill_stroke="red", **kwargs),
+        "kR": circle(fill="red", stroke="white", **kwargs),
         "kW": circle(fill_stroke="white", **kwargs),
         # ---- go
         "gB": image(files("protograf").joinpath(f"{RESOURCES}/go/black.png"), **kwargs),
