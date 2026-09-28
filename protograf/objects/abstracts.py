@@ -940,6 +940,9 @@ class AbstractStateObject(BaseShape):
                     True,
                     True,
                 )
+        # ---- draw the frame
+        if self.frame:
+            pass  # TODO - draw styled frame
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
             self.draw_pieces()

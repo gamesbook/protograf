@@ -477,7 +477,6 @@ class BaseCanvas:
         self.grid = None  # some Shapes can auto-generate a GridShape
         self.rows = self.defaults.get("rows", 0)
         self.cols = self.defaults.get("cols", self.defaults.get("columns", 0))
-        self.frame = self.defaults.get("frame", "rectangle")
         self.offset = self.defaults.get("offset", 0.0)  # from margin
         self.offset_x = self.defaults.get("offset_x", self.offset)
         self.offset_y = self.defaults.get("offset_y", self.offset)
@@ -489,6 +488,12 @@ class BaseCanvas:
         self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
         self.lines = self.defaults.get("lines", "all")  # which direction to draw
         self.margin_fit = self.defaults.get("margin_fit", True)  # respect margin?
+        # ---- frame
+        self.frame = self.defaults.get("frame", "rectangle")
+        self.frame_stroke = self.defaults.get("frame_stroke", self.stroke)
+        self.frame_width = self.defaults.get("frame_width", self.stroke_width)
+        self.frame_dotted = self.defaults.get("frame_dotted", None)
+        self.frame_dashed = self.defaults.get("frame_dashed", None)  # ---- OTHER
         # ---- HexHex grid
         self.rings = self.defaults.get("rings", 1)
         self.locations = self.defaults.get("locations", None)
@@ -1218,7 +1223,6 @@ class BaseShape:
             self.cols = self.kw_int(_cols, "cols")
         else:
             self.cols = _cols
-        self.frame = kwargs.get("frame", base.frame)
         self.offset = self.kw_float(kwargs.get("offset", base.offset))
         self.offset_x = self.kw_float(kwargs.get("offset_x", self.offset))
         self.offset_y = self.kw_float(kwargs.get("offset_y", self.offset))
@@ -1238,6 +1242,12 @@ class BaseShape:
         self.margin_fit = self.kw_bool(
             kwargs.get("margin_fit", base.margin_fit)
         )  # respect margin?
+        # ---- frame
+        self.frame = kwargs.get("frame", base.frame)
+        self.frame_stroke = kwargs.get("frame_stroke", base.frame_stroke)
+        self.frame_width = self.kw_float(kwargs.get("frame_width", base.frame_width))
+        self.frame_dashed = kwargs.get("frame_dashed", base.frame_dashed)
+        self.frame_dotted = kwargs.get("frame_dotted", base.frame_dotted)
         # ---- HexHex grid
         self.rings = kwargs.get("rings", base.rings)
         self.locations = kwargs.get("locations", base.locations)

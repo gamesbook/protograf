@@ -101,11 +101,11 @@ The properties that can be set for an AbstractGame are:
     for `AbstractGame Pieces`_
 * *colors*: a list of one or more :ref:`colors <basic-color>`  in which to draw
   alternating board spaces; the default is to draw all squares ``white`` (or
-  the board's *fill* color)
-* *hairs*: if ``True``, draw small lines extending outwards from the board's
-  gridlines; these lines are one-quarter of the length of a board cell, for
-  example, if the board had squares of side 1 inch, then the hairs would be
-  one-quarter of an inch long
+  the board's *fill* color); for Chess or Checker games, the squares are drawn
+  in a snake-like pattern
+* *frame*: if ``True``, draw a frame around the board's gridlines; use the
+  normal styling options for the frame; *_width*, *_stroke*, *_dotted*, and
+  *_dashed* to customize it
 * *intersections*: if ``True``, draw pieces on grid intersections, not grid
   spaces, and label the lines, not the spaces
 * *pieces_resize*: a fractional value by which to resize the built-in piece
