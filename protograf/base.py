@@ -494,6 +494,8 @@ class BaseCanvas:
         self.frame_width = self.defaults.get("frame_width", self.stroke_width)
         self.frame_dotted = self.defaults.get("frame_dotted", None)
         self.frame_dashed = self.defaults.get("frame_dashed", None)  # ---- OTHER
+        # use for pymupdf lineCap: 0 = line ends in sharp edge; 1 = semi-circle at end
+        self.frame_ends = self.defaults.get("frame_ends", None)
         # ---- HexHex grid
         self.rings = self.defaults.get("rings", 1)
         self.locations = self.defaults.get("locations", None)
@@ -1248,6 +1250,7 @@ class BaseShape:
         self.frame_width = self.kw_float(kwargs.get("frame_width", base.frame_width))
         self.frame_dashed = kwargs.get("frame_dashed", base.frame_dashed)
         self.frame_dotted = kwargs.get("frame_dotted", base.frame_dotted)
+        self.frame_ends = kwargs.get("frame_ends", base.frame_ends)
         # ---- HexHex grid
         self.rings = kwargs.get("rings", base.rings)
         self.locations = kwargs.get("locations", base.locations)

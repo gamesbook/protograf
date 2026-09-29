@@ -55,25 +55,25 @@ class AbstractGameObject(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         self.set_unit_properties()
+        self.cnv = (
+            canvas if canvas else globals.canvas
+        )  # a new Page/Shape may now exist
         # ---- user properties
         self.name = kwargs.get("name", "grid")
-        self.fills = kwargs.get("fills", None)  # MUST be none; set by user OR game type
-        self.strokes = kwargs.get(
-            "strokes", None
-        )  # MUST be none; set by user OR game type
         self.areas = kwargs.get("areas", None)  # MUST be none; set by user
-        self.hairs = tools.as_bool(kwargs.get("hairs", False))
-        self.intersections = tools.as_bool(kwargs.get("intersections", False))
+        self.fills = kwargs.get("fills", None)  # MUST be none; set by user OR game
+        self.frame = tools.as_bool(kwargs.get("frame", False))
         self.hex_pattern = kwargs.get("hex_pattern", None)  # TODO - process this!
+        self.intersections = tools.as_bool(kwargs.get("intersections", False))
         self.label_start = kwargs.get("label_start", None)
         self.label_type = kwargs.get("label_type", None)
-        self.pieces = None
-        user_pieces = kwargs.get("pieces", [])
+        self.markers = kwargs.get("markers", None)
         self.pieces_resize = tools.as_float(
             kwargs.get("pieces_resize", 1.0), "pieces_resize"
         )  # scaling??? # TODO - process this!
+        self.strokes = kwargs.get("strokes", None)  # MUST be none; set by user OR game
         self._validate_choices()
-        # ---- custom properties
+        # ---- custom /interal properties
         self.board_pattern = "default"
         self.orientation = (
             HexOrientationName.POINTY.value
@@ -99,7 +99,8 @@ class AbstractGameObject(BaseShape):
                     True,
                 )
         # ---- setup pieces
-        self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
+        _pieces = kwargs.get("pieces", [])  # custom, define by user
+        self.pieces = self.setup_pieces(self.pieces_type, _pieces)
         # ---- setup board
         self.setup_board()
 
@@ -340,6 +341,7 @@ class AbstractGameObject(BaseShape):
                     Layout(self.board_layout, shapes=self.areas, _draw_grid=False)
                 # ---- set default cell attributes (plus label)
                 # TODO  - change this for shogi !! (numbers only; start at TR)
+                # TODO  - change this for go !! (skip the "I" col)
                 for row in range(self.rows, 0, -1):
                     for col in range(1, self.cols + 1):
                         col_id = tools.sheet_column(col, lower=True)
@@ -593,7 +595,7 @@ class AbstractGameObject(BaseShape):
                                 "knight",
                             ):
                                 feedback(
-                                    f"A named piece's Chess name cannot be '{parts[2]}'.",
+                                    f"A piece's Chess name cannot be '{parts[2]}'.",
                                     True,
                                     True,
                                 )
@@ -613,7 +615,7 @@ class AbstractGameObject(BaseShape):
                         case "shogi":
                             if pname not in SHOGI_NAMES:
                                 feedback(
-                                    f"A named piece's Shogi name cannot be '{parts[2]}'.",
+                                    f"A piece's Shogi name cannot be '{parts[2]}'.",
                                     True,
                                     True,
                                 )
@@ -627,7 +629,7 @@ class AbstractGameObject(BaseShape):
                         case "shogi_int":
                             if pname not in SHOGI_NAMES:
                                 feedback(
-                                    f"A named piece's Shogi International name cannot be '{parts[2]}'.",
+                                    f"A piece's Shogi International name cannot be '{parts[2]}'.",
                                     True,
                                     True,
                                 )
@@ -665,12 +667,15 @@ class AbstractStateObject(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         self.set_unit_properties()
+        self.cnv = (
+            canvas if canvas else globals.canvas
+        )  # a new Page/Shape may now exist
         # ---- custom properties
         self.board = kwargs.get("board", None)
         self.positions = kwargs.get("positions", ".")
         self.setup = tools.as_bool(kwargs.get("setup", False))
         self.moves = kwargs.get("moves", None)
-        self.annotations = kwargs.get("annotations", None)
+        self.markers = kwargs.get("markers", None)
         self.position_shapes = []
         self._validate_choices()
         # ---- set positions
@@ -746,11 +751,11 @@ class AbstractStateObject(BaseShape):
                     True,
                     True,
                 )
-        if self.annotations is not None:
-            if not isinstance(self.annotations, (list, tuple)):
+        if self.markers is not None:
+            if not isinstance(self.markers, (list, tuple)):
                 feedback(
-                    "The AbstractState 'annotations' property must be a list of annotations, "
-                    f" not a '{type(self.annotations).__name__}'.",
+                    "The AbstractState 'markers' property must be a list of elements, "
+                    f" not a '{type(self.markers).__name__}'.",
                     True,
                     True,
                 )
@@ -853,9 +858,9 @@ class AbstractStateObject(BaseShape):
                     # print(f'&&& AbstractState {row_no=},{col_no=} : BLANK')
                     continue  # no piece here; move along, move along
                 kwargs = {}
-                piece_shape = self.board.pieces.get(col, None)
+                piece_shp = self.board.pieces.get(col, None)
                 # ---- NULL shape
-                if piece_shape is None:
+                if piece_shp is None:
                     feedback(
                         item=f"Unable to find the piece named '{col}'; "
                         f" please check the 'positions' for '{self.board.name}'.",
@@ -867,7 +872,7 @@ class AbstractStateObject(BaseShape):
                 else:
                     cell = self.board.board_layout.cells.get((col_no + 1, row_no + 1))
                     # ---- Image shape
-                    if isinstance(piece_shape, ImageShape):
+                    if isinstance(piece_shp, ImageShape):
                         bbox = cell.bbox  # geo ~ user units ~ relative to margin
                         if bbox:
                             # define absolute position on page
@@ -883,7 +888,7 @@ class AbstractStateObject(BaseShape):
                                 True,
                             )
                     # ---- Other shape
-                    elif isinstance(piece_shape, BaseShape):
+                    elif isinstance(piece_shp, BaseShape):
                         cntr = cell.centre  # geo ~ user units ~ relative to margin
                         kwargs = {
                             "_abs_cx": tools.unit(cntr.x + globals.margins.left),
@@ -891,10 +896,50 @@ class AbstractStateObject(BaseShape):
                         }
                     else:
                         raise NotImplementedError(
-                            f'Unable to draw a piece of type "{type(piece_shape)}"'
+                            f'Unable to draw a piece of type "{type(piece_shp)}"'
                         )
-                    # print(f'&&& AbstractState {row_no=},{col_no=} P:', type(piece_shape))
-                    piece_shape.draw(**kwargs)
+                    # print(f'&&& AbstractState {row_no=},{col_no=} P:', type(piece_shp))
+                    piece_shp.draw(**kwargs)
+
+    def draw_frame(self):
+        """Draw the board's frame on a given canvas."""
+        match _lower(self.board.name):
+            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default name is grid
+                total_width = self.board.cols * self.board.cell_size
+                total_height = self.board.rows * self.board.cell_size
+                top_left = self.board.board_layout.cells[(1, 1)].bbox.tl
+                x_left = tools.unit(top_left.x + globals.margins.left)
+                y_top = tools.unit(top_left.y + globals.margins.top)
+                # ---- offset frame as a rectangle
+                rect = (
+                    x_left - self.board.frame_width / 2.0,
+                    y_top - self.board.frame_width / 2.0,
+                    x_left + tools.unit(total_width) + self.board.frame_width / 2.0,
+                    y_top + tools.unit(total_height) + self.board.frame_width / 2.0,
+                )
+                rkwargs = {}  # copy.copy(kwargs)
+                rkwargs["fill"] = None
+                rkwargs["stroke"] = self.board.frame_stroke
+                rkwargs["stroke_width"] = self.board.frame_width
+                rkwargs["dashed"] = self.board.frame_dashed
+                rkwargs["dotted"] = self.board.frame_dotted
+                pymu_props = tools.get_pymupdf_props(**rkwargs)
+                globals.doc_page.draw_rect(
+                    rect,
+                    width=pymu_props.width,
+                    color=pymu_props.color,
+                    fill=pymu_props.fill,
+                    lineCap=pymu_props.lineCap,
+                    dashes=pymu_props.dashes,
+                    fill_opacity=pymu_props.fill_opacity,
+                    # radius=None,
+                )
+            case _:
+                feedback(
+                    f"No available logic to draw a frame for AbstractBoard '{self.board.name}'",
+                    True,
+                    True,
+                )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
@@ -904,7 +949,6 @@ class AbstractStateObject(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- draw board
-        _shapes = []
         match _lower(self.board.name):
             case "grid" | "chess" | "checkers" | "go" | "shogi":  # default name is grid
                 if self.board.intersections:
@@ -941,12 +985,22 @@ class AbstractStateObject(BaseShape):
                     True,
                 )
         # ---- draw the frame
-        if self.frame:
-            pass  # TODO - draw styled frame
+        if self.board.frame is True:
+            self.draw_frame()
+        # ---- draw board markers
+        if self.board.markers:
+            for mark in self.board.markers:
+                if not isinstance(mark, BaseShape):
+                    feedback(
+                        "The AbstractBoard 'markers' property must be a list of shapes, "
+                        f" not a '{type(mark).__name__}'.",
+                        True,
+                        True,
+                    )
+                mark.draw()
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
             self.draw_pieces()
-            # print("PIECES DISABELD")
         elif self.board.pieces and not self.position_matrix:
             feedback(
                 "To draw an AbstractState requires the 'positions' for the pieces",
@@ -969,14 +1023,13 @@ class AbstractStateObject(BaseShape):
             raise ValueError(
                 "Unexpected error handling position_matrix and board.pieces!"
             )
-
-        # ---- draw annotations
-        if self.annotations:
-            for anno in self.annotations:
+        # ---- draw markers
+        if self.markers:
+            for anno in self.markers:
                 if not isinstance(anno, BaseShape):
                     feedback(
-                        "The AbstractGame 'annotations' property must be a list of shapes, "
-                        f" not a '{type(self.board.pieces).__name__}'.",
+                        "The AbstractGame 'markers' property must be a list of shapes, "
+                        f" not a '{type(anno).__name__}'.",
                         True,
                         True,
                     )

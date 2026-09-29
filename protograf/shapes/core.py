@@ -37,6 +37,7 @@ from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower  # , _vprint
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
+    BBox,
     CrossParts,
     DirectionGroup,
     Perbis,
