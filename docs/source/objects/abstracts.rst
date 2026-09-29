@@ -36,14 +36,14 @@ The aim of the ``AbstractGame`` and ``AbstractState`` commands is to allow
 diagrams for such games to be readily created.
 
 The ``AbstractGame`` command allows for the details of the board and pieces
-for such a game to be specified and, optionally, annotated and/or labelled.
-However, such an object is **not** designed to be drawn |dash| it can be
-thought of as the game being "still in the box".
+for such a game to be specified and, optionally, annotated and/or labelled
+via markers. However, an ``AbstractGame`` is **not** designed to be drawn
+|dash| it can be thought of as the game being "still in the box".
 
 The ``AbstractState`` command will, when supplied with a previously defined
 ``AbstractGame``, allow for a position in the game |dash| at any point from
 the setup through to its end state |dash| to be shown in diagrammatic form
-and, optionally, annotated.
+and also, optionally, annotated and/or labelled via markers.
 
 A series of ``AbstractState`` commands, all using the same ``AbstractGame``
 could, if so required, depict an entire game but this is not the primary
@@ -52,8 +52,8 @@ intended use of the ``AbstractState`` command.
 .. NOTE::
 
   An AbstractState command does **not** have the concept of a game "move".
-  Tracking and processing this is beyond the scope of **protograf**.
-  The *annotations* property for the AbstractState can be used to show
+  Tracking and processing moves is beyond the scope of **protograf**.
+  The *markers* property for the AbstractState can be used to show
   how a piece might move with, for example, the aid of a line or arrow.
 
 .. _abstractgame-command:
@@ -63,23 +63,22 @@ AbstractGame Command
 `↑ <abstractIndex_>`_
 
 The ``AbstractGame()`` command defines the parts of an abstract game; primarily
-the type of board and pieces that it uses.
+the type, and styling, of the board and pieces that it uses.
 
 A board can be specifed either by referring to an existing abstract game by
-name |dash| for example, Chess, Checkers (aka Draughts), or Go |dash| or via
-a specific combination of rows and columns.
+name |dash| for example, Chess, Checkers (aka Draughts), Go or Shogi |dash|
+or via a specific combination of rows and columns, plus type of grid.
 
 Pieces can also be specified by the type of game that they are usually used
-with |dash| for example, Chess, Checkers (aka Draughts), or Go. It is also
-possible to create completely unique pieces by using one or more of
-*protograf* shapes and/or images.
+with |dash| for example, Chess, Checkers (aka Draughts), Go or Shogi. It is
+also possible to create completely unique pieces either by using one or more
+of *protograf* shapes and/or images of your choice.
 
 - `AbstractGame Properties`_
 - `AbstractGame Board`_
 - `AbstractGame Pieces`_
-- `AbstractGame Annotations`_
+- `AbstractGame Markers`_
 - `AbstractGame Examples`_
-
 
 .. _abstractGameProperties:
 
@@ -87,7 +86,7 @@ AbstractGame Properties
 -----------------------
 `^ <abstractgame-command_>`_
 
-The properties that can be set for an AbstractGame are:
+The key properties that can be set for an AbstractGame are:
 
 * *name*: the name of a type of board; which can chosen from  one of:
   ``chess``, ``checkers``, ``go``; if omitted, the default is a ``grid``
@@ -99,37 +98,40 @@ The properties that can be set for an AbstractGame are:
     ``shogi``; or
   * defined with a customised list of piece names and shapes; see below
     for `AbstractGame Pieces`_
+* *cols*: if no game *name* has been set |dash| each game is already associated
+  with a predefined number of columns |dash| then this is the number of cells,
+  in the horizontal direction, for a regular grid; a default of  ``8`` is used
+* *rows*: if no game *name* has been set |dash| each game is already associated
+  with a predefined number of rows |dash| then this is the number of cells,
+  in the vertical direction, for a regular grid; a default of  ``8`` is used
+
+Other useful properties that can be set for an AbstractGame are:
+
 * *colors*: a list of one or more :ref:`colors <basic-color>`  in which to draw
   alternating board spaces; the default is to draw all squares ``white`` (or
   the board's *fill* color); for Chess or Checker games, the squares are drawn
   in a snake-like pattern
 * *frame*: if ``True``, draw a frame around the board's gridlines; use the
-  normal styling options for the frame; *_width*, *_stroke*, *_dotted*, and
-  *_dashed* to customize it
-* *intersections*: if ``True``, draw pieces on grid intersections, not grid
-  spaces, and label the lines, not the spaces
+  normal styling options for the frame; *frame_width*, *frame_stroke*,
+  *frame_dotted*, and/or *frame_dashed* to customize it
+* *intersections*: if ``True``, draw pieces on **grid intersections**, not
+  grid spaces, and label the lines, not the spaces
+* *labels_type*: the type of labels, drawn along the board edges, which are
+  used to identify rows and columns; it can be  either *alpha-numeric*,
+  or *AN* (the default), which is the labelling used for Chess boards;
+  or *numeric*, or *N*, which is the labelling used for Shogi boards
+* *labels_start*: the corner of the board at which the labelling starts; this
+  can be one of: *lower-left* (*LL*), *lower-right* (*LR*), *upper-left* (*UL*),
+  *upper-right* (*UR*); Chess boards use the *lower-left*, the default, while
+  Shogi boards use the *upper-right*
+* *markers*: a list of AbstractGame markers; see below for details
 * *pieces_resize*: a fractional value by which to resize the built-in piece
   shapes or images; this defaults to ``1`` |dash| note that this does **not**
   apply to custom-made shapes
-* *labels_type*: the type of labels, drawn labels along board edges, which are
-  used to identify rows and columns; this can be  either *alpha-numeric*,
-  or *AN*, (the default) which is the labelling used for Chess boards;
-  or *numeric*, or *N*, which is the labelling used for Shogi boards
-* *labels_start*: the corner of the board at which the labelling starts; this
-  can be one of *lower-left* (*LL*), *lower-right* (*LR*), *upper-left* (*UL*),
-  *upper-right* (*UR*); Chess boards use *lower-left*, the default, while
-  Shogi boards use *upper-right*
-* *cols*: if no game *name* is set |dash| each associated with a predefined
-  number of columns |dash| then this is the number of cells in the horizontal
-  direction for a regular grid; a default of  ``8`` is used
-* *rows*: if no game *name* is set |dash| each associated with a predefined
-  number of columns |dash| then this is the number of cells in the vertical
-  direction for a regular grid; a default of  ``8`` is used
 * *width* and *height* refer to the overall board size on the page; if omitted,
   the board will be automatically sized to fit within the smallest available
   space inside of the page margins.  The size of cells on the board are based
   on these values, using the *rows* and *cols* values
-* *annotations*: a list of AbstractGame annotations; see below for details
 
 
 .. NOTE::
@@ -189,19 +191,19 @@ pre-create image.
     standard grid cell |dash| square or hexagon.
 
 
-.. _abstractGameAnnotations:
+.. _abstractGameMarkers:
 
-AbstractGame Annotations
-------------------------
+AbstractGame Markers
+--------------------
 `^ <abstractgame-command_>`_
 
 
 .. _abstractGameExamples:
 
+
 AbstractGame Examples
 ----------------------
 `^ <abstractgame-command_>`_
-
 
 
 
@@ -218,8 +220,9 @@ referred to as "the game state".
 
 - `AbstractState Properties`_
 - `AbstractState Positions`_
-- `AbstractState Annotations`_
+- `AbstractState Markers`_
 - `AbstractState Examples`_
+
 
 .. _AbstractStateProperties:
 
@@ -233,9 +236,11 @@ The properties that can be set for an AbstractState command are:
   AbstractState object cannot be displayed without it
 * *positions*: details of where an AbstractGame's pieces go on the board;
   see below for details
-* *setup*: if set to True, and the game is one whose initial position is
-  stored in *protograf*, then the pieces will be assigned to the board
-* *annotations*: a list of AbstractState annotations; see below for details
+* *setup*: if set to ``True``, and the game is one whose initial position is
+  stored in *protograf*, then the pieces will be assigned to the board to
+  match that defined setup
+* *markers*: a list of AbstractState markers; see below for details
+
 
 .. _abstractStatePositions:
 
@@ -255,9 +260,9 @@ FEN-like Notation
 
 This notation is based on the Chess notation called "FEN" (see:
 https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)
-in which the pieces' characters are separated by a combination of numbers, to
-represent blank cells and/or ``/`` (forward slash) characters to mark the
-start of the next row.
+in which the characters, representing pieces, are separated by a combination
+of numbers, to represent consecutive blank cells, and/or ``/`` (forward slash)
+characters to mark the end of row.
 
 For example:
 
@@ -265,15 +270,19 @@ For example:
 
    positions = "rnbqkbnr/pppppppp/8"
 
-would represent the Black pieces in Chess, as well as the unoccupied row in
-front of the pawns.
+would represent the Black pieces at the start of a Chess game, as well as the
+unoccupied row in front of the pawns.
 
 If there are more than nine adjacent blank cells in a row, as there might be in
 a game of Go, then use multiple numbers, For example:
 
 .. code:: python
 
-   positions = "8B9/B98"
+   positions = "9B9/B99"
+
+This represents a situation where the first row has 9 empty points, a Black
+stone, and then 9 empty points; whereas the second row has a Black stone,
+followed by 9 empty points, and then another 9 empty points.
 
 The FEN-like notation is converted internally by *protograf* into
 `Line-and-Dot Notation`_.
@@ -291,19 +300,24 @@ For example:
 
 .. code:: python
 
-   positions = """r.bqkb.r
-   .ppppppp"""
+   positions = """
+   r.bqkb.r
+   .ppppppp
+   """
 
-would show the rows in a Chess game where Black has moved both Knights
-and one Pawn.
+would show two rows near the start of a Chess game where Black has moved
+both Knights and one Pawn.
 
-If row is entirely blank, it can be shown with a single ``.``.
+Note that empty lines and "whitespace" at the start and end of line is
+ignored.
+
+If row on the board contains no pieces, this can be shown with a single ``.``.
 
 
-.. _abstractStateAnnotations:
+.. _abstractStateMarkers:
 
-AbstractState Annotations
--------------------------
+AbstractState Markers
+---------------------
 `^ <abstractstate-command_>`_
 
 <TBD>
