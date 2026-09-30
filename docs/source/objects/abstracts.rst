@@ -116,14 +116,17 @@ Other useful properties that can be set for an AbstractGame are:
   *frame_dotted*, and/or *frame_dashed* to customize it
 * *intersections*: if ``True``, draw pieces on **grid intersections**, not
   grid spaces, and label the lines, not the spaces
-* *labels_type*: the type of labels, drawn along the board edges, which are
-  used to identify rows and columns; it can be  either *alpha-numeric*,
+* *label*: if ``True``, draw a labels around the board's edges; use the
+  normal styling options for a label; *label_font*, *label_stroke* etc.
+* *label_type*: the type of label, drawn on the board edges, which is
+  used to identify a row or column; it can be  either *alpha-numeric*,
   or *AN* (the default), which is the labelling used for Chess boards;
   or *numeric*, or *N*, which is the labelling used for Shogi boards
-* *labels_start*: the corner of the board at which the labelling starts; this
+* *label_start*: the corner of the board at which the labelling starts; this
   can be one of: *lower-left* (*LL*), *lower-right* (*LR*), *upper-left* (*UL*),
   *upper-right* (*UR*); Chess boards use the *lower-left*, the default, while
   Shogi boards use the *upper-right*
+* *label_offset*: how far away a label are drawn from the board edge(s)
 * *markers*: a list of AbstractGame markers; see below for details
 * *pieces_resize*: a fractional value by which to resize the built-in piece
   shapes or images; this defaults to ``1`` |dash| note that this does **not**

@@ -71,6 +71,7 @@ sqLite = rectangle(default=sqr)
 agcb = AbstractGame(
     name="chess",
     areas=[sqLite, sqDark],
+    label=True,
 )
 AbstractState(board=agcb, setup=True)
 

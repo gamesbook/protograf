@@ -65,9 +65,14 @@ class AbstractGameObject(BaseShape):
         self.frame = tools.as_bool(kwargs.get("frame", False))
         self.hex_pattern = kwargs.get("hex_pattern", None)  # TODO - process this!
         self.intersections = tools.as_bool(kwargs.get("intersections", False))
+        self.label = tools.as_bool(kwargs.get("label", False))
         self.label_start = kwargs.get("label_start", None)
         self.label_type = kwargs.get("label_type", None)
+        self.label_offset = tools.as_float(
+            kwargs.get("label_offset", 0), "label_offset"
+        )
         self.markers = kwargs.get("markers", None)
+        self.pieces = kwargs.get("pieces", None)
         self.pieces_resize = tools.as_float(
             kwargs.get("pieces_resize", 1.0), "pieces_resize"
         )  # scaling??? # TODO - process this!
@@ -75,6 +80,7 @@ class AbstractGameObject(BaseShape):
         self._validate_choices()
         # ---- custom /interal properties
         self.board_pattern = "default"
+        self.board_type = "grid"
         self.orientation = (
             HexOrientationName.POINTY.value
         )  # hard-coded for HexHex and Hex Grid
@@ -129,6 +135,10 @@ class AbstractGameObject(BaseShape):
                     self.cols = 8
                 _max_cells = max(self.rows, self.cols)
                 self.cell_size = _available / _max_cells
+                if self.label_start is None:
+                    self.label_start = "BL"
+                if self.label_type is None:
+                    self.label_type = "AN"
             case "chess":
                 self.pieces_type = "chess"
                 self.intersections = False
@@ -141,6 +151,8 @@ class AbstractGameObject(BaseShape):
                 if not self.cols:
                     self.cols = 8
                 self.board_pattern = "snake"
+                self.label_start = "BL"
+                self.label_type = "AN"
             case "checkers" | "draughts":
                 self.pieces_type = "checkers"
                 self.intersections = False
@@ -153,6 +165,8 @@ class AbstractGameObject(BaseShape):
                 if not self.cols:
                     self.cols = 8
                 self.board_pattern = "snake"
+                self.label_start = "BL"
+                self.label_type = "AN"
             case "go":
                 self.pieces_type = "go"
                 self.intersections = True
@@ -164,6 +178,8 @@ class AbstractGameObject(BaseShape):
                     self.rows = 18
                 if not self.cols:
                     self.cols = 18
+                self.label_start = "BL"
+                self.label_type = "AN"
             case "shogi":
                 self.pieces_type = "shogi"
                 self.intersections = False
@@ -175,6 +191,8 @@ class AbstractGameObject(BaseShape):
                     self.rows = 9
                 if not self.cols:
                     self.cols = 9
+                self.label_start = "TR"
+                self.label_type = "N"
             case "hexagons":
                 if not self.cols:
                     feedback(
@@ -190,7 +208,15 @@ class AbstractGameObject(BaseShape):
                     )
                 _max_cells = max(self.rows, self.cols)
                 self.cell_size = _available / _max_cells
+                self.board_type == "hex"
+                if self.label_start is None:
+                    self.label_start = "BL"
+                if self.label_type is None:
+                    self.label_type = "AN"
             case "hex":
+                self.label_start = "TL"
+                self.label_type = "AN"
+                self.board_type == "hex"
                 raise NotImplementedError("Sorry, a hex board is not available yet.")
             case "hexhex":
                 if not self.side:
@@ -202,12 +228,20 @@ class AbstractGameObject(BaseShape):
                     )
                 _max_cells = self.side * 2 - 1
                 self.cell_size = _available / _max_cells / 0.866
+                self.board_type == "hex"
+                self.label_start = "BL"
+                self.label_type = "AN"
             case "tri" | "triangle" | "triangular":
+                self.board_type == "tri"
                 raise NotImplementedError(
                     "Sorry, a triangular board is not available yet."
                 )
             case None:
-                pass  # can ignore the name for this AB
+                # can ignore the name for this AB
+                if self.label_start is None:
+                    self.label_start = "BL"
+                if self.label_type is None:
+                    self.label_type = "AN"
             case _:
                 self.game_name_error()
         # ---- calculate cell_size for gridded boards
@@ -215,8 +249,15 @@ class AbstractGameObject(BaseShape):
             case "grid" | "chess" | "checkers" | "go" | "shogi":
                 _max_cells = max(self.rows, self.cols)
                 self.cell_size = _available / _max_cells
+            case "hexagons" | "hexhex" | "hex":
+                _max_cells = max(self.rows, self.cols)
+                if _max_cells:
+                    self.cell_size = _available / _max_cells
             case _:
-                pass
+                feedback(
+                    "Cannot auto-calculate cell size for a '{self.name}' AbstractGame.",
+                    alert=True,
+                )
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
@@ -292,6 +333,140 @@ class AbstractGameObject(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+
+    def draw_frame(self):
+        """Draw the board's frame on a given canvas."""
+        match _lower(self.name):
+            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default name is grid
+                total_width = self.cols * self.cell_size
+                total_height = self.rows * self.cell_size
+                top_left = self.board_layout.cells[(1, 1)].bbox.tl
+                x_left = tools.unit(top_left.x + globals.margins.left)
+                y_top = tools.unit(top_left.y + globals.margins.top)
+                # ---- offset frame as a rectangle
+                rect = (
+                    x_left - self.frame_width / 2.0,
+                    y_top - self.frame_width / 2.0,
+                    x_left + tools.unit(total_width) + self.frame_width / 2.0,
+                    y_top + tools.unit(total_height) + self.frame_width / 2.0,
+                )
+                rkwargs = {}  # copy.copy(kwargs)
+                rkwargs["fill"] = None
+                rkwargs["stroke"] = self.frame_stroke
+                rkwargs["stroke_width"] = self.frame_width
+                rkwargs["dashed"] = self.frame_dashed
+                rkwargs["dotted"] = self.frame_dotted
+                pymu_props = tools.get_pymupdf_props(**rkwargs)
+                globals.doc_page.draw_rect(
+                    rect,
+                    width=pymu_props.width,
+                    color=pymu_props.color,
+                    fill=pymu_props.fill,
+                    lineCap=pymu_props.lineCap,
+                    dashes=pymu_props.dashes,
+                    fill_opacity=pymu_props.fill_opacity,
+                    # radius=None,
+                )
+            case _:
+                feedback(
+                    f"No available logic to draw a frame for AbstractBoard '{self.name}'",
+                    True,
+                    True,
+                )
+
+    def draw_markers(self):
+        """Draw marker elements on the board."""
+        if self.markers:
+            for mark in self.markers:
+                if not isinstance(mark, BaseShape):
+                    feedback(
+                        "The AbstractGame 'markers' property must be a list of shapes, "
+                        f" not a '{type(mark).__name__}'.",
+                        True,
+                        True,
+                    )
+                mark.draw()
+
+    def draw_labels(self):
+        """Draw labels around the board."""
+        from protograf.protos import Text
+
+        _label_start = _lower(self.label_start)
+        if self.label:
+            match _label_start:
+                case "tr":  # eg. Shogi
+                    start_col, start_row = self.cols, 1
+                    delta_row, delta_col = 1, -1
+                    end_col, end_row = 1, self.rows
+                case "tl":  # eg. Hex?
+                    start_col, start_row = 1, 1
+                    delta_row, delta_col = 1, 1
+                    end_col, end_row = self.cols, self.rows
+                case "br":  # eg. ???
+                    start_col, start_row = self.cols, self.rows
+                    delta_row, delta_col = -1, -1
+                    end_col, end_row = 1, 1
+                case _:  # default is BL
+                    start_col, start_row = 1, self.rows
+                    delta_row, delta_col = -1, 1
+                    end_col, end_row = self.cols + 1, 0
+
+            loffset = self.label_offset if self.label_offset else self.cell_size / 2.0
+            ltype = _lower(self.label_type)
+
+            # ---- column labels
+            # TODO - add in label styling
+            if _label_start in ["tr", "tl"]:
+                label_row = 1
+                shift = -1
+            else:
+                label_row = self.rows
+                shift = 1
+            col_num = 1
+            for col_no in range(start_col, end_col, delta_col):
+                col_value = str(col_num)
+                if ltype == "an":
+                    col_value = tools.alpha_column(col_num, lower=True)
+                adjacent_cell = self.board_layout.cells[(col_no, label_row)]
+                if self.board_type == "grid":
+                    x = adjacent_cell.s.x
+                    y = adjacent_cell.s.y + shift * loffset
+                elif self.board_type == "hex":
+                    raise NotImplementedError("No labels for Hex grids!")
+                elif self.board_type == "tri":
+                    raise NotImplementedError("No labels for Triangle grids!")
+                # print('&&& col label', ltype, col_value, x, y)
+                Text(col_value, x=x, y=y)
+                col_num += 1
+
+            # ---- row labels
+            if _label_start in ["tl", "bl"]:
+                label_col = 1
+                shift = -1
+            else:
+                label_col = self.cols
+                shift = 1
+            row_num = 1
+            for row_no in range(start_row, end_row, delta_row):
+                row_value = str(row_num)
+                # currently do not use alphas for row labels
+                # if ltype == 'an':
+                #     row_value = tools.alpha_column(row_no, lower=True)
+                adjacent_cell = self.board_layout.cells[(label_col, row_no)]
+                if self.board_type == "grid":
+                    if _label_start in ["tl", "bl"]:
+                        x = adjacent_cell.w.x + shift * loffset
+                        y = adjacent_cell.w.y + self.label_size / globals.units / 2.0
+                    else:
+                        x = adjacent_cell.e.x + shift * loffset
+                        y = adjacent_cell.e.y + self.label_size / globals.units / 2.0
+                elif self.board_type == "hex":
+                    raise NotImplementedError("No labels for Hex grids!")
+                elif self.board_type == "tri":
+                    raise NotImplementedError("No labels for Triangle grids!")
+                # print('&&& row label', ltype, row_value, x, y)
+                Text(row_value, xy=Point(x, y))
+                row_num += 1
 
     def setup_board(self):
         """Create board_layout for the required grid"""
@@ -901,46 +1076,6 @@ class AbstractStateObject(BaseShape):
                     # print(f'&&& AbstractState {row_no=},{col_no=} P:', type(piece_shp))
                     piece_shp.draw(**kwargs)
 
-    def draw_frame(self):
-        """Draw the board's frame on a given canvas."""
-        match _lower(self.board.name):
-            case "grid" | "chess" | "checkers" | "go" | "shogi":  # default name is grid
-                total_width = self.board.cols * self.board.cell_size
-                total_height = self.board.rows * self.board.cell_size
-                top_left = self.board.board_layout.cells[(1, 1)].bbox.tl
-                x_left = tools.unit(top_left.x + globals.margins.left)
-                y_top = tools.unit(top_left.y + globals.margins.top)
-                # ---- offset frame as a rectangle
-                rect = (
-                    x_left - self.board.frame_width / 2.0,
-                    y_top - self.board.frame_width / 2.0,
-                    x_left + tools.unit(total_width) + self.board.frame_width / 2.0,
-                    y_top + tools.unit(total_height) + self.board.frame_width / 2.0,
-                )
-                rkwargs = {}  # copy.copy(kwargs)
-                rkwargs["fill"] = None
-                rkwargs["stroke"] = self.board.frame_stroke
-                rkwargs["stroke_width"] = self.board.frame_width
-                rkwargs["dashed"] = self.board.frame_dashed
-                rkwargs["dotted"] = self.board.frame_dotted
-                pymu_props = tools.get_pymupdf_props(**rkwargs)
-                globals.doc_page.draw_rect(
-                    rect,
-                    width=pymu_props.width,
-                    color=pymu_props.color,
-                    fill=pymu_props.fill,
-                    lineCap=pymu_props.lineCap,
-                    dashes=pymu_props.dashes,
-                    fill_opacity=pymu_props.fill_opacity,
-                    # radius=None,
-                )
-            case _:
-                feedback(
-                    f"No available logic to draw a frame for AbstractBoard '{self.board.name}'",
-                    True,
-                    True,
-                )
-
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
         from protograf.protos import Layout, hexagon
@@ -948,7 +1083,7 @@ class AbstractStateObject(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- draw board
+        # ---- draw the board
         match _lower(self.board.name):
             case "grid" | "chess" | "checkers" | "go" | "shogi":  # default name is grid
                 if self.board.intersections:
@@ -984,21 +1119,16 @@ class AbstractStateObject(BaseShape):
                     True,
                     True,
                 )
-        # ---- draw the frame
+        # ---- draw the board frame
         if self.board.frame is True:
-            self.draw_frame()
-        # ---- draw board markers
+            self.board.draw_frame()
+        # ---- draw the board labels
+        if self.board.label is True:
+            self.board.draw_labels()
+        # ---- draw the board markers
         if self.board.markers:
-            for mark in self.board.markers:
-                if not isinstance(mark, BaseShape):
-                    feedback(
-                        "The AbstractBoard 'markers' property must be a list of shapes, "
-                        f" not a '{type(mark).__name__}'.",
-                        True,
-                        True,
-                    )
-                mark.draw()
-        # ---- draw pieces
+            self.board.draw_markers()
+        # ---- draw the pieces
         if self.board.pieces and self.position_matrix:
             self.draw_pieces()
         elif self.board.pieces and not self.position_matrix:
@@ -1023,7 +1153,7 @@ class AbstractStateObject(BaseShape):
             raise ValueError(
                 "Unexpected error handling position_matrix and board.pieces!"
             )
-        # ---- draw markers
+        # ---- draw the state markers
         if self.markers:
             for anno in self.markers:
                 if not isinstance(anno, BaseShape):
