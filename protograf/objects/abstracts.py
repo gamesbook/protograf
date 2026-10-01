@@ -71,8 +71,15 @@ class AbstractGameObject(BaseShape):
         self.label_offset = tools.as_float(
             kwargs.get("label_offset", 0), "label_offset"
         )
+        self.label_offset_col = tools.as_float(
+            kwargs.get("label_offset_col", self.label_offset), "label_offset_col"
+        )
+        self.label_offset_row = tools.as_float(
+            kwargs.get("label_offset_row", self.label_offset), "label_offset_row"
+        )
         self.markers = kwargs.get("markers", None)
         self.pieces = kwargs.get("pieces", None)
+        self.pieces_type = kwargs.get("pieces_type", None)  # Shogi can change!
         self.pieces_resize = tools.as_float(
             kwargs.get("pieces_resize", 1.0), "pieces_resize"
         )  # scaling??? # TODO - process this!
@@ -83,8 +90,7 @@ class AbstractGameObject(BaseShape):
         self.board_type = "grid"
         self.orientation = (
             HexOrientationName.POINTY.value
-        )  # hard-coded for HexHex and Hex Grid
-        self.pieces_type = None
+        )  # orientation is hard-coded for HexHex and Hex Grid
         self.cell_size = 1  # typically a "square" area; hexagon height; circle dia.
         # ---- calculated properties
         if not kwargs.get("width"):  # default to page width
@@ -157,7 +163,7 @@ class AbstractGameObject(BaseShape):
                 self.pieces_type = "checkers"
                 self.intersections = False
                 if self.fills is None:
-                    self.fills = ("red", "black")
+                    self.fills = ("firebrick", "black")
                 if self.strokes is None:
                     self.strokes = (None, None)
                 if not self.cols:
@@ -181,7 +187,7 @@ class AbstractGameObject(BaseShape):
                 self.label_start = "BL"
                 self.label_type = "AN"
             case "shogi":
-                self.pieces_type = "shogi"
+                self.pieces_type = self.pieces_type or "shogi"
                 self.intersections = False
                 if self.fills is None:
                     self.fills = ("white",)
@@ -194,18 +200,6 @@ class AbstractGameObject(BaseShape):
                 self.label_start = "TR"
                 self.label_type = "N"
             case "hexagons":
-                if not self.cols:
-                    feedback(
-                        'Missing number of cols for AbstractBoard of type "hexagons"',
-                        True,
-                        True,
-                    )
-                if not self.rows:
-                    feedback(
-                        'Missing number of rows for AbstractBoard of type "hexagons"',
-                        True,
-                        True,
-                    )
                 _max_cells = max(self.rows, self.cols)
                 self.cell_size = _available / _max_cells
                 self.board_type == "hex"
@@ -219,13 +213,6 @@ class AbstractGameObject(BaseShape):
                 self.board_type == "hex"
                 raise NotImplementedError("Sorry, a hex board is not available yet.")
             case "hexhex":
-                if not self.side:
-                    feedback(
-                        "Missing 'side' value (hexes along an edge)"
-                        " for AbstractBoard of type 'hexhex'",
-                        True,
-                        True,
-                    )
                 _max_cells = self.side * 2 - 1
                 self.cell_size = _available / _max_cells / 0.866
                 self.board_type == "hex"
@@ -310,6 +297,30 @@ class AbstractGameObject(BaseShape):
                         True,
                         True,
                     )
+        match _lower(self.name):
+            case "hexagons":
+                if not self.cols:
+                    feedback(
+                        'Missing number of cols for AbstractBoard of type "hexagons"',
+                        True,
+                        True,
+                    )
+                if not self.rows:
+                    feedback(
+                        'Missing number of rows for AbstractBoard of type "hexagons"',
+                        True,
+                        True,
+                    )
+            case "hexhex":
+                if not self.side:
+                    feedback(
+                        "Missing 'side' value (hexes along an edge)"
+                        " for AbstractBoard of type 'hexhex'",
+                        True,
+                        True,
+                    )
+            case _:
+                pass
 
         return True
 
@@ -391,13 +402,14 @@ class AbstractGameObject(BaseShape):
         """Draw labels around the board."""
         from protograf.protos import Text
 
+        # ---- label ranges
         _label_start = _lower(self.label_start)
         if self.label:
             match _label_start:
                 case "tr":  # eg. Shogi
                     start_col, start_row = self.cols, 1
                     delta_row, delta_col = 1, -1
-                    end_col, end_row = 1, self.rows
+                    end_col, end_row = 0, self.rows + 1
                 case "tl":  # eg. Hex?
                     start_col, start_row = 1, 1
                     delta_row, delta_col = 1, 1
@@ -411,11 +423,17 @@ class AbstractGameObject(BaseShape):
                     delta_row, delta_col = -1, 1
                     end_col, end_row = self.cols + 1, 0
 
+            # ---- label settings
             loffset = self.label_offset if self.label_offset else self.cell_size / 2.0
+            loffset_col = self.label_offset_col if self.label_offset_col else loffset
+            loffset_row = self.label_offset_row if self.label_offset_row else loffset
             ltype = _lower(self.label_type)
-
+            lkeys = {}
+            lkeys["font_name"] = self.label_font
+            lkeys["font_size"] = self.label_size
+            lkeys["stroke"] = self.label_stroke
+            #
             # ---- column labels
-            # TODO - add in label styling
             if _label_start in ["tr", "tl"]:
                 label_row = 1
                 shift = -1
@@ -429,14 +447,18 @@ class AbstractGameObject(BaseShape):
                     col_value = tools.alpha_column(col_num, lower=True)
                 adjacent_cell = self.board_layout.cells[(col_no, label_row)]
                 if self.board_type == "grid":
-                    x = adjacent_cell.s.x
-                    y = adjacent_cell.s.y + shift * loffset
+                    if _label_start in ["br", "bl"]:
+                        x = adjacent_cell.s.x
+                        y = adjacent_cell.s.y + shift * loffset_col
+                    if _label_start in ["tr", "tl"]:
+                        x = adjacent_cell.n.x
+                        y = adjacent_cell.n.y + shift * loffset_col
                 elif self.board_type == "hex":
                     raise NotImplementedError("No labels for Hex grids!")
                 elif self.board_type == "tri":
                     raise NotImplementedError("No labels for Triangle grids!")
-                # print('&&& col label', ltype, col_value, x, y)
-                Text(col_value, x=x, y=y)
+                # print('&&& col label', ltype, col_value, x, y); breakpoint()
+                Text(col_value, x=x, y=y, **lkeys)
                 col_num += 1
 
             # ---- row labels
@@ -455,7 +477,7 @@ class AbstractGameObject(BaseShape):
                 adjacent_cell = self.board_layout.cells[(label_col, row_no)]
                 if self.board_type == "grid":
                     if _label_start in ["tl", "bl"]:
-                        x = adjacent_cell.w.x + shift * loffset
+                        x = adjacent_cell.w.x + shift * loffset_row
                         y = adjacent_cell.w.y + self.label_size / globals.units / 2.0
                     else:
                         x = adjacent_cell.e.x + shift * loffset
@@ -465,7 +487,7 @@ class AbstractGameObject(BaseShape):
                 elif self.board_type == "tri":
                     raise NotImplementedError("No labels for Triangle grids!")
                 # print('&&& row label', ltype, row_value, x, y)
-                Text(row_value, xy=Point(x, y))
+                Text(row_value, x=x, y=y, **lkeys)
                 row_num += 1
 
     def setup_board(self):
@@ -648,7 +670,7 @@ class AbstractGameObject(BaseShape):
                     "V": piece_shape("sW", "White Silver General: Promoted", **kwargs),
                     "v": piece_shape("sw", "Black Silver General: Promoted", **kwargs),
                 }
-            case "shogi_int":
+            case "shogi_int" | "shogi-int":
                 pg_pieces = {
                     "A": piece_shape("iA", "White Lance: Promoted", **kwargs),
                     "a": piece_shape("ia", "Black Lance: Promoted", **kwargs),

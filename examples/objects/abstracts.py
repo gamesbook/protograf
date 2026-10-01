@@ -15,6 +15,7 @@ Create(
     page_grid=1)
 
 header = Common(x=0, y=0, font_size=12, align="left")
+footer = Common(x=0, y=8.5, font_size=12, align="left")
 
 # ---- default Abstract Game Grid
 Text("Abstract Game: Default Board", common=header)
@@ -28,12 +29,25 @@ agcs = AbstractGame(name="chess")
 AbstractState(board=agcs, setup=True)
 PageBreak()
 
-# ---- Chess - positions
-Text("Chess Game: Positions and Colors", common=header)
-agcp = AbstractGame(
+# ---- Chess - customised board
+agcs = AbstractGame(
     name="chess",
-    fills=("#EAD7B4", "#D18B47")  # browns
+    fills=("#FFCE9E", "#D18B47"),  # browns
+    frame=True,
+    frame_width=15,
+    frame_stroke="brown",
+    label=True,
+    label_stroke="#FFCE9E",
+    label_offset_row=0.275,
+    label_offset_col=0.35,
 )
+AbstractState(board=agcs, setup=True)
+Text("Chess Game: Frame, Colors & Labels", common=header)
+PageBreak()
+
+# ---- Chess - positions
+Text("Chess Game: Positions", common=header)
+agcp = AbstractGame(name="chess")
 AbstractState(
     board=agcp,
     positions="""
@@ -71,21 +85,19 @@ sqLite = rectangle(default=sqr)
 agcb = AbstractGame(
     name="chess",
     areas=[sqLite, sqDark],
-    label=True,
 )
 AbstractState(board=agcb, setup=True)
-
 PageBreak()
 
 # ---- Shogi - setup
-Text("Shogi Game: Setup", common=header)
-agss = AbstractGame(name="shogi")
+Text("Shogi Game: Setup", common=footer)
+agss = AbstractGame(name="shogi", label=True)
 AbstractState(board=agss, setup=True)
 PageBreak()
 
 # ---- Shogi - positions
-Text("Shogi Game: Positions", common=header)
-agcp = AbstractGame(name="shogi")
+Text("Shogi Game: Positions (International)", common=footer)
+agcp = AbstractGame(name="shogi", pieces_type="shogi-int")
 AbstractState(
     board=agcp,
     positions="""
@@ -115,6 +127,7 @@ Save(
     names=[
         'abstracts_default',
         'abstracts_chess_setup',
+        'abstracts_chess_customised',
         'abstracts_chess_positions',
         'abstracts_chess_custom_board',
         'abstracts_shogi_setup',

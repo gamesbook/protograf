@@ -2704,7 +2704,22 @@ class BaseShape:
         ypt = round(xy.y / units - margin_top, 10)
         return Point(xpt, ypt)
 
-    def _p2v(self, value: float, decimals: int = 4):
+    def _v2p(self, value: Point, margin_offset: bool = True) -> Point:
+        """Convert Point value using user units to a Point using points units."""
+        margin_left, margin_top = 0.0, 0.0
+        if margin_offset:
+            margin_left = globals.margins.left
+            margin_top = globals.margins.top
+        try:
+            return Point(
+                float(value.x) * self.units + margin_left,
+                float(value.y) * self.units + margin_top,
+            )
+        except Exception as err:
+            log.exception(err)
+            feedback(f'Unable to convert value "{value}" to points!', True)
+
+    def _p2v(self, value: float, decimals: int = 4) -> float:
         """Convert point value to a rounded, units-based value using user units."""
         try:
             return round(float(value) / self.units, decimals)

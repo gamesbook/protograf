@@ -90,13 +90,15 @@ The key properties that can be set for an AbstractGame are:
 
 * *name*: the name of a type of board; which can chosen from  one of:
   ``chess``, ``checkers``, ``go``; if omitted, the default is a ``grid``
-* *pieces*: details of pieces that will be placed on the board; the set
-  of pieces can either be:
+* *pieces*: details of pieces that will be placed on the board; these
+  pieces can:
 
-  * chosen |dash| **independantly** of the board name |dash| from a
+  * each be chosen |dash| **independantly** of the board name |dash| from a
     pre-existing set: ``chess``, ``checkers`` (the default), ``go``,
-    ``shogi``; or
-  * defined with a customised list of piece names and shapes; see below
+    ``shogi``, ``shogi-int``; or
+  * make use of the full set available from a pre-existing game by using
+    *pieces_type* property (see below); or
+  * be defined with a customised list of piece names and shapes; see below
     for `AbstractGame Pieces`_
 * *cols*: if no game *name* has been set |dash| each game is already associated
   with a predefined number of columns |dash| then this is the number of cells,
@@ -128,6 +130,9 @@ Other useful properties that can be set for an AbstractGame are:
   Shogi boards use the *upper-right*
 * *label_offset*: how far away a label are drawn from the board edge(s)
 * *markers*: a list of AbstractGame markers; see below for details
+* *pieces_type*: choose a predefined set of pieces from well-known abstract
+  games; possible choices areL ``chess``, ``checkers``, ``go``, ``shogi`` or
+  ``shog-int`` (International, or Westernised, Shogi)
 * *pieces_resize*: a fractional value by which to resize the built-in piece
   shapes or images; this defaults to ``1`` |dash| note that this does **not**
   apply to custom-made shapes
@@ -135,7 +140,6 @@ Other useful properties that can be set for an AbstractGame are:
   the board will be automatically sized to fit within the smallest available
   space inside of the page margins.  The size of cells on the board are based
   on these values, using the *rows* and *cols* values
-
 
 .. NOTE::
 
