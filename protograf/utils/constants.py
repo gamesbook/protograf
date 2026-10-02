@@ -117,6 +117,7 @@ GRID_SHAPES_WITH_CENTRE = [
     "DotShape",
     "EllipseShape",
     "HexShape",
+    "ImageShape",  # if H&W known??
     "PodShape",
     "PolygonShape",
     "RectangleShape",

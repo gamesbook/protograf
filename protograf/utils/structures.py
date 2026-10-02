@@ -402,6 +402,7 @@ class ShapeGeometry(NamedTuple):
     area: float | None = None
     sides: int | None = None  # e.g. for a regular Polygon
     # meta
+    blank: bool = False  # signals "no Shape drawn here"
     t: str | None = None
     type: str | None = None
     shapetype: str | None = None

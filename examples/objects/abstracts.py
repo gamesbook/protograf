@@ -17,6 +17,7 @@ Create(
 header = Common(x=0, y=0, font_size=12, align="left")
 footer = Common(x=0, y=8.5, font_size=12, align="left")
 
+'''
 # ---- default Abstract Game Grid
 Text("Abstract Game: Default Board", common=header)
 agd = AbstractGame()
@@ -118,7 +119,33 @@ PageBreak()
 Text("Checkers Game: Setup", common=header)
 agks = AbstractGame(name="checkers")
 AbstractState(board=agks, setup=True)
+PageBreak()
+
+# ---- Hexagons - default
+Text("Hexagons: default", common=header)
+aghd = AbstractGame(name="hexagons")
+AbstractState(board=aghd)
+PageBreak()
+'''
+
+# ---- Hexagons - pattern
+Text("Hexagons: pattern", common=header)
+aghp = AbstractGame(
+    name="hexagons",
+    rows=5,
+    cols=7,
+    pattern = """
+    . O O O 0 O .
+     0 O O 0 0 O .
+    O O . . . O O
+     0 O O O 0 O .
+    . O O 0 0 O .
+    """)
+AbstractState(
+    board=aghp,
+    positions="B3W/B4W/B5W/B4W/B3W")
 # PageBreak()
+
 
 Save(
     output='png',
@@ -133,5 +160,7 @@ Save(
         'abstracts_shogi_setup',
         'abstracts_shogi_positions',
         'abstracts_checkers_setup',
+        'abstracts_hexagons_default',
+        'abstracts_hexagons_pattern',
     ]
 )

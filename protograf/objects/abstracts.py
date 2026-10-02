@@ -84,7 +84,6 @@ class AbstractGameObject(BaseShape):
             kwargs.get("pieces_resize", 1.0), "pieces_resize"
         )  # scaling??? # TODO - process this!
         self.strokes = kwargs.get("strokes", None)  # MUST be none; set by user OR game
-        self._validate_choices()
         # ---- custom /interal properties
         self.board_pattern = "default"
         self.board_type = "grid"
@@ -92,6 +91,7 @@ class AbstractGameObject(BaseShape):
             HexOrientationName.POINTY.value
         )  # orientation is hard-coded for HexHex and Hex Grid
         self.cell_size = 1  # typically a "square" area; hexagon height; circle dia.
+        self.cols_non_blank = []  # count-per-row of non-blank cells
         # ---- calculated properties
         if not kwargs.get("width"):  # default to page width
             self.width = (
@@ -101,7 +101,9 @@ class AbstractGameObject(BaseShape):
             self.height = (
                 globals.page.height - globals.margins.top - globals.margins.bottom
             )
+        # ---- add in defaults from games
         self.set_options_by_game()
+        self._validate_choices()
         # ---- check fills and colors
         if self.fills and self.strokes:
             if len(self.fills) != len(self.strokes):
@@ -135,7 +137,7 @@ class AbstractGameObject(BaseShape):
                     self.fills = ("white",)
                 if self.strokes is None:
                     self.strokes = ("black",)
-                if not self.cols:
+                if not self.rows:
                     self.rows = 8
                 if not self.cols:
                     self.cols = 8
@@ -152,7 +154,7 @@ class AbstractGameObject(BaseShape):
                     self.fills = ("white", "silver")
                 if self.strokes is None:
                     self.strokes = (None, None)
-                if not self.cols:
+                if not self.rows:
                     self.rows = 8
                 if not self.cols:
                     self.cols = 8
@@ -166,7 +168,7 @@ class AbstractGameObject(BaseShape):
                     self.fills = ("firebrick", "black")
                 if self.strokes is None:
                     self.strokes = (None, None)
-                if not self.cols:
+                if not self.rows:
                     self.rows = 8
                 if not self.cols:
                     self.cols = 8
@@ -180,7 +182,7 @@ class AbstractGameObject(BaseShape):
                     self.fills = ("#D9A359",)
                 if self.strokes is None:
                     self.strokes = ("black",)
-                if not self.cols:
+                if not self.rows:
                     self.rows = 18
                 if not self.cols:
                     self.cols = 18
@@ -193,13 +195,17 @@ class AbstractGameObject(BaseShape):
                     self.fills = ("white",)
                 if self.strokes is None:
                     self.strokes = ("black",)
-                if not self.cols:
+                if not self.rows:
                     self.rows = 9
                 if not self.cols:
                     self.cols = 9
                 self.label_start = "TR"
                 self.label_type = "N"
             case "hexagons":
+                if not self.rows:
+                    self.rows = 8
+                if not self.cols:
+                    self.cols = 8
                 _max_cells = max(self.rows, self.cols)
                 self.cell_size = _available / _max_cells
                 self.board_type == "hex"
@@ -208,11 +214,19 @@ class AbstractGameObject(BaseShape):
                 if self.label_type is None:
                     self.label_type = "AN"
             case "hex":
+                if self.side:
+                    pass
+                else:
+                    if not self.rows:
+                        self.rows = 11
+                    if not self.cols:
+                        self.cols = 11
                 self.label_start = "TL"
                 self.label_type = "AN"
                 self.board_type == "hex"
                 raise NotImplementedError("Sorry, a hex board is not available yet.")
             case "hexhex":
+                # TODO - calc rows and cols from side
                 _max_cells = self.side * 2 - 1
                 self.cell_size = _available / _max_cells / 0.866
                 self.board_type == "hex"
@@ -540,6 +554,7 @@ class AbstractGameObject(BaseShape):
                 # TODO  - change this for shogi !! (numbers only; start at TR)
                 # TODO  - change this for go !! (skip the "I" col)
                 for row in range(self.rows, 0, -1):
+                    self.cols_non_blank.append(self.cols)
                     for col in range(1, self.cols + 1):
                         col_id = tools.sheet_column(col, lower=True)
                         cell_id = f"{col_id}{row}"
@@ -583,6 +598,7 @@ class AbstractGameObject(BaseShape):
                 )
                 # ---- set default cell attributes (plus label)
                 for row in range(1, self.rows + 1):
+                    cols_non_blank = 0
                     for col in range(1, self.cols + 1):
                         try:
                             # TODO - pass in settings to this function!
@@ -591,6 +607,8 @@ class AbstractGameObject(BaseShape):
                             )
                             cell_id = f"{col_row[0]}{col_row[1]}"
                             cell_geo = self.board_layout.cells[(col, row)]
+                            if not cell_geo.blank:
+                                cols_non_blank += 1
                             # print(f"{col=} {row=}", col_row, cell_geo)
                             cell_geo_label = cell_geo._replace(name=cell_id)
                             setattr(self, cell_id, cell_geo_label)
@@ -600,13 +618,14 @@ class AbstractGameObject(BaseShape):
                                 True,
                                 True,
                             )
+                    self.cols_non_blank.append(cols_non_blank)
             case _:
                 self.game_name_error()
 
     def setup_pieces(self, pieces_type: str = None, pieces_list: list = None) -> dict:
         """Return pieces mapped as character:shape(s)."""
         if pieces_type is None and not pieces_list:
-            pieces_type = "checkers"  # Default!
+            pieces_type = None  # Default!
         pg_pieces = {}
         kwargs = {}
         kwargs["height"] = self.cell_size
@@ -706,7 +725,10 @@ class AbstractGameObject(BaseShape):
                     "v": piece_shape("iw", "Black Silver General: Promoted", **kwargs),
                 }
             case None:
-                pass  # no defauls
+                pg_pieces = {
+                    "B": piece_shape("B", "Black", **kwargs),  # plain circle
+                    "W": piece_shape("W", "White", **kwargs),  # plain circle
+                }
             case _:
                 raise NotImplementedError(
                     f'Pieces Type "{pieces_type}" is not available.'
@@ -1026,13 +1048,13 @@ class AbstractStateObject(BaseShape):
                 row = "." * int(self.board.cols)
                 position_list[key] = row
             if len(row) != self.board.cols:
-                if len(row) < self.board.cols:
+                if len(row) < self.board.cols_non_blank[key]:
                     feedback(
                         f"Not all columns have been set for row#{key + 1} of the"
                         f" AbstractState 'positions' ({len(row)} vs {self.board.cols}).",
                         False,
                     )
-                if len(row) > self.board.cols:
+                if len(row) > self.board.cols_non_blank[key]:
                     feedback(
                         f"There are too many columns for row#{key + 1} of the AbstractState"
                         f" 'positions' ({len(row)} vs {self.board.cols}).",

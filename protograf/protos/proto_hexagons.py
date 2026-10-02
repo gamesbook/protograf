@@ -49,6 +49,7 @@ class Hexagons(ProtografGrid):
         self.hex_layout = kwargs.get("hex_layout", "")  # default to rectangular
         self.pattern = kwargs.get("pattern", None)  # used by AbstractGame
         self.user = kwargs.get("user", "Hexagons")  # the calling Shape
+        self.is_blank = False  # track if a cell is blank
         self.locales = []  # will be created by specific draw_* method
         self.draw_layout()
 
@@ -73,6 +74,12 @@ class Hexagons(ProtografGrid):
             ene=hexgn.geo.ene,
             ese=hexgn.geo.ese,
             wsw=hexgn.geo.wsw,
+            # # meta
+            blank=self.is_blank,  # signals "no Shape drawn here"
+            t="HexShape",
+            type="HexShape",
+            shapetype="HexShape",
+            name="Hexagon",
         )
         return shape_geometry
 
@@ -173,13 +180,13 @@ class Hexagons(ProtografGrid):
                         hex_cols=cols,
                         **self.kwargs,
                     )
-                    is_blank = False
+                    self.is_blank = False
                     if hex_pattern:  # test if current col/row in pattern
                         if hex_pattern[row][col] == ".":
-                            is_blank = True
+                            self.is_blank = True
                         # feedback(f'$$$ Hexagons:draw_hexag {col=},{row=} {is_blank=}')
                     # test if blank and if skip drawing
-                    if self._draw_grid and not is_blank:
+                    if self._draw_grid and not self.is_blank:
                         hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
                     _locale = Locale(
@@ -189,7 +196,7 @@ class Hexagons(ProtografGrid):
                         y=hxgn.grid.y,
                         cxy=Point(hxgn.grid.x, hxgn.grid.y),
                         geo=shape_geo,
-                        is_blank=is_blank,
+                        is_blank=self.is_blank,
                         id=f"{ccol - 1}:{row}",
                         sequence=sequence,
                         label=hxgn.grid.label,
@@ -263,13 +270,13 @@ class Hexagons(ProtografGrid):
                         hex_cols=self.cols,
                         **self.kwargs,
                     )
-                    is_blank = False
+                    self.is_blank = False
                     if hex_pattern:  # test if current col/row in pattern
                         if hex_pattern[row][col] == ".":
-                            is_blank = True
+                            self.is_blank = True
                         # feedback(f'$$$ Hexagons:draw_layout_rec {col=},{row=} {is_blank=}')
                     # test if blank and skip drawing
-                    if self._draw_grid and not is_blank:
+                    if self._draw_grid and not self.is_blank:
                         hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
                     if hxgn.grid:
@@ -287,7 +294,7 @@ class Hexagons(ProtografGrid):
                         y=_y,
                         cxy=Point(_x, _y),
                         geo=shape_geo,
-                        is_blank=is_blank,
+                        is_blank=self.is_blank,
                         id=f"{col}:{row}",
                         sequence=sequence,
                         label=_label,
