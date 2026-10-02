@@ -4,6 +4,7 @@ protograf Class for layout of Hexagons on a grid
 """
 
 # lib
+import re
 
 # project
 from protograf import globals
@@ -46,6 +47,8 @@ class Hexagons(ProtografGrid):
             self.hidden = tools.integer_pairs(kwargs.get("hidden"), "hidden")
         self._draw_grid = kwargs.get("_draw_grid", False)
         self.hex_layout = kwargs.get("hex_layout", "")  # default to rectangular
+        self.pattern = kwargs.get("pattern", None)  # used by AbstractGame
+        self.user = kwargs.get("user", "Hexagons")  # the calling Shape
         self.locales = []  # will be created by specific draw_* method
         self.draw_layout()
 
@@ -73,16 +76,82 @@ class Hexagons(ProtografGrid):
         )
         return shape_geometry
 
+    def process_pattern(self, hex_rows, hex_cols) -> list:
+        """Convert pattern into a list structure."""
+        if self.pattern is None or self.pattern == "":
+            return []
+        if "/" in self.pattern and "\n" in self.pattern:
+            feedback(
+                "Do not mix '/' and line-breaks for {self.user} 'pattern'.",
+                True,
+                True,
+            )
+            return []
+        # ---- list of items in pattern
+        if "/" in self.pattern:
+            position_std = re.sub(r"\d", lambda m: "." * int(m.group()), self.pattern)
+            _pattern_list = position_std.split("/")
+        elif "\n" in self.pattern:
+            _pattern_list = self.pattern.split("\n")
+        else:
+            feedback(
+                f"Neither '/' or line-break were specified for {self.user} 'pattern',"
+                " so only a single row will be processed.",
+                False,
+            )
+            _pattern_list = self.pattern
+        # ---- clean list
+        pattern_list = [row.strip() for row in _pattern_list if row]
+        pattern_list = [row.replace(" ", "") for row in pattern_list if row]
+        pattern_list = [row.replace("\t", "") for row in pattern_list if row]
+        pattern_list = [row for row in pattern_list if row]
+        # ---- validate pattern list
+        if pattern_list and len(pattern_list) != hex_rows:
+            if len(pattern_list) < hex_rows:
+                feedback(
+                    f"Not all rows have been set for the {self.user} 'pattern'"
+                    f" ({len(pattern_list)} vs {hex_rows}).",
+                    False,
+                )
+            if len(pattern_list) > hex_rows:
+                feedback(
+                    f"There are too many rows for the {self.user} 'pattern'"
+                    f" ({len(pattern_list)} vs {hex_rows}).",
+                    True,
+                    True,
+                )
+        for key, row in enumerate(pattern_list):
+            if row == "O" or row == "o":
+                row = "O" * int(hex_cols)
+                pattern_list[key] = row
+            if len(row) != hex_cols:
+                if len(row) < hex_cols:
+                    feedback(
+                        f"Not all columns have been set for row#{key + 1} of the"
+                        f" {self.user} 'pattern' ({len(row)} vs {hex_cols}).",
+                        False,
+                    )
+                if len(row) > hex_cols:
+                    feedback(
+                        f"There are too many columns for row#{key + 1} of the {self.user}"
+                        f" 'pattern' ({len(row)} vs {hex_cols}).",
+                        True,
+                        True,
+                    )
+        return pattern_list
+
     def draw_hexagons(
         self, rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True
     ):
-        """Draw rows of hexagons for each column in `the_cols`"""
+        """Create rows of hexagons for each column in `the_cols`"""
         from protograf.protos import hexagon
 
         locales = []
         sequence = 0
         top_row = 0
         end_row = rows - 1
+        hex_pattern = self.process_pattern(hex_rows=rows, hex_cols=cols)
+
         if not odd_mid:
             end_row = rows
             top_row = 1
@@ -104,7 +173,13 @@ class Hexagons(ProtografGrid):
                         hex_cols=cols,
                         **self.kwargs,
                     )
-                    if self._draw_grid:
+                    is_blank = False
+                    if hex_pattern:  # test if current col/row in pattern
+                        if hex_pattern[row][col] == ".":
+                            is_blank = True
+                        # feedback(f'$$$ Hexagons:draw_hexag {col=},{row=} {is_blank=}')
+                    # test if blank and if skip drawing
+                    if self._draw_grid and not is_blank:
                         hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
                     _locale = Locale(
@@ -114,6 +189,7 @@ class Hexagons(ProtografGrid):
                         y=hxgn.grid.y,
                         cxy=Point(hxgn.grid.x, hxgn.grid.y),
                         geo=shape_geo,
+                        is_blank=is_blank,
                         id=f"{ccol - 1}:{row}",
                         sequence=sequence,
                         label=hxgn.grid.label,
@@ -174,6 +250,7 @@ class Hexagons(ProtografGrid):
         from protograf.protos import hexagon
 
         sequence = 0
+        hex_pattern = self.process_pattern(hex_rows=self.rows, hex_cols=self.cols)
         for row in range(self.rows):
             for col in range(self.cols):
                 if self.hidden and (row + 1, col + 1) in self.hidden:
@@ -186,7 +263,13 @@ class Hexagons(ProtografGrid):
                         hex_cols=self.cols,
                         **self.kwargs,
                     )
-                    if self._draw_grid:
+                    is_blank = False
+                    if hex_pattern:  # test if current col/row in pattern
+                        if hex_pattern[row][col] == ".":
+                            is_blank = True
+                        # feedback(f'$$$ Hexagons:draw_layout_rec {col=},{row=} {is_blank=}')
+                    # test if blank and skip drawing
+                    if self._draw_grid and not is_blank:
                         hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
                     if hxgn.grid:
@@ -204,14 +287,12 @@ class Hexagons(ProtografGrid):
                         y=_y,
                         cxy=Point(_x, _y),
                         geo=shape_geo,
+                        is_blank=is_blank,
                         id=f"{col}:{row}",
                         sequence=sequence,
                         label=_label,
                         page=globals.page_count + 1,
                     )
-                    # print(
-                    #     f"$$$ Locale {id=} {col=} {row=} {hxgn.grid=}"
-                    # )
                     self.cells[(col + 1, row + 1)] = hxgn.geometry  # 1-based for cells
                     self.locales.append(_locale)
                     sequence += 1

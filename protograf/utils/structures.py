@@ -426,6 +426,7 @@ class Locale(NamedTuple):
     width: float | None = None
     radius: float | None = None
     side: float | None = None
+    is_blank: bool = False
     id: int | None = None
     sequence: int | None = None
     corner: bool = False

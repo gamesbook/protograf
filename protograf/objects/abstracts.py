@@ -63,7 +63,7 @@ class AbstractGameObject(BaseShape):
         self.areas = kwargs.get("areas", None)  # MUST be none; set by user
         self.fills = kwargs.get("fills", None)  # MUST be none; set by user OR game
         self.frame = tools.as_bool(kwargs.get("frame", False))
-        self.hex_pattern = kwargs.get("hex_pattern", None)  # TODO - process this!
+        self.pattern = kwargs.get("pattern", None)  # TODO - process this!
         self.intersections = tools.as_bool(kwargs.get("intersections", False))
         self.label = tools.as_bool(kwargs.get("label", False))
         self.label_start = kwargs.get("label_start", None)
@@ -457,7 +457,7 @@ class AbstractGameObject(BaseShape):
                     raise NotImplementedError("No labels for Hex grids!")
                 elif self.board_type == "tri":
                     raise NotImplementedError("No labels for Triangle grids!")
-                # print('&&& col label', ltype, col_value, x, y); breakpoint()
+                # print('&&& col label', ltype, col_value, x, y);breakpoint()
                 Text(col_value, x=x, y=y, **lkeys)
                 col_num += 1
 
@@ -578,6 +578,8 @@ class AbstractGameObject(BaseShape):
                     y=top_y,
                     orientation=HexOrientationName.POINTY.value,  # hard-coded: HexGrid
                     _draw_grid=False,
+                    pattern=self.pattern,
+                    user="AbstractGame",
                 )
                 # ---- set default cell attributes (plus label)
                 for row in range(1, self.rows + 1):

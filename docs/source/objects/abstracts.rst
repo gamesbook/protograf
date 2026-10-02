@@ -116,6 +116,7 @@ Other useful properties that can be set for an AbstractGame are:
 * *frame*: if ``True``, draw a frame around the board's gridlines; use the
   normal styling options for the frame; *frame_width*, *frame_stroke*,
   *frame_dotted*, and/or *frame_dashed* to customize it
+* *hex_pattern*: an on/off design showing which
 * *intersections*: if ``True``, draw pieces on **grid intersections**, not
   grid spaces, and label the lines, not the spaces
 * *label*: if ``True``, draw a labels around the board's edges; use the
@@ -167,6 +168,48 @@ will contain either an equal or unequal number of rows and columms.
 Such a grid allows pieces to be placed either in the spaces between the lines
 or on their intersection points |dash| **protograf** terms these locations
 *cells*.
+
+
+.. _abstractGameHexagonPattern:
+
+AbstractGame Hexagon Pattern
+-----------------------------
+`^ <abstractgame-command_>`_
+
+If a hexagonal grid for a game does not contain an equal number of
+hexagons in every row of the board, then a pattern design, or layout,
+can be defined, using a cell-and-dot notation defined for the *hex_pattern*
+property.
+
+This notation represents each row as separate line, with each regular, or
+normal hexagon with a ``O`` (the letter "oh"), and each blank, or missing,
+cell with a ``.`` (dot or full stop).
+
+There should be as many lines in the pattern as are set in the *rows* value
+for the AbstractGame.
+
+The best way to represent multi-line list of characters such as this is by
+starting and ending with triple quotes |dash| ``"""``.`
+
+For example, for an AbstractGame with ``cols=5`` and ``rows=5`` a valid
+*hex_pattern* could be:
+
+.. code:: python
+
+   hex_pattern = """
+   . O O O .
+    0 O O O .
+   O O O O O
+    0 O O O .
+   . O O O .
+   """
+
+Note that empty lines and "whitespace" at the start and end of a line is
+ignored; but each line **must** contain an equal number of characters |dash|
+again, ignoring any whitespace |dash| corresponding to the *cols* value.
+
+If a row on the board contains only normal cells, this can be shown with a
+single ``O``.
 
 
 .. _abstractGamePieces:
@@ -292,16 +335,16 @@ stone, and then 9 empty points; whereas the second row has a Black stone,
 followed by 9 empty points, and then another 9 empty points.
 
 The FEN-like notation is converted internally by *protograf* into
-`Line-and-Dot Notation`_.
+`Piece-and-Dot Notation`_.
 
-Line-and-Dot Notation
-~~~~~~~~~~~~~~~~~~~~~
+Piece-and-Dot Notation
+~~~~~~~~~~~~~~~~~~~~~~
 
 This notation represents each row as separate line, and each blank cell
 with a ``.`` (dot or full stop).
 
-The best way to represent multi-line sets of characters is by starting
-and ending with triple quotes |dash| ``"""``.
+The best way to represent multi-line list of characters such as this is by
+starting and ending with triple quotes |dash| ``"""``.
 
 For example:
 
@@ -315,10 +358,11 @@ For example:
 would show two rows near the start of a Chess game where Black has moved
 both Knights and one Pawn.
 
-Note that empty lines and "whitespace" at the start and end of line is
+Note that empty lines and "whitespace" at the start and end of a line is
 ignored.
 
-If row on the board contains no pieces, this can be shown with a single ``.``.
+If a row on the board contains **no** pieces, this can be shown with a single
+``.``.
 
 
 .. _abstractStateMarkers:
