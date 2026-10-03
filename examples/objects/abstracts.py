@@ -17,7 +17,6 @@ Create(
 header = Common(x=0, y=0, font_size=12, align="left")
 footer = Common(x=0, y=8.5, font_size=12, align="left")
 
-'''
 # ---- default Abstract Game Grid
 Text("Abstract Game: Default Board", common=header)
 agd = AbstractGame()
@@ -126,7 +125,6 @@ Text("Hexagons: default", common=header)
 aghd = AbstractGame(name="hexagons")
 AbstractState(board=aghd)
 PageBreak()
-'''
 
 # ---- Hexagons - pattern
 Text("Hexagons: pattern", common=header)
@@ -143,9 +141,8 @@ aghp = AbstractGame(
     """)
 AbstractState(
     board=aghp,
-    positions="B3W/B4W/B5W/B4W/B3W")
+    positions="B3W/B4W/B2W/B4W/B3W")  # ignore blanks!!
 # PageBreak()
-
 
 Save(
     output='png',

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 protograf Abstract game shapes
+
+Notes:
+    * all arrays, such the cells of a board, are (col,row) with 1-based values
 """
 
 # lib
@@ -87,11 +90,8 @@ class AbstractGameObject(BaseShape):
         # ---- custom /interal properties
         self.board_pattern = "default"
         self.board_type = "grid"
-        self.orientation = (
-            HexOrientationName.POINTY.value
-        )  # orientation is hard-coded for HexHex and Hex Grid
+        self.orientation = HexOrientationName.POINTY.value  # set for HexHex & Hex Grid
         self.cell_size = 1  # typically a "square" area; hexagon height; circle dia.
-        self.cols_non_blank = []  # count-per-row of non-blank cells
         # ---- calculated properties
         if not kwargs.get("width"):  # default to page width
             self.width = (
@@ -101,6 +101,7 @@ class AbstractGameObject(BaseShape):
             self.height = (
                 globals.page.height - globals.margins.top - globals.margins.bottom
             )
+        self.cells_non_blank = []  # (col,row) pairs of non-blank cells PER ROW
         # ---- add in defaults from games
         self.set_options_by_game()
         self._validate_choices()
@@ -508,8 +509,6 @@ class AbstractGameObject(BaseShape):
         """Create board_layout for the required grid"""
         from protograf.protos import Layout, rectangle, Hexagons
 
-        # TODO - calculate board labels
-
         # ---- game-based defaults
         board_start = "NW"
         board_direction = "east"
@@ -528,6 +527,7 @@ class AbstractGameObject(BaseShape):
                     direction=board_direction,
                     pattern=self.board_pattern,
                 )
+                # print(f'&&& GRID BOARD {self.board_layout.cells.keys()=}')
                 if self.intersections:
                     Layout(self.board_layout, draw_lines=True, _draw_grid=False)
                 else:
@@ -550,17 +550,21 @@ class AbstractGameObject(BaseShape):
                                 )
                             )
                     Layout(self.board_layout, shapes=self.areas, _draw_grid=False)
-                # ---- set default cell attributes (plus label)
+                # ---- GRID default cell attributes (plus label); track non-blank cells
                 # TODO  - change this for shogi !! (numbers only; start at TR)
                 # TODO  - change this for go !! (skip the "I" col)
                 for row in range(self.rows, 0, -1):
-                    self.cols_non_blank.append(self.cols)
+                    non_blank = []
                     for col in range(1, self.cols + 1):
                         col_id = tools.sheet_column(col, lower=True)
                         cell_id = f"{col_id}{row}"
                         cell_geo = self.board_layout.cells[(col, row)]
+                        if not cell_geo.blank:
+                            non_blank.append((col, row))
+                        # print(f"&&& GRID {col=} {row=}", col_row, cell_geo)
                         cell_geo_label = cell_geo._replace(name=cell_id)
                         setattr(self, cell_id, cell_geo_label)
+                    self.cells_non_blank.append(non_blank)  # per-row list of non-blank
             case "hex":
                 self.game_name_error()
             case "hexhex":
@@ -573,6 +577,7 @@ class AbstractGameObject(BaseShape):
                     rings=rings,
                     orientation=self.orientation,
                 )
+                # print(f'&&& HEXHEX BOARD {self.board_layout.cells.keys()=}')
                 self.rows = (int(self.side) - 1) * 2 + 1
                 self.cols = self.rows  # maximum at centre row!
                 for key in self.board_layout.cells.keys():
@@ -596,9 +601,10 @@ class AbstractGameObject(BaseShape):
                     pattern=self.pattern,
                     user="AbstractGame",
                 )
-                # ---- set default cell attributes (plus label)
+                # print(f'&&& HEXES BOARD {self.board_layout.cells.keys()=}')
+                # ---- HEXES default cell attributes (plus label); track non-blank cells
                 for row in range(1, self.rows + 1):
-                    cols_non_blank = 0
+                    non_blank = []
                     for col in range(1, self.cols + 1):
                         try:
                             # TODO - pass in settings to this function!
@@ -608,9 +614,10 @@ class AbstractGameObject(BaseShape):
                             cell_id = f"{col_row[0]}{col_row[1]}"
                             cell_geo = self.board_layout.cells[(col, row)]
                             if not cell_geo.blank:
-                                cols_non_blank += 1
-                            # print(f"{col=} {row=}", col_row, cell_geo)
+                                non_blank.append((col, row))
                             cell_geo_label = cell_geo._replace(name=cell_id)
+                            # print(f"&&& HEXES {col=} {row=}", cell_id, cell_geo.blank)
+                            # breakpoint()
                             setattr(self, cell_id, cell_geo_label)
                         except Exception as err:
                             feedback(
@@ -618,7 +625,7 @@ class AbstractGameObject(BaseShape):
                                 True,
                                 True,
                             )
-                    self.cols_non_blank.append(cols_non_blank)
+                    self.cells_non_blank.append(non_blank)  # per-row list of non-blank
             case _:
                 self.game_name_error()
 
@@ -997,11 +1004,8 @@ class AbstractStateObject(BaseShape):
         """Geometry of AbstractStateObject - alias for geo."""
         return self.geo
 
-    def set_shape_positions(self, positions) -> list:
-        """Convert positions list into Shapes suitable for drawing on board."""
-
     def process_positions(self) -> list:
-        """Convert positions into a list structure."""
+        """Convert positions into a list of AbstractPiece objects."""
         if self.positions is None or self.positions == "":
             return []
         if "/" in self.positions and "\n" in self.positions:
@@ -1048,16 +1052,19 @@ class AbstractStateObject(BaseShape):
                 row = "." * int(self.board.cols)
                 position_list[key] = row
             if len(row) != self.board.cols:
-                if len(row) < self.board.cols_non_blank[key]:
+                non_blanks = len(self.board.cells_non_blank[key])
+                if len(row) < non_blanks:
                     feedback(
-                        f"Not all columns have been set for row#{key + 1} of the"
-                        f" AbstractState 'positions' ({len(row)} vs {self.board.cols}).",
+                        "Not all columns have been set for available cells"
+                        f" in row#{key + 1} of the"
+                        f" AbstractState 'positions' ({len(row)} vs {non_blanks}).",
                         False,
                     )
-                if len(row) > self.board.cols_non_blank[key]:
+                if len(row) > non_blanks:
                     feedback(
-                        f"There are too many columns for row#{key + 1} of the AbstractState"
-                        f" 'positions' ({len(row)} vs {self.board.cols}).",
+                        "There are too many columns for available cells"
+                        f" in row#{key + 1} of the AbstractState"
+                        f" 'positions' ({len(row)} vs {non_blanks}).",
                         True,
                         True,
                     )
@@ -1072,6 +1079,8 @@ class AbstractStateObject(BaseShape):
                 True,
             )
         # print(f'&&& {self.position_matrix=}')
+        # for index, row in enumerate(self.board.cells_non_blank):
+        #     print(f'&&& cells_non_blank {index=} {row=}')
         for row_no, row in enumerate(self.position_matrix):
             for col_no, col in enumerate(row):
                 # print(f'&&& AbstractState {row_no=},{col_no=} :', col)
@@ -1091,8 +1100,14 @@ class AbstractStateObject(BaseShape):
                     )
 
                 else:
-                    cell = self.board.board_layout.cells.get((col_no + 1, row_no + 1))
-                    # ---- Image shape
+                    # ---- get cell location
+                    # cell = self.board.board_layout.cells.get((col_no + 1, row_no + 1))
+                    the_cell = self.board.cells_non_blank[row_no][
+                        col_no
+                    ]  # list->0-based!
+                    cell_col, cell_row = the_cell[0], the_cell[1]
+                    cell = self.board.board_layout.cells.get((cell_col, cell_row))
+                    # ---- set Image shape props
                     if isinstance(piece_shp, ImageShape):
                         bbox = cell.bbox  # geo ~ user units ~ relative to margin
                         if bbox:
@@ -1108,7 +1123,7 @@ class AbstractStateObject(BaseShape):
                                 True,
                                 True,
                             )
-                    # ---- Other shape
+                    # ---- set Other shape props
                     elif isinstance(piece_shp, BaseShape):
                         cntr = cell.centre  # geo ~ user units ~ relative to margin
                         kwargs = {
@@ -1120,6 +1135,7 @@ class AbstractStateObject(BaseShape):
                             f'Unable to draw a piece of type "{type(piece_shp)}"'
                         )
                     # print(f'&&& AbstractState {row_no=},{col_no=} P:', type(piece_shp))
+                    # ---- draw shape
                     piece_shp.draw(**kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):

@@ -184,8 +184,7 @@ class Hexagons(ProtografGrid):
                     if hex_pattern:  # test if current col/row in pattern
                         if hex_pattern[row][col] == ".":
                             self.is_blank = True
-                        # feedback(f'$$$ Hexagons:draw_hexag {col=},{row=} {is_blank=}')
-                    # test if blank and if skip drawing
+                    # test if blank AND if skip drawing
                     if self._draw_grid and not self.is_blank:
                         hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
@@ -203,7 +202,8 @@ class Hexagons(ProtografGrid):
                         page=globals.page_count + 1,
                     )
                     # print(f'$$$ locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
-                    self.cells[(col, row)] = hxgn.geometry
+                    self.cells[(col, row)] = shape_geo  # 1-based for cells
+                    # feedback(f'$$$ Hexagons.cells {col=},{row=} {shape_geo.blank=}')
                     locales.append(_locale)
                     sequence += 1
 
@@ -274,8 +274,7 @@ class Hexagons(ProtografGrid):
                     if hex_pattern:  # test if current col/row in pattern
                         if hex_pattern[row][col] == ".":
                             self.is_blank = True
-                        # feedback(f'$$$ Hexagons:draw_layout_rec {col=},{row=} {is_blank=}')
-                    # test if blank and skip drawing
+                    # test if blank AND skip drawing
                     if self._draw_grid and not self.is_blank:
                         hxgn.draw()
                     shape_geo = self.get_geometry(hxgn)
@@ -300,7 +299,8 @@ class Hexagons(ProtografGrid):
                         label=_label,
                         page=globals.page_count + 1,
                     )
-                    self.cells[(col + 1, row + 1)] = hxgn.geometry  # 1-based for cells
+                    self.cells[(col + 1, row + 1)] = shape_geo  # 1-based for cells
+                    # feedback(f'$$$ Hexagons.cells {col+1=},{row+1=} {shape_geo.blank=}')
                     self.locales.append(_locale)
                     sequence += 1
 

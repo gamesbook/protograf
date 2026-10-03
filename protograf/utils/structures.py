@@ -328,6 +328,15 @@ class BBox:
 # ---- NAMEDTUPLE CLASS
 
 
+class AbstractPiece(NamedTuple):
+    """Attributes for tracking and displaying a piece for an AbstractGame"""
+
+    col: int | None = None
+    row: int | None = None
+    name: str | None = None
+    shape: object | None = None
+
+
 class CardBleed(NamedTuple):
     """Attributes for setting bleed color and extent around a Card"""
 
