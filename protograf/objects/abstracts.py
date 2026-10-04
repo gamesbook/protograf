@@ -91,6 +91,7 @@ class AbstractGameObject(BaseShape):
             self.stroke = None
         self.board_pattern = "default"
         self.board_type = "grid"
+        self.labels_lower = True
         self.orientation = HexOrientationName.POINTY.value  # set for HexHex & Hex Grid
         self.cell_size = 1  # typically a "square" area; hexagon height; circle dia.
         # ---- calculated properties
@@ -457,7 +458,7 @@ class AbstractGameObject(BaseShape):
                 case "tl":  # eg. Hex?
                     start_col, start_row = 1, 1
                     delta_row, delta_col = 1, 1
-                    end_col, end_row = self.cols, self.rows
+                    end_col, end_row = self.cols, self.rows + 1
                 case "br":  # eg. ???
                     start_col, start_row = self.cols, self.rows
                     delta_row, delta_col = -1, -1
@@ -478,7 +479,6 @@ class AbstractGameObject(BaseShape):
                 _label_row = self._p2v(self.label_size) * 0.75  # user-units
             loffset_col = self.label_offset_col if self.label_offset_col else _label_col
             loffset_row = self.label_offset_row if self.label_offset_row else _label_row
-            ltype = _lower(self.label_type)
             lkeys = {}
             lkeys["font_name"] = self.label_font
             lkeys["font_size"] = self.label_size
@@ -493,9 +493,19 @@ class AbstractGameObject(BaseShape):
                 shift = 1
             col_num = 1
             for col_no in range(start_col, end_col, delta_col):
+                # skip blank columns at start OR end of row
+                active_cells = self.cells_non_blank[label_row - 1]
+                col_exists = any(
+                    len(tup) > 1 and tup[0] == col_no for tup in active_cells
+                )
+                if not col_exists:
+                    continue
                 col_value = str(col_num)
-                if ltype == "an":
-                    col_value = tools.alpha_column(col_num, lower=True)
+                if self.label_type in ["AN", "AA"]:
+                    col_value = tools.alpha_column(col_num, lower=self.labels_lower)
+                else:
+                    col_value = str(col_num)
+                # get cell geo to use for label position
                 adjacent_cell = self.board_layout.cells[(col_no, label_row)]
                 if self.board_type == "grid":
                     if _label_start in ["br", "bl"]:
@@ -510,7 +520,17 @@ class AbstractGameObject(BaseShape):
                             "Cannot process label_start of {self.label_start}"
                         )
                 elif self.board_type == "hexagonal":
-                    raise NotImplementedError("No labels for Hex grids!")
+                    if _label_start in ["br", "bl"]:
+                        x = adjacent_cell.se.x
+                        y = adjacent_cell.s.y + shift * loffset_col * 1.5
+                    elif _label_start in ["tr", "tl"]:
+                        x = adjacent_cell.nw.x
+                        y = adjacent_cell.n.y  # + shift * loffset_col
+                    else:
+                        x, y = 0, 0
+                        raise NotImplementedError(
+                            "Cannot process label_start of {self.label_start}"
+                        )
                 elif self.board_type == "tri":
                     raise NotImplementedError("No labels for Triangle grids!")
                 # print('&&& col label', ltype, col_value, x, y)
@@ -521,16 +541,35 @@ class AbstractGameObject(BaseShape):
             if _label_start in ["tl", "bl"]:
                 label_col = 1
                 shift = -1
+                col_shift = 1
             else:
                 label_col = self.cols
                 shift = 1
+                col_shift = -1
             row_num = 1
             for row_no in range(start_row, end_row, delta_row):
-                row_value = str(row_num)
-                # currently do not use alphas for row labels
-                # if ltype == 'an':
-                #     row_value = tools.alpha_column(row_no, lower=True)
-                adjacent_cell = self.board_layout.cells[(label_col, row_no)]
+                if self.label_type in ["AA", "NA"]:
+                    row_value = tools.alpha_column(row_num, lower=self.labels_lower)
+                else:
+                    row_value = str(row_num)
+                col_no = label_col  # label col can be at start or end
+                # print(f'{row_no=} {col_no=}'); breakpoint()
+                # skip blank columns at start of a hexagonal grid row
+                if self.board_type == "hexagonal":
+                    active_cells = self.cells_non_blank[row_no - 1]
+                    while True:
+                        col_exists = any(
+                            len(tup) > 1 and tup[0] == col_no for tup in active_cells
+                        )
+                        if col_exists:
+                            break
+                        else:
+                            col_no += col_shift
+                            if col_no < 1 or col_no > self.cols:
+                                col_no = label_col  # give up and use default ...
+                                break
+                # get cell geo to use for label position
+                adjacent_cell = self.board_layout.cells[(col_no, row_no)]
                 if self.board_type == "grid":
                     if _label_start in ["tl", "bl"]:
                         x = adjacent_cell.w.x + shift * loffset_row
@@ -539,7 +578,12 @@ class AbstractGameObject(BaseShape):
                         x = adjacent_cell.e.x + shift * loffset_row
                         y = adjacent_cell.e.y + (self.label_size * 0.5) / globals.units
                 elif self.board_type == "hexagonal":
-                    raise NotImplementedError("No labels for Hex grids!")
+                    if _label_start in ["tl", "bl"]:
+                        x = adjacent_cell.w.x + shift * loffset_row
+                        y = adjacent_cell.w.y + (self.label_size * 0.5) / globals.units
+                    else:
+                        x = adjacent_cell.e.x + shift * loffset_row
+                        y = adjacent_cell.e.y + (self.label_size * 0.5) / globals.units
                 elif self.board_type == "tri":
                     raise NotImplementedError("No labels for Triangle grids!")
                 # print('&&& row label', ltype, row_value, x, y)

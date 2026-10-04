@@ -128,13 +128,13 @@ PageBreak()
 
 # ---- Hexagons - default
 Text("Hexagons: default", common=header)
-aghd = AbstractGame(name="hexagons")
+aghd = AbstractGame(name="hexagons", label=True)
 AbstractState(board=aghd)
 PageBreak()
 
 # ---- Hexagons - hex game
 Text("Hexagons: Hex Game", common=header)
-aghh = AbstractGame(name="hex")
+aghh = AbstractGame(name="hex", label=True, label_size=7)
 AbstractState(board=aghh)
 PageBreak()
 
@@ -144,6 +144,7 @@ aghp = AbstractGame(
     name="hexagons",
     rows=5,
     cols=7,
+    label=True,
     pattern = """
     . O O O 0 O .
      0 O O 0 0 O .
