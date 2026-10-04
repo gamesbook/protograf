@@ -2210,7 +2210,7 @@ class BaseShape:
         def get_image_from_svg(image_location: str | None = None):
             """Load SVG image and convert to PNG."""
             with open(image_location) as f:
-                svg_code = f.read()
+                svg_code = f.read()  # could alter the SVG string here...
             png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
             image = Image.open(io.BytesIO(png_bytes))
             return image  # NO embedded filename!

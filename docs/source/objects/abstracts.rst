@@ -109,14 +109,15 @@ The key properties that can be set for an AbstractGame are:
 
 Other useful properties that can be set for an AbstractGame are:
 
-* *colors*: a list of one or more :ref:`colors <basic-color>`  in which to draw
-  alternating board spaces; the default is to draw all squares ``white`` (or
+* *fills*: a list of one or more :ref:`colors <basic-color>`  in which to draw
+  alternating board spaces; the default is to draw all cells ``white`` (or
   the board's *fill* color); for Chess or Checker games, the squares are drawn
-  in a snake-like pattern
+  in a snake-like pattern |dash| line properties can be set with the normal
+  *stroke* and *stroke_width*
 * *frame*: if ``True``, draw a frame around the board's gridlines; use the
   normal styling options for the frame; *frame_width*, *frame_stroke*,
   *frame_dotted*, and/or *frame_dashed* to customize it
-* *hex_pattern*: an on/off design showing which
+* *pattern*: an on/off design showing which cells should be blank i.e. unused
 * *intersections*: if ``True``, draw pieces on **grid intersections**, not
   grid spaces, and label the lines, not the spaces
 * *label*: if ``True``, draw a labels around the board's edges; use the
@@ -124,12 +125,13 @@ Other useful properties that can be set for an AbstractGame are:
 * *label_type*: the type of label, drawn on the board edges, which is
   used to identify a row or column; it can be  either *alpha-numeric*,
   or *AN* (the default), which is the labelling used for Chess boards;
-  or *numeric*, or *N*, which is the labelling used for Shogi boards
+  or *numeric*, or *NN*, which is the labelling used for Shogi boards
 * *label_start*: the corner of the board at which the labelling starts; this
-  can be one of: *lower-left* (*LL*), *lower-right* (*LR*), *upper-left* (*UL*),
-  *upper-right* (*UR*); Chess boards use the *lower-left*, the default, while
-  Shogi boards use the *upper-right*
-* *label_offset*: how far away a label are drawn from the board edge(s)
+  can be: *bottom-left* (*BL*), *bottom-right* (*BR*), *top-left* (*TL*),
+  or *top-right* (*TR*). Chess boards use the *bottom-left*, the default, while
+  Shogi boards use the *top-right*.
+* *label_offset*: how far away a label are drawn from the board edge(s); if not
+  set, this is calculated from the label's font size
 * *markers*: a list of AbstractGame markers; see below for details
 * *pieces_type*: choose a predefined set of pieces from well-known abstract
   games; possible choices areL ``chess``, ``checkers``, ``go``, ``shogi`` or

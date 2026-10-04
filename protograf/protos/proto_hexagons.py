@@ -30,7 +30,7 @@ class Hexagons(ProtografGrid):
 
     def __init__(self, rows=1, cols=1, **kwargs):
         """
-        Kwrgs:
+        Kwargs:
 
         - sides (int): the number of hexagons along the edge of a HexHex frame
         - hidden: a list of hidden hexagons
@@ -45,10 +45,11 @@ class Hexagons(ProtografGrid):
         self.hidden = None
         if kwargs.get("hidden"):
             self.hidden = tools.integer_pairs(kwargs.get("hidden"), "hidden")
-        self._draw_grid = kwargs.get("_draw_grid", False)
+        self._draw_grid = kwargs.get("_draw_grid", True)
         self.hex_layout = kwargs.get("hex_layout", "")  # default to rectangular
         self.pattern = kwargs.get("pattern", None)  # used by AbstractGame
         self.user = kwargs.get("user", "Hexagons")  # the calling Shape
+        # ---- custom properties
         self.is_blank = False  # track if a cell is blank
         self.locales = []  # will be created by specific draw_* method
         self.draw_layout()

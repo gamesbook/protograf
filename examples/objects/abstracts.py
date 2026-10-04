@@ -32,14 +32,14 @@ PageBreak()
 # ---- Chess - customised board
 agcs = AbstractGame(
     name="chess",
-    fills=("#FFCE9E", "#D18B47"),  # browns
+    fills=["#FFCE9E", "#D18B47"],  # browns
     frame=True,
     frame_width=15,
     frame_stroke="brown",
     label=True,
     label_stroke="#FFCE9E",
     label_offset_row=0.275,
-    label_offset_col=0.35,
+    label_offset_col=0.25,
 )
 AbstractState(board=agcs, setup=True)
 Text("Chess Game: Frame, Colors & Labels", common=header)
@@ -85,6 +85,7 @@ sqLite = rectangle(default=sqr)
 agcb = AbstractGame(
     name="chess",
     areas=[sqLite, sqDark],
+    label=True,
 )
 AbstractState(board=agcb, setup=True)
 PageBreak()
@@ -97,11 +98,16 @@ PageBreak()
 
 # ---- Shogi - positions
 Text("Shogi Game: Positions (International)", common=footer)
-agcp = AbstractGame(name="shogi", pieces_type="shogi-int")
+agcp = AbstractGame(
+    name="shogi",
+    fills=['#D8A300'],
+    stroke_width=1.5,
+    stroke="white",
+    pieces_type="shogi-int")
 AbstractState(
     board=agcp,
     positions="""
-    R..R..K..
+    L..R..K..
     P.S.NnB.P
     B..PN.P.P
     .........
@@ -109,7 +115,7 @@ AbstractState(
     ....p....
     p....pb.p
     bp...n.p.
-    r...r.k..
+    l...r.k..
     """
 )
 PageBreak()
@@ -124,6 +130,12 @@ PageBreak()
 Text("Hexagons: default", common=header)
 aghd = AbstractGame(name="hexagons")
 AbstractState(board=aghd)
+PageBreak()
+
+# ---- Hexagons - hex game
+Text("Hexagons: Hex Game", common=header)
+aghh = AbstractGame(name="hex")
+AbstractState(board=aghh)
 PageBreak()
 
 # ---- Hexagons - pattern
@@ -141,8 +153,9 @@ aghp = AbstractGame(
     """)
 AbstractState(
     board=aghp,
-    positions="B3W/B4W/B2W/B4W/B3W")  # ignore blanks!!
+    positions="B3W/B4W/B2W/B4W/B3W")  # SHOULD ignore blank cells!!
 # PageBreak()
+
 
 Save(
     output='png',
@@ -158,6 +171,7 @@ Save(
         'abstracts_shogi_positions',
         'abstracts_checkers_setup',
         'abstracts_hexagons_default',
+        'abstracts_hexagons_hexgame',
         'abstracts_hexagons_pattern',
     ]
 )
