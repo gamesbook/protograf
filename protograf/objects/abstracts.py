@@ -113,11 +113,18 @@ class AbstractGameObject(BaseShape):
         # ---- setup board
         self.setup_board()
 
+    def hexhex_size(text):
+        # Search for one or more digits at the end of the string
+        match = re.search(r"\d+$", text)
+        if match:
+            number = match.group()
+            return int(number)
+
     def game_name_error(self):
         """Generate feedback if incorrect game name used."""
         feedback(
             "The AbstractGame 'name' property must be one of the following: "
-            f" Chess, Go, Checkers, Shogi, Hex, or grid (not '{self.name}').",
+            f" Chess, Go, Checkers, Shogi, Hex, HexHex, or grid (not '{self.name}').",
             True,
             True,
         )
@@ -197,6 +204,10 @@ class AbstractGameObject(BaseShape):
                 self.label_start = "TR"
                 self.label_type = "NN"
             case "hexagons":
+                if self.fills is None:
+                    self.fills = ("white",)
+                if self.stroke is None:
+                    self.stroke = "black"
                 if not self.rows:
                     self.rows = 8
                 if not self.cols:
@@ -209,6 +220,10 @@ class AbstractGameObject(BaseShape):
                 if self.label_type is None:
                     self.label_type = "AN"
             case "hex":
+                if self.fills is None:
+                    self.fills = ("white",)
+                if self.stroke is None:
+                    self.stroke = "black"
                 self.rows = 11
                 self.cols = 16
                 _max_cells = max(self.rows, self.cols)
@@ -233,6 +248,10 @@ class AbstractGameObject(BaseShape):
                 """
             case "hexhex":
                 # TODO - calc rows and cols from side
+                if self.fills is None:
+                    self.fills = ("white",)
+                if self.stroke is None:
+                    self.stroke = "black"
                 _max_cells = self.side * 2 - 1
                 self.cell_size = _available / _max_cells / 0.866
                 self.board_type = "hexagonal"
@@ -240,11 +259,19 @@ class AbstractGameObject(BaseShape):
                 self.label_type = "AN"
             case "tri" | "triangle" | "triangular":
                 self.board_type == "tri"
+                if self.fills is None:
+                    self.fills = ("white",)
+                if self.stroke is None:
+                    self.stroke = "black"
                 raise NotImplementedError(
                     "Sorry, a triangular board is not available yet."
                 )
             case None:
                 # can ignore the name for this AB
+                if self.fills is None:
+                    self.fills = ("white",)
+                if self.stroke is None:
+                    self.stroke = "black"
                 if self.label_start is None:
                     self.label_start = "BL"
                 if self.label_type is None:
@@ -447,6 +474,20 @@ class AbstractGameObject(BaseShape):
         """Draw labels around the board."""
         from protograf.protos import Text
 
+        def hex_col_label():
+            if _label_start in ["br", "bl"]:
+                x = adjacent_cell.se.x
+                y = adjacent_cell.s.y + shift * loffset_col * 1.5
+            elif _label_start in ["tr", "tl"]:
+                x = adjacent_cell.nw.x
+                y = adjacent_cell.n.y  # + shift * loffset_col
+            else:
+                x, y = 0, 0
+                raise NotImplementedError(
+                    "Cannot process label_start of {self.label_start}"
+                )
+            return x, y
+
         # ---- label ranges
         _label_start = _lower(self.label_start)
         if self.label:
@@ -483,14 +524,16 @@ class AbstractGameObject(BaseShape):
             lkeys["font_name"] = self.label_font
             lkeys["font_size"] = self.label_size
             lkeys["stroke"] = self.label_stroke
-            #
-            # ---- column labels
+
+            # ---- column labels for label row
             if _label_start in ["tr", "tl"]:
                 label_row = 1
                 shift = -1
+                row_shift = 1
             else:
                 label_row = self.rows
                 shift = 1
+                row_shift = -1
             col_num = 1
             for col_no in range(start_col, end_col, delta_col):
                 # skip blank columns at start OR end of row
@@ -520,22 +563,39 @@ class AbstractGameObject(BaseShape):
                             "Cannot process label_start of {self.label_start}"
                         )
                 elif self.board_type == "hexagonal":
-                    if _label_start in ["br", "bl"]:
-                        x = adjacent_cell.se.x
-                        y = adjacent_cell.s.y + shift * loffset_col * 1.5
-                    elif _label_start in ["tr", "tl"]:
-                        x = adjacent_cell.nw.x
-                        y = adjacent_cell.n.y  # + shift * loffset_col
-                    else:
-                        x, y = 0, 0
-                        raise NotImplementedError(
-                            "Cannot process label_start of {self.label_start}"
-                        )
+                    x, y = hex_col_label()
                 elif self.board_type == "tri":
                     raise NotImplementedError("No labels for Triangle grids!")
                 # print('&&& col label', ltype, col_value, x, y)
                 Text(col_value, x=x, y=y, **lkeys)
                 col_num += 1
+
+            # ---- col labels "extras" for hex
+            if self.board_type == "hexagonal":
+                max_active_cells = self.cells_non_blank[label_row - 1]
+                end_row = self.rows - label_row + 1
+                for check_row in range(label_row, end_row, row_shift):
+                    row_active_cells = self.cells_non_blank[check_row - 1]
+                    if len(row_active_cells) <= len(max_active_cells):
+                        continue
+                    for col_no in range(start_col, end_col, delta_col):
+                        # skip blank columns at start OR end of row
+                        col_exists = any(
+                            len(tup) > 1 and tup[0] == col_no
+                            for tup in row_active_cells
+                        )
+                        if not col_exists:
+                            continue
+                        col_value = str(col_num)
+                        if self.label_type in ["AN", "AA"]:
+                            col_value = tools.alpha_column(
+                                col_num, lower=self.labels_lower
+                            )
+                        else:
+                            col_value = str(col_num)
+                        # get cell geo to use for label position
+                        adjacent_cell = self.board_layout.cells[(col_no, check_row)]
+                        x, y = hex_col_label()
 
             # ---- row labels
             if _label_start in ["tl", "bl"]:
@@ -684,6 +744,8 @@ class AbstractGameObject(BaseShape):
                     cell_geo_label = cell_geo._replace(name=cell_id)
                     setattr(self, cell_id, cell_geo_label)
             case "hexagons" | "hex":
+                # TODO - pass 'shapes' into Hexagons for drawing e.g. circles
+                colr = self.fills[0] if self.fills else "white"
                 self.board_layout = Hexagons(
                     cols=self.cols,
                     rows=self.rows,
@@ -692,8 +754,11 @@ class AbstractGameObject(BaseShape):
                     orientation=HexOrientationName.POINTY.value,  # hard-coded: HexGrid
                     _draw_grid=False,
                     pattern=self.pattern,
-                    height=self.cell_size,  # single hexagon size
                     user="AbstractGame",
+                    # single hexagon properties:-
+                    height=self.cell_size,
+                    stroke_width=self.stroke_width,
+                    fill=colr,
                 )
                 # print(f'&&& HEXES BOARD {self.board_layout.cells.keys()=}')
                 # ---- HEXES default cell attributes (plus label); track non-blank cells

@@ -144,17 +144,18 @@ aghp = AbstractGame(
     name="hexagons",
     rows=5,
     cols=7,
+    fills=['lawngreen'],
     label=True,
     pattern = """
-    . O O O 0 O .
+    . O O . 0 O .
      0 O O 0 0 O .
-    O O . . . O O
+    O O . 0 . O O
      0 O O O 0 O .
-    . O O 0 0 O .
+    . O O . 0 O .
     """)
 AbstractState(
     board=aghp,
-    positions="B3W/B4W/B2W/B4W/B3W")  # SHOULD ignore blank cells!!
+    positions="B2W/B4W/B3W/B4W/B2W")  # SHOULD ignore blank cells!!
 # PageBreak()
 
 
