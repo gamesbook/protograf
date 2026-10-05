@@ -23,6 +23,21 @@ agd = AbstractGame()
 AbstractState(board=agd)
 PageBreak()
 
+# ---- styled Abstract Game Grid
+ags = AbstractGame(
+    name="grid",
+    fills=["gold"],
+    stroke="red",
+    stroke_width=2,
+    frame=True,
+    frame_width=15,
+    frame_stroke="limegreen",
+    label=True,
+    label_stroke="blue")
+AbstractState(board=ags)
+Text("Abstract Game: Styled Board", common=header)
+PageBreak()
+
 # ---- Chess - setup
 Text("Chess Game: Setup", common=header)
 agcs = AbstractGame(name="chess")
@@ -134,27 +149,50 @@ PageBreak()
 
 # ---- Hexagons - hex game
 Text("Hexagons: Hex Game", common=header)
-aghh = AbstractGame(name="hex", label=True, label_size=7)
+aghg = AbstractGame(name="hex", label=True, label_size=7)
+AbstractState(board=aghg)
+PageBreak()
+
+# ---- Hexagons - hex game
+Text("Hexagons: hexhex", common=header)
+aghh = AbstractGame(name="hexhex")
 AbstractState(board=aghh)
 PageBreak()
 
 # ---- Hexagons - pattern
 Text("Hexagons: pattern", common=header)
-aghp = AbstractGame(
+agha = AbstractGame(
+    name="hexagons",
+    rows=5,
+    cols=7,
+    fills=['lawngreen'],
+    pattern = """
+    . O O . O O .
+     O O O O O O .
+    O O . O . O O
+     O O O O O O .
+    . O O . O O .
+    """)
+AbstractState(board=agha)
+PageBreak()
+
+# ---- Hexagons - pattern + pieces
+Text("Hexagons: pattern & pieces", common=header)
+aghpp = AbstractGame(
     name="hexagons",
     rows=5,
     cols=7,
     fills=['lawngreen'],
     label=True,
     pattern = """
-    . O O . 0 O .
-     0 O O 0 0 O .
-    O O . 0 . O O
-     0 O O O 0 O .
-    . O O . 0 O .
+    . O O . O O .
+     O O O O O O .
+    O O . O . O O
+     O O O O O O .
+    . O O . O O .
     """)
 AbstractState(
-    board=aghp,
+    board=aghpp,
     positions="B2W/B4W/B3W/B4W/B2W")  # SHOULD ignore blank cells!!
 # PageBreak()
 
@@ -165,6 +203,7 @@ Save(
     directory="../docs/source/images/objects",
     names=[
         'abstracts_default',
+        'abstracts_styled',
         'abstracts_chess_setup',
         'abstracts_chess_customised',
         'abstracts_chess_positions',
@@ -174,6 +213,8 @@ Save(
         'abstracts_checkers_setup',
         'abstracts_hexagons_default',
         'abstracts_hexagons_hexgame',
+        'abstracts_hexagons_hexhex',
         'abstracts_hexagons_pattern',
+        'abstracts_hexagons_pattern_pieces',
     ]
 )

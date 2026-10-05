@@ -38,11 +38,11 @@ and commands, which act as summary and cross-reference.
     supplemented by the :doc:`geometry of a shape <shapes_geometry>`
 10. :doc:`Customised Text <customised_text>` - how to refine the
     appearance of text
-11. :doc:`Compound Objects <objects>` - special composite shapes not part
-    of the core shapes e.g. cubes, dice, polyominoes, pentominoes, tuckbox,
-    abstract board & game
-12. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
-    tracks and grid layouts
+11. :doc:`Compound Objects <objects/index>` - special composite shapes not part
+    of the core shapes; including cubes, dice, polyominoes, pentominoes,
+    tuckbox, and boards |dash| grid and hexagonal |dash| for abstract games
+12. :doc:`Repetitive Elements <layouts/index>` - how to work with repeats,
+    sequences, tracks and grid layouts
 13. :doc:`Hexagonal <hexagonal_grids>` and :doc:`HexHex <hexhex_grids>`
     grids - how to create and customise them
 14. :doc:`Additional Commands <additional_commands>` - special commands not part

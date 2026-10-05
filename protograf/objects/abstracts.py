@@ -113,7 +113,7 @@ class AbstractGameObject(BaseShape):
         # ---- setup board
         self.setup_board()
 
-    def hexhex_size(text):
+    def hexhex_size(self, text):
         # Search for one or more digits at the end of the string
         match = re.search(r"\d+$", text)
         if match:
@@ -235,19 +235,18 @@ class AbstractGameObject(BaseShape):
                 self.board_type = "hexagonal"
                 self.pattern = """
                 O O O O O O O O O O O . . . . .
-                 0 0 0 0 0 0 0 0 0 0 0 . . . . .
-                . 0 0 0 0 0 0 0 0 0 0 0 . . . .
-                 . 0 0 0 0 0 0 0 0 0 0 0 . . . .
-                . . 0 0 0 0 0 0 0 0 0 0 0 . . .
-                 . . 0 0 0 0 0 0 0 0 0 0 0 . . .
-                . . . 0 0 0 0 0 0 0 0 0 0 0 . .
-                 . . . 0 0 0 0 0 0 0 0 0 0 0 . .
-                . . . . 0 0 0 0 0 0 0 0 0 0 0 .
-                 . . . . 0 0 0 0 0 0 0 0 0 0 0 .
-                . . . . . 0 0 0 0 0 0 0 0 0 0 0
+                 O O O O O O O O O O O . . . . .
+                . O O O O O O O O O O O . . . .
+                 . O O O O O O O O O O O . . . .
+                . . O O O O O O O O O O O . . .
+                 . . O O O O O O O O O O O . . .
+                . . . O O O O O O O O O O O . .
+                 . . . O O O O O O O O O O O . .
+                . . . . O O O O O O O O O O O .
+                 . . . . O O O O O O O O O O O .
+                . . . . . O O O O O O O O O O O
                 """
             case "hexhex":
-                # TODO - calc rows and cols from side
                 if self.fills is None:
                     self.fills = ("white",)
                 if self.stroke is None:
@@ -257,6 +256,17 @@ class AbstractGameObject(BaseShape):
                 self.board_type = "hexagonal"
                 self.label_start = "BL"
                 self.label_type = "AN"
+                self.board_type = "hexagonal"
+                # TODO - calc rows and cols from side
+                self.rows = 5
+                self.cols = 5
+                self.pattern = """
+                . O O O .
+                 O O O O .
+                O O O O O
+                 O O O O .
+                . O O O .
+                """
             case "tri" | "triangle" | "triangular":
                 self.board_type == "tri"
                 if self.fills is None:
@@ -565,7 +575,11 @@ class AbstractGameObject(BaseShape):
                 elif self.board_type == "hexagonal":
                     x, y = hex_col_label()
                 elif self.board_type == "tri":
+                    x, y = 0, 0
                     raise NotImplementedError("No labels for Triangle grids!")
+                else:
+                    x, y = 0, 0
+                    raise NotImplementedError(f"No labels for {self.board_type} grid!")
                 # print('&&& col label', ltype, col_value, x, y)
                 Text(col_value, x=x, y=y, **lkeys)
                 col_num += 1
