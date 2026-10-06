@@ -86,6 +86,9 @@ class AbstractGameObject(BaseShape):
         self.pieces_resize = tools.as_float(
             kwargs.get("pieces_resize", 1.0), "pieces_resize"
         )  # scaling??? # TODO - process this!
+        if not kwargs.get("side"):
+            self.side = 2  # override default in base.py
+        self.side = tools.as_int(self.side, "side", minimum=2, allow_none=True)
         # ---- custom /interal properties
         if not kwargs.get("stroke"):
             self.stroke = None
@@ -126,10 +129,37 @@ class AbstractGameObject(BaseShape):
         Args:
             side (int): number of hexagons along an edge
         """
-        size = side * 2 - 1
-        for rows in (1, size + 1):
-            for cols in (1, size + 1):
-                pass
+
+        def _split_gap(number: int):
+            if number % 2 != 0:  # odd
+                return number // 2, number // 2 + 1
+            else:  # even
+                return number // 2, number // 2
+
+        width = side * 2 - 1
+        row_size = side
+        add = True
+        hexes = ""
+        even = 0
+        while True:
+            gap = width - row_size
+            small, big = _split_gap(gap)
+            prefix = " " if even else ""
+            if side % 2 != 0:  # odd side
+                hexes += prefix + ". " * small + "O " * row_size + ". " * big + "\n"
+            else:  # even side
+                hexes += prefix + ". " * big + "O " * row_size + ". " * small + "\n"
+            even = 1 if even != 1 else 0
+            if add:
+                row_size += 1
+            else:
+                row_size -= 1
+            if row_size == width:
+                add = False
+            if row_size < side:
+                break
+        # print(f'&&& {hexes=}')
+        return hexes
 
     def game_name_error(self):
         """Generate feedback if incorrect game name used."""
@@ -267,17 +297,9 @@ class AbstractGameObject(BaseShape):
                 self.board_type = "hexagonal"
                 self.label_start = "BL"
                 self.label_type = "AN"
-                self.board_type = "hexagonal"
-                # TODO - calc rows and cols from side
-                self.rows = 5
-                self.cols = 5
-                self.pattern = """
-                . O O O .
-                 O O O O .
-                O O O O O
-                 O O O O .
-                . O O O .
-                """
+                self.rows = self.side * 2 - 1
+                self.cols = self.side * 2 - 1
+                self.pattern = self.hexhex_pattern(side=self.side)
             case "tri" | "triangle" | "triangular":
                 self.board_type = "tri"
                 if self.fills is None:
@@ -413,6 +435,22 @@ class AbstractGameObject(BaseShape):
                         True,
                         True,
                     )
+                else:
+                    if not self.side.is_integer():
+                        feedback(
+                            "The 'side' value (hexagons along an edge) must be an"
+                            " integer for an AbstractBoard of type 'hexhex'",
+                            True,
+                            True,
+                        )
+                    self.side = int(self.side)
+                    if self.side < 2:
+                        feedback(
+                            "The 'side' value (hexagons along an edge) must be more"
+                            " than 2 for an AbstractBoard of type 'hexhex'",
+                            True,
+                            True,
+                        )
             case _:
                 pass
 
@@ -752,10 +790,13 @@ class AbstractGameObject(BaseShape):
             case "hexagonal":
                 # TODO - pass 'shapes' into Hexagons for drawing e.g. circles
                 colr = self.fills[0] if self.fills else "white"
+                x_offset = -0.5 * self.cell_size
+                if self.name == "hexhex" and self.side % 2 == 0:
+                    x_offset = -self.cell_size
                 self.board_layout = Hexagons(
                     cols=self.cols,
                     rows=self.rows,
-                    x=top_x - 0.5 * self.cell_size,
+                    x=top_x + x_offset,
                     y=top_y,
                     orientation=HexOrientationName.POINTY.value,  # hard-coded: HexGrid
                     _draw_grid=False,

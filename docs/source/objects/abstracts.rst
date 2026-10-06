@@ -159,9 +159,9 @@ Other useful properties that can be set for an AbstractGame are:
     * *cols*: ``8`` (the same as Chess or Checkers board)
     * *pieces*: ``checkers`` (simple black and white circles)
 
-    Note also that the definitions of the board and pieces are **not** the
-    determinants of where the pieces get placed; how many pieces there are,
-    or what the rules are for their movement!
+    Note also that the definitions of the board and pieces are **not**,
+    generally speaking, the determinants of where the pieces get placed;
+    how many pieces there are, or what the rules are for their movement!
 
 
 .. _abstractGameGrid:
@@ -319,7 +319,8 @@ The term "hexhex" refers to a hexagonal grid that itself appears to look like
 a hexagon.
 
 This type of board is constructed by specifying the number of hexagons that
-appear along the edge or *side* of such a grid; the minimum vale being ``2``.
+appear along the edge or *side* of such a grid; the minimum |dash| and
+default |dash| value being ``2``.
 
 .. |ah3| image:: ../images/objects/abstracts_hexagons_hexhex.png
    :width: 330
