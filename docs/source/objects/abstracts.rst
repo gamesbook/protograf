@@ -94,15 +94,17 @@ AbstractGame Properties
 The key properties that can be set for an AbstractGame are:
 
 * *name*: the name of a type of board; which can chosen from  one of:
-  ``chess``, ``checkers``, ``go``; if omitted, the default is a ``grid``
+  ``chess``, ``checkers``, ``go`` or ``shogi``; if omitted, the default
+  is a ``grid``
 * *pieces*: details of pieces that will be placed on the board; these
   pieces can:
 
-  * each be chosen |dash| **independently** of the board name |dash| from a
-    pre-existing set: ``chess``, ``checkers`` (the default), ``go``,
-    ``shogi``, ``shogi-int``; or
-  * make use of the full set available from a pre-existing game by using
+  * make use of the full set available from a pre-defined game (``chess``,
+    ``checkers``, ``go``, ``shogi``, ``shogi-int``) by using
     *pieces_type* property (see below); or
+  * each be chosen individual and **independently** of the board name from
+    any of the pre-existing sets: ``chess``, ``checkers``, ``go``,
+    ``shogi``, ``shogi-int``; or
   * be defined with a customised list of piece names and shapes; see below
     for `AbstractGame Pieces`_
 * *cols*: if no game *name* has been set |dash| each game is already associated
@@ -120,7 +122,7 @@ Other useful properties that can be set for an AbstractGame are:
   *stroke_width*
 * *frame*: if ``True``, draw a frame around a gridded board's outlines; use the
   normal styling options for the frame |dash| *frame_width*, *frame_stroke*,
-  *frame_dotted*, and/or *frame_dashed* to customize it
+  , *frame_fill*, *frame_dotted*, and/or *frame_dashed* to customize it
 * *pattern*: an on/off design showing which cells should be blank i.e. unused
 * *intersections*: if ``True``, draw pieces on **grid intersections**, not
   grid spaces, and label the lines, not the spaces
@@ -248,7 +250,7 @@ Example 2: Styled Board
 ===== ======
 
 
-.. _abstractGameHexagonPattern:
+.. _abstractGameHexagonal:
 
 AbstractGame Board: Hexagonal
 -----------------------------
@@ -348,7 +350,7 @@ If a hexagonal grid for a game contains a custom number of hexagons,
 that may even be different in every row of the board, then a pattern
 design, or layout, can be defined for an ``AbstractGame``.
 
-A pattern grid use a cell-and-dot notation which is set with the
+A pattern grid uses a cell-and-dot notation which is set with the
 *hex_pattern* property.
 
 This notation represents each row as separate line, with each regular, or
@@ -395,14 +397,14 @@ single ``O``.
       ``hexagons``.
 
       The *pattern* property shows, in string format, an arrangement of
-      hexagons (``0``) and spaces (``.``). Note that the spaces are ignored
+      hexagons (``O``) and spaces (``.``). Note that the spaces are ignored
       when constructing the board; they are there just to help visualise
       the pattern being created.
 
       .. NOTE::
 
           It is important that the correct number of *rows* and *cols* are
-          set; the pattern has to fit inside these dimensions.
+          set; the pattern has to fit exactly to these dimensions.
 
 ===== ======
 

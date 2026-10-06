@@ -491,6 +491,7 @@ class BaseCanvas:
         # ---- frame
         self.frame = self.defaults.get("frame", "rectangle")
         self.frame_stroke = self.defaults.get("frame_stroke", self.stroke)
+        self.frame_fill = self.defaults.get("frame_fill", None)
         self.frame_width = self.defaults.get("frame_width", self.stroke_width)
         self.frame_dotted = self.defaults.get("frame_dotted", None)
         self.frame_dashed = self.defaults.get("frame_dashed", None)  # ---- OTHER
@@ -1247,6 +1248,7 @@ class BaseShape:
         # ---- frame
         self.frame = kwargs.get("frame", base.frame)
         self.frame_stroke = kwargs.get("frame_stroke", base.frame_stroke)
+        self.frame_fill = kwargs.get("frame_fill", base.frame_fill)
         self.frame_width = self.kw_float(kwargs.get("frame_width", base.frame_width))
         self.frame_dashed = kwargs.get("frame_dashed", base.frame_dashed)
         self.frame_dotted = kwargs.get("frame_dotted", base.frame_dotted)

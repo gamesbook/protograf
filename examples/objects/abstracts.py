@@ -16,10 +16,11 @@ Create(
 
 header = Common(x=0, y=0, font_size=12, align="left")
 footer = Common(x=0, y=8.5, font_size=12, align="left")
+thick = Default(stroke_width=0.5)
 
 # ---- default Abstract Game Grid
 Text("Abstract Game: Default Board", common=header)
-agd = AbstractGame()
+agd = AbstractGame(default=thick)
 AbstractState(board=agd)
 PageBreak()
 
@@ -107,7 +108,7 @@ PageBreak()
 
 # ---- Shogi - setup
 Text("Shogi Game: Setup", common=footer)
-agss = AbstractGame(name="shogi", label=True)
+agss = AbstractGame(name="shogi", label=True, default=thick)
 AbstractState(board=agss, setup=True)
 PageBreak()
 
@@ -142,26 +143,26 @@ AbstractState(board=agks, setup=True)
 PageBreak()
 
 # ---- Hexagons - default
-Text("Hexagons: default", common=header)
-aghd = AbstractGame(name="hexagons", label=True)
+Text("Hexagons: default?", common=header)
+aghd = AbstractGame(name="hexagons", label=True, default=thick)
 AbstractState(board=aghd)
 PageBreak()
 
 # ---- Hexagons - hex game
 Text("Hexagons: Hex Game", common=header)
-aghg = AbstractGame(name="hex", label=True, label_size=7)
+aghg = AbstractGame(name="hex", label=True, label_size=7, default=thick)
 AbstractState(board=aghg)
 PageBreak()
 
 # ---- Hexagons - hex game
 Text("Hexagons: hexhex", common=header)
-aghh = AbstractGame(name="hexhex")
+aghh = AbstractGame(name="hexhex", default=thick)
 AbstractState(board=aghh)
 PageBreak()
 
 # ---- Hexagons - pattern
 Text("Hexagons: pattern", common=header)
-agha = AbstractGame(
+agha = AbstractGame(default=thick,
     name="hexagons",
     rows=5,
     cols=7,
@@ -178,11 +179,11 @@ PageBreak()
 
 # ---- Hexagons - pattern + pieces
 Text("Hexagons: pattern & pieces", common=header)
-aghpp = AbstractGame(
+aghpp = AbstractGame(default=thick,
     name="hexagons",
     rows=5,
     cols=7,
-    fills=['lawngreen'],
+    fills='lawngreen',
     label=True,
     pattern = """
     . O O . O O .

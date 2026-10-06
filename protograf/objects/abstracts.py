@@ -113,12 +113,23 @@ class AbstractGameObject(BaseShape):
         # ---- setup board
         self.setup_board()
 
-    def hexhex_size(self, text):
-        # Search for one or more digits at the end of the string
+    def hexhex_size(self, text) -> int:
+        """Find one or more digits at the end of the string."""
         match = re.search(r"\d+$", text)
         if match:
             number = match.group()
             return int(number)
+
+    def hexhex_pattern(self, side: int = 2) -> str:
+        """Create a O-and-. pattern layout for a hexhex board.
+
+        Args:
+            side (int): number of hexagons along an edge
+        """
+        size = side * 2 - 1
+        for rows in (1, size + 1):
+            for cols in (1, size + 1):
+                pass
 
     def game_name_error(self):
         """Generate feedback if incorrect game name used."""
@@ -268,7 +279,7 @@ class AbstractGameObject(BaseShape):
                 . O O O .
                 """
             case "tri" | "triangle" | "triangular":
-                self.board_type == "tri"
+                self.board_type = "tri"
                 if self.fills is None:
                     self.fills = ("white",)
                 if self.stroke is None:
@@ -326,8 +337,7 @@ class AbstractGameObject(BaseShape):
         ]:
             feedback(
                 "The AbstractGame 'label_start' property must be one of: "
-                "'TL', 'TR', 'BL', or 'BR'; "
-                f" not '{self.label_start}'.",
+                f"'TL', 'TR', 'BL', or 'BR'; not '{self.label_start}'.",
                 True,
                 True,
             )
@@ -354,6 +364,8 @@ class AbstractGameObject(BaseShape):
                 True,
             )
         if self.fills:
+            if isinstance(self.fills, str):
+                self.fills = [self.fills]  # "auto-correct" for user
             if not isinstance(self.fills, (list, tuple)):
                 feedback(
                     "The AbstractGame 'fills' property must be a list of colors, "
@@ -362,7 +374,7 @@ class AbstractGameObject(BaseShape):
                     True,
                 )
             for col in self.fills:
-                colrs.get_color(col)
+                colrs.get_color(col)  # validate each color
         if self.areas:
             if not isinstance(self.areas, (list, tuple)):
                 feedback(
@@ -396,7 +408,7 @@ class AbstractGameObject(BaseShape):
             case "hexhex":
                 if not self.side:
                     feedback(
-                        "Missing 'side' value (hexes along an edge)"
+                        "Missing 'side' value (hexagons along an edge)"
                         " for AbstractBoard of type 'hexhex'",
                         True,
                         True,
@@ -444,7 +456,7 @@ class AbstractGameObject(BaseShape):
                     y_top + tools.unit(total_height) + self.frame_width / 2.0,
                 )
                 rkwargs = {}  # copy.copy(kwargs)
-                rkwargs["fill"] = None
+                rkwargs["fill"] = self.frame_fill
                 rkwargs["stroke"] = self.frame_stroke
                 rkwargs["stroke_width"] = self.frame_width
                 rkwargs["dashed"] = self.frame_dashed
@@ -674,8 +686,9 @@ class AbstractGameObject(BaseShape):
         # Point(top_x, top_x) is the top-left point of the VirtualLocations (grid points)
         top_x = self.x if self.kwargs.get("x") else self.cell_size / 2.0
         top_y = self.y if self.kwargs.get("y") else self.cell_size / 2.0
-        match _lower(self.name):
-            case "grid" | "chess" | "checkers" | "draughts" | "go" | "shogi":  # default
+        match self.board_type:
+            # ---- setup Grid boards
+            case "grid":
                 self.board_layout = RectangularLocations(  # VirtualLocations
                     cols=self.cols,
                     rows=self.rows,
@@ -694,7 +707,7 @@ class AbstractGameObject(BaseShape):
                         pass
                     else:
                         self.areas = []
-                        for key, colr in enumerate(self.fills):
+                        for colr in self.fills:
                             self.areas.append(
                                 rectangle(
                                     height=self.cell_size,
@@ -705,11 +718,11 @@ class AbstractGameObject(BaseShape):
                                 )
                             )
                     Layout(self.board_layout, shapes=self.areas, _draw_grid=False)
-                # ---- GRID default cell attributes (plus label); track non-blank cells
-                # TODO  - change labels for go !! (skip the "I" col)
 
+                # ---- * default cell attributes (plus label); track non-blank cells
+                # TODO  - change labels for Go !! (skip the "I" col)
                 r_start, r_end, r_inc = self.rows, 0, -1
-                # ---- label direction
+                # ---- * label direction
                 if _lower(self.label_start) in ["br", "bl"]:
                     r_start, r_end, r_inc = 1, self.rows + 1, 1
 
@@ -734,30 +747,9 @@ class AbstractGameObject(BaseShape):
                         cell_geo_label = cell_geo._replace(name=cell_id)
                         setattr(self, cell_id, cell_geo_label)
                     self.cells_non_blank.append(non_blank)  # per-row list of non-blank
-            case "hexhex":
-                rings = int(self.side) - 1
-                self.board_layout = HexHexLocations(
-                    cx=self.cx or self.x,  # no default value for cx
-                    cy=self.cy or self.y,  # no default value for cy
-                    diameter=self.cell_size,
-                    # height=,  # NB self.height is the whole grid height
-                    rings=rings,
-                    orientation=self.orientation,
-                )
-                # print(f'&&& HEXHEX BOARD {self.board_layout.cells.keys()=}')
-                self.rows = (int(self.side) - 1) * 2 + 1
-                self.cols = self.rows  # maximum at centre row!
-                for key in self.board_layout.cells.keys():
-                    ring, position = key[0], key[1] - 1  # 0-based position
-                    col_row = geoms.hexhex_label(
-                        ring=ring, position=position, num_rings=rings
-                    )
-                    cell_id = f"{col_row[0]}{col_row[1]}"
-                    cell_geo = self.board_layout.cells[(ring, position + 1)]
-                    # print(f"{ring=} {position=} => {cell_id} -> {cell_geo.centre}")
-                    cell_geo_label = cell_geo._replace(name=cell_id)
-                    setattr(self, cell_id, cell_geo_label)
-            case "hexagons" | "hex":
+
+            # ---- setup Hexagonal boards
+            case "hexagonal":
                 # TODO - pass 'shapes' into Hexagons for drawing e.g. circles
                 colr = self.fills[0] if self.fills else "white"
                 self.board_layout = Hexagons(
@@ -775,7 +767,7 @@ class AbstractGameObject(BaseShape):
                     fill=colr,
                 )
                 # print(f'&&& HEXES BOARD {self.board_layout.cells.keys()=}')
-                # ---- HEXES default cell attributes (plus label); track non-blank cells
+                # ---- * default cell attributes (plus label); track non-blank cells
                 for row in range(1, self.rows + 1):
                     non_blank = []
                     for col in range(1, self.cols + 1):
@@ -798,6 +790,12 @@ class AbstractGameObject(BaseShape):
                                 True,
                             )
                     self.cells_non_blank.append(non_blank)  # per-row list of non-blank
+
+            # ---- setup Triangular boards
+            case "tri":
+                raise NotImplementedError(
+                    "Sorry, a triangular board is not available yet."
+                )
             case _:
                 self.game_name_error()
 
@@ -1314,20 +1312,25 @@ class AbstractStateObject(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractStateObject on a given canvas."""
-        from protograf.protos import Layout, hexagon
+        from protograf.protos import Layout
 
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- draw the board frame
+        if self.board.frame is True:
+            self.board.draw_frame()
         # ---- draw the board
         match _lower(self.board.name):
             case "grid" | "chess" | "checkers" | "go" | "shogi":  # default name is grid
                 if self.board.intersections:
                     Layout(
-                        self.board.board_layout, shapes=None, draw_lines=True, **kwargs
+                        self.board.board_layout,
+                        shapes=None,
+                        # debug="colrow",  (for testing only!)
+                        draw_lines=True,
+                        **kwargs,
                     )
-                    # TODO - draw a square (rows*cols) to "fill in" board with color
-                    # warning if setting colors for board cells as they do not show?
                 else:
                     Layout(
                         self.board.board_layout,
@@ -1335,29 +1338,15 @@ class AbstractStateObject(BaseShape):
                         # debug="colrow",  (for testing only!)
                         **kwargs,
                     )
-            case "hexagons" | "hex":
+            case "hexagons" | "hex" | "hexhex":
                 self.board.board_layout._draw_grid = True
                 self.board.board_layout.draw_layout()
-            case "hexhex":
-                hhs = HexHexShape(
-                    hexhex_locations=self.board.board_layout,
-                    shape=hexagon(
-                        diameter=self.board.cell_size,
-                        fill=self.board.fill,
-                        orientation=self.board.orientation,
-                    ),
-                    **kwargs,
-                )
-                hhs.draw()
             case _:
                 feedback(
                     f"No available logic to draw AbstractState board '{self.board.name}'",
                     True,
                     True,
                 )
-        # ---- draw the board frame
-        if self.board.frame is True:
-            self.board.draw_frame()
         # ---- draw the board labels
         if self.board.label is True:
             self.board.draw_labels()
