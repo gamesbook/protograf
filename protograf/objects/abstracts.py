@@ -594,6 +594,7 @@ class AbstractGameObject(BaseShape):
                 label_row = self.rows
                 shift = 1
                 row_shift = -1
+
             col_num = 1
             for col_no in range(start_col, end_col, delta_col):
                 # skip blank columns at start OR end of row
@@ -610,6 +611,7 @@ class AbstractGameObject(BaseShape):
                     col_value = str(col_num)
                 # get cell geo to use for label position
                 adjacent_cell = self.board_layout.cells[(col_no, label_row)]
+                x, y = 0, 0
                 if self.board_type == "grid":
                     if _label_start in ["br", "bl"]:
                         x = adjacent_cell.s.x
@@ -618,17 +620,14 @@ class AbstractGameObject(BaseShape):
                         x = adjacent_cell.n.x
                         y = adjacent_cell.n.y + shift * loffset_col
                     else:
-                        x, y = 0, 0
                         raise NotImplementedError(
                             "Cannot process label_start of {self.label_start}"
                         )
                 elif self.board_type == "hexagonal":
                     x, y = hex_col_label()
                 elif self.board_type == "tri":
-                    x, y = 0, 0
-                    raise NotImplementedError("No labels for Triangle grids!")
+                    raise NotImplementedError("No column labels for Triangle grids!")
                 else:
-                    x, y = 0, 0
                     raise NotImplementedError(f"No labels for {self.board_type} grid!")
                 # print('&&& col label', ltype, col_value, x, y)
                 Text(col_value, x=x, y=y, **lkeys)
@@ -637,8 +636,8 @@ class AbstractGameObject(BaseShape):
             # ---- col labels "extras" for hex
             if self.board_type == "hexagonal":
                 max_active_cells = self.cells_non_blank[label_row - 1]
-                end_row = self.rows - label_row + 1
-                for check_row in range(label_row, end_row, row_shift):
+                col_end_row = self.rows - label_row + 1
+                for check_row in range(label_row, col_end_row, row_shift):
                     row_active_cells = self.cells_non_blank[check_row - 1]
                     if len(row_active_cells) <= len(max_active_cells):
                         continue
