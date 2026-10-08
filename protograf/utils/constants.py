@@ -37,6 +37,7 @@ SIN_60 = math.sin(math.radians(60))
 COS_60 = math.cos(math.radians(60))
 TAN_60 = math.tan(math.radians(60))
 HEX_HD = math.sqrt(3) / 2.0
+PHI = 1.61803398875  # an irrational number; decimal places continue...
 
 BGG_IMAGES = "cf.geekdo-images.com"
 COLOR_NAMES = getColorList()

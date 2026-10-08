@@ -22,12 +22,25 @@ log = logging.getLogger(__name__)
 
 
 class CardFrame(Enum):
+    """Constants for types of Card frames"""
+
     RECTANGLE = 1
     HEXAGON = 2
     CIRCLE = 3
 
 
+class Corners(Enum):
+    """Constants for corners of an area"""
+
+    TOP_LEFT = 1
+    TOP_RIGHT = 2
+    BOTTOM_LEFT = 3
+    BOTTOM_RIGHT = 4
+
+
 class DatasetType(Enum):
+    """Constants for allowed sources of data"""
+
     FILE = 1
     DICT = 2
     MATRIX = 3
@@ -36,6 +49,8 @@ class DatasetType(Enum):
 
 
 class DirectionGroup(Enum):
+    """Constants for groups of directions"""
+
     CARDINAL = 1
     COMPASS = 2
     HEX_FLAT = 3  # vertex
@@ -52,12 +67,16 @@ class DirectionGroup(Enum):
 
 
 class ExportFormat(Enum):
+    """Constants for file type being exported"""
+
     GIF = 1
     PNG = 2
     SVG = 3
 
 
 class FontStyleType(Enum):
+    """Constants for styles of a Font"""
+
     REGULAR = 1
     BOLD = 2
     ITALIC = 3
@@ -65,16 +84,22 @@ class FontStyleType(Enum):
 
 
 class HexOrientation(Enum):
+    """Constants for hexagon's upwards orientation"""
+
     FLAT = 1
     POINTY = 2
 
 
 class HexOrientationName(Enum):
+    """Constants for  hexagon's upwards orientation name"""
+
     FLAT = "flat"
     POINTY = "pointy"
 
 
 class TriangleType(Enum):
+    """Constants for types of a Triangle"""
+
     EQUILATERAL = 1
     ISOSCELES = 2
     IRREGULAR = 3
@@ -209,6 +234,7 @@ PageMarginsBase = namedtuple(
 
 
 class PageMargins(PageMarginsBase):
+    """Page margin's in Points."""
 
     @property
     def left_u(self):
@@ -318,10 +344,12 @@ class BBox:
 
     @property
     def height(self):
+        """Height of Bounding Box."""
         return self.br.y - self.tl.y
 
     @property
     def width(self):
+        """Width of Bounding Box."""
         return self.br.x - self.tl.x
 
 
