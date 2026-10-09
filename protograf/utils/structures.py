@@ -29,8 +29,8 @@ class CardFrame(Enum):
     CIRCLE = 3
 
 
-class Corners(Enum):
-    """Constants for corners of an area"""
+class Corner(Enum):
+    """Constants for each corner of an area"""
 
     TOP_LEFT = 1
     TOP_RIGHT = 2

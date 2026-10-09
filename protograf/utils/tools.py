@@ -5,7 +5,6 @@ General purpose utility functions for protograf
 
 # lib
 from collections.abc import Iterable
-import collections
 import copy
 from functools import lru_cache
 from itertools import zip_longest
@@ -17,7 +16,7 @@ import re
 import string
 from string import ascii_uppercase, digits
 import sys
-from typing import Any, LiteralString, cast, Dict
+from typing import Any, LiteralString, cast
 from urllib.parse import urlparse
 
 # third-party
@@ -36,6 +35,7 @@ from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.messaging import feedback
 from protograf.utils.support import to_units
 from protograf.utils.structures import (
+    Corner,
     DirectionGroup,
     GlobalDocument,
     Point,
@@ -94,10 +94,16 @@ def boolean_join(items):
 
     Doc Test:
 
+    >>> items = [True, 'and', False]
+    >>> boolean_join(items)
+    False
     >>> items = [True, '+', False]
     >>> boolean_join(items)
     False
     >>> items = [True, '|', False]
+    >>> boolean_join(items)
+    True
+    >>> items = [True, 'or', False]
     >>> boolean_join(items)
     True
     >>> items = [True, None]
@@ -108,9 +114,9 @@ def boolean_join(items):
         return None
     expr = ""
     for item in items:
-        if item == "&" or item == "and" or item == "+":
+        if item in ["&", "and", "+"]:
             expr += " and "
-        elif item == "|" or item == "or":
+        elif item in ["|", "or"]:
             expr += " or "
         elif item is not None:
             expr += f"{item}"
@@ -156,8 +162,8 @@ def _lower(value) -> str | None:
         return None
     try:
         return str(value).lower().strip()
-    except Exception:
-        raise ValueError(f"Cannot convert {value} into a string!")
+    except Exception as exc:
+        raise ValueError(f"Cannot convert {value} into a string!") from exc
 
 
 def _p2v(value: Point, decimals: int = 4) -> tuple:
@@ -170,7 +176,7 @@ def _p2v(value: Point, decimals: int = 4) -> tuple:
     """
     try:
         _units = globals.units
-    except:
+    except Exception:
         _units = 28.3465
     try:
         return (
@@ -197,7 +203,7 @@ def _u2p(value: Point) -> tuple:
     """
     try:
         _units = globals.units
-    except:
+    except Exception:
         _units = 28.3465
     try:
         return Point(float(value.x) * _units, float(value.y) * _units)
@@ -1113,8 +1119,8 @@ def column_from_string(col: str) -> int:
     for letter, power in zip(list(_col), __powers):
         try:
             pos = __alpha_to_decimal.get(cast(LiteralString, letter))
-        except KeyError:
-            raise ValueError(error_msg)
+        except KeyError as exc:
+            raise ValueError(error_msg) from exc
         if pos is not None:
             idx += pos * power
     if not 0 < idx < 18279:
@@ -1122,6 +1128,7 @@ def column_from_string(col: str) -> int:
     return idx
 
 
+@lru_cache(maxsize=None)
 def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple | None:
     """Convert Excel style coordinate to 1-based (column, row) tuple
 
@@ -1150,6 +1157,145 @@ def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple | None:
         if zeroed:
             return column_from_string(col) - 1, int(row) - 1
         return column_from_string(col), int(row)
+
+
+@lru_cache(maxsize=None)
+def hexgrid_diagonal_cells(cols: int, rows: int, start_cell: Corner) -> dict:
+    """Return dict keyed on diagonals angled away from the start_cell for pointy grid.
+
+    Args:
+        cols (int): number of columns in the hexagonal grid
+        rows (int): number of rows in the hexagonal grid
+        start_cell (Corner): the location of the cell for the first diagonal
+
+    Example:
+
+    For cols=5 rows=5 start_cell='bl', the result is:
+        {1: [[1, 5]],
+         2: [[2, 5], [1, 4], [1, 3]],
+         3: [[3, 5], [2, 4], [2, 3], [1, 2], [1, 1]],
+         4: [[4, 5], [3, 4], [3, 3], [2, 2], [2, 1]],
+         5: [[5, 5], [4, 4], [4, 3], [3, 2], [3, 1]],
+         6: [[5, 4], [5, 3], [4, 2], [4, 1]],
+         7: [[5, 2], [5, 1]]}
+
+    Doc Test:
+
+    >>> hexgrid_diagonal_cells(5, 5, Corner.TOP_LEFT)
+    {1: [[1, 1]], 2: [[2, 1], [1, 2], [1, 3]], 3: [[3, 1], [2, 2], [2, 3], [1, 4], [1, 5]], 4: [[4, 1], [3, 2], [3, 3], [2, 4], [2, 5]], 5: [[5, 1], [4, 2], [4, 3], [3, 4], [3, 5]], 6: [[5, 2], [5, 3], [4, 4], [4, 5]], 7: [[5, 4], [5, 5]]}
+    >>> hexgrid_diagonal_cells(5, 5, Corner.BOTTOM_LEFT)
+    {1: [[1, 5]], 2: [[2, 5], [1, 4], [1, 3]], 3: [[3, 5], [2, 4], [2, 3], [1, 2], [1, 1]], 4: [[4, 5], [3, 4], [3, 3], [2, 2], [2, 1]], 5: [[5, 5], [4, 4], [4, 3], [3, 2], [3, 1]], 6: [[5, 4], [5, 3], [4, 2], [4, 1]], 7: [[5, 2], [5, 1]]}
+    """
+    # validate
+    if start_cell not in [
+        Corner.BOTTOM_LEFT,
+        Corner.TOP_LEFT,
+        Corner.BOTTOM_RIGHT,
+        Corner.TOP_RIGHT,
+    ]:
+        raise ValueError("The start_cell must be of type Corner")
+
+    # setup variables
+    diagonals = {}
+    even_rows = 1 if rows % 2 == 0 else 0
+    even_cols = 1 if cols % 2 == 0 else 0
+    no_of_diagonals = cols + rows // 2 - even_rows + even_cols
+    odd_rows_in_grid = rows % 2 != 0
+    # print(f"{cols=} {rows=} {start_cell=} {no_of_diagonals=} {odd_rows_in_grid=}")
+
+    match start_cell:
+        case Corner.BOTTOM_LEFT:  # direction = "up_and_to_the_left"
+            start_row = rows
+            start_col = 1
+        case Corner.TOP_LEFT:  # direction = "down_and_to_the_left"
+            start_row = 1
+            start_col = 1
+        case Corner.BOTTOM_RIGHT:  # direction = "up_and_to_the_right"
+            start_row = rows
+            start_col = cols
+        case Corner.TOP_RIGHT:  # direction = "down_and_to_the_right"
+            start_row = 1
+            start_col = cols
+        case _:
+            raise ValueError(f"start_cell must be: bl, br, tl, tr; not {start_cell}")
+
+    diagonal = 1
+    row = start_row
+    col = start_col
+    path = []
+
+    while diagonal <= no_of_diagonals:
+        # breakpoint()
+        while True:
+            if (col <= cols and col >= 1) and (row <= rows and row >= 1):
+                path.append([col, row])
+
+            match start_cell:
+                case Corner.BOTTOM_LEFT:
+                    row -= 1
+                    even_row = 1 if row % 2 == 0 else 0
+                    col = col - 1 if even_row else col
+                case Corner.TOP_LEFT:
+                    row += 1
+                    even_row = 1 if row % 2 == 0 else 0
+                    col = col - 1 if even_row else col
+                case Corner.BOTTOM_RIGHT:
+                    row -= 1
+                    odd_row = row % 2 != 0
+                    col = col + 1 if odd_row else col
+                case Corner.TOP_RIGHT:
+                    row += 1
+                    odd_row = row % 2 != 0
+                    col = col + 1 if odd_row else col
+
+            match start_cell:
+                case Corner.BOTTOM_LEFT:
+                    if row < 1 or col < 1:
+                        break
+                case Corner.TOP_LEFT:
+                    if row > rows or col < 1:
+                        break
+                case Corner.BOTTOM_RIGHT:
+                    if row < 1 or col > cols:
+                        break
+                case Corner.TOP_RIGHT:
+                    if row > rows or col > cols:
+                        break
+
+        if path:
+            diagonals[diagonal] = path
+        diagonal += 1
+
+        match start_cell:
+            case Corner.BOTTOM_LEFT | Corner.TOP_LEFT:
+                row = start_row
+                col = diagonal  # shift-to-right
+            case Corner.BOTTOM_RIGHT | Corner.TOP_RIGHT:
+                row = start_row
+                col = cols - diagonal + 1  # shift-to-left
+
+        if col > cols or col < 1:  # CAN'T exceed cols; move up/down row(s) instead
+            match start_cell:
+                case Corner.BOTTOM_LEFT:
+                    row = row - (diagonal - row) * 2
+                    if odd_rows_in_grid:
+                        row += 1
+                    col = cols
+                case Corner.TOP_LEFT:
+                    row = (diagonal - rows) * 2
+                    col = cols
+                case Corner.BOTTOM_RIGHT:
+                    row = row - (diagonal - row) * 2
+                    if not odd_rows_in_grid:
+                        row += 1
+                    col = 1
+                case Corner.TOP_RIGHT:
+                    row = (diagonal - rows) * 2 + 1
+                    col = 1
+
+        path = []
+
+    return diagonals
 
 
 def sheet_column(num: int, lower: bool = False) -> str:
@@ -1345,7 +1491,6 @@ def eval_template(strng: str, data: dict | None = None):
 
 def valid_directions(
     direction_group: DirectionGroup,
-    label: str = "",
     vertex_count: int = 0,
 ) -> dict | set:
     """."""
@@ -1461,7 +1606,7 @@ def validated_gridlines(
                 )
     # ---- validate all directions
     values_set = set(clean_values)
-    valid = valid_directions(direction_group, label, 0)
+    valid = valid_directions(direction_group, 0)
     if values_set.issubset(valid):
         # NOTE in some cases, we need to ignore `vertex_count` because not yet known...
         return clean_values
@@ -1515,7 +1660,7 @@ def validated_directions(
             )
         values = [str(val).lower().strip() for val in value]
     values_set = set(values)
-    valid = valid_directions(direction_group, label, vertex_count)
+    valid = valid_directions(direction_group, vertex_count)
     if "all" in values or "*" in values:
         values = list(valid)
         if direction_group in [DirectionGroup.POLYGONAL, DirectionGroup.STAR]:
@@ -1769,7 +1914,7 @@ def get_property_spacing(the_property: object, property_name: str = "Property") 
             if the_property < 2:
                 feedback(f"{property_name} value must be a minimum of 2.", True)
             lane_sum = 0.0
-            for count in range(0, the_property - 1):
+            for _ in range(0, the_property - 1):
                 lane_sum += 1 / the_property
                 fractions.append(lane_sum)
         elif isinstance(the_property, (list, tuple)):

@@ -24,6 +24,25 @@ agd = AbstractGame(default=thick)
 AbstractState(board=agd)
 PageBreak()
 
+# ---- Abstract Game Grids: Size and Position
+Text("Abstract Game: Default Board", common=header)
+agsp = AbstractGame(
+    x=1, y=1,
+    height=3, width=3,
+    rows=3, cols=3,
+    default=thick
+)
+AbstractState(board=agsp)
+ahsp = AbstractGame(
+    name="hexagons",
+    x=5, y=5,
+    height=3, width=3,
+    rows=3, cols=3,
+    default=thick
+)
+AbstractState(board=ahsp)
+PageBreak()
+
 # ---- styled Abstract Game Grid
 ags = AbstractGame(
     name="grid",
@@ -195,8 +214,28 @@ aghpp = AbstractGame(default=thick,
 AbstractState(
     board=aghpp,
     positions="B2W/B4W/B3W/B4W/B2W")  # SHOULD ignore blank cells!!
-# PageBreak()
+#PageBreak()
 
+
+PageBreak()
+Text(common=header, text="GridLine: paths: multi style")
+hexgrid = Hexagons(
+    # side=0.25,
+    x=1, y=1,
+    rows=3, cols=3,
+    orientation="pointy",
+    dot=0.02,
+)
+ahsp = AbstractGame(
+    name="hexagons",
+    x=5, y=5,
+    height=1,
+    # side=0.25,
+    rows=3, cols=3,
+    default=thick
+)
+AbstractState(board=ahsp)
+Dot(cxy=Point(5,5))
 
 Save(
     output='png',
@@ -204,6 +243,7 @@ Save(
     directory="../docs/source/images/objects",
     names=[
         'abstracts_default',
+        'abstracts_size_position',
         'abstracts_styled',
         'abstracts_chess_setup',
         'abstracts_chess_customised',

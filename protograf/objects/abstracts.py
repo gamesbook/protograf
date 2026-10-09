@@ -27,7 +27,7 @@ from protograf.shapes import (
 from protograf.utils import tools, colrs, geoms
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (  # named tuples; enums
-    Corners,
+    Corner,
     HexOrientationName,
     Point,
     ShapeGeometry,
@@ -188,7 +188,7 @@ class AbstractGameObject(BaseShape):
                 _max_cells = max(self.rows, self.cols)
                 self.cell_size = _available / _max_cells
                 if self.label_start is None:
-                    self.label_start = Corners.BOTTOM_LEFT
+                    self.label_start = Corner.BOTTOM_LEFT
                 if self.label_type is None:
                     self.label_type = "AN"
             case "chess":
@@ -203,7 +203,7 @@ class AbstractGameObject(BaseShape):
                 if not self.cols:
                     self.cols = 8
                 self.board_pattern = "snake"
-                self.label_start = Corners.BOTTOM_LEFT
+                self.label_start = Corner.BOTTOM_LEFT
                 self.label_type = "AN"
             case "checkers" | "draughts":
                 self.pieces_type = "checkers"
@@ -217,7 +217,7 @@ class AbstractGameObject(BaseShape):
                 if not self.cols:
                     self.cols = 8
                 self.board_pattern = "snake"
-                self.label_start = Corners.BOTTOM_LEFT
+                self.label_start = Corner.BOTTOM_LEFT
                 self.label_type = "AN"
             case "go":
                 self.pieces_type = "go"
@@ -230,7 +230,7 @@ class AbstractGameObject(BaseShape):
                     self.rows = 18
                 if not self.cols:
                     self.cols = 18
-                self.label_start = Corners.BOTTOM_LEFT
+                self.label_start = Corner.BOTTOM_LEFT
                 self.label_type = "AN"
             case "shogi":
                 self.pieces_type = self.pieces_type or "shogi"
@@ -243,7 +243,7 @@ class AbstractGameObject(BaseShape):
                     self.rows = 9
                 if not self.cols:
                     self.cols = 9
-                self.label_start = Corners.TOP_RIGHT
+                self.label_start = Corner.TOP_RIGHT
                 self.label_type = "NN"
             case "hexagons":
                 if self.fills is None:
@@ -258,7 +258,7 @@ class AbstractGameObject(BaseShape):
                 self.cell_size = _available / _max_cells
                 self.board_type = "hexagonal"
                 if self.label_start is None:
-                    self.label_start = Corners.BOTTOM_LEFT
+                    self.label_start = Corner.BOTTOM_LEFT
                 if self.label_type is None:
                     self.label_type = "AN"
             case "hex":
@@ -271,7 +271,7 @@ class AbstractGameObject(BaseShape):
                 _max_cells = max(self.rows, self.cols)
                 self.cell_size = _available / _max_cells
                 if self.label_start is None:
-                    self.label_start = Corners.TOP_LEFT
+                    self.label_start = Corner.TOP_LEFT
                 if self.label_type is None:
                     self.label_type = "AN"
                 self.board_type = "hexagonal"
@@ -296,7 +296,7 @@ class AbstractGameObject(BaseShape):
                 _max_cells = self.side * 2 - 1
                 self.cell_size = _available / _max_cells / 0.866
                 self.board_type = "hexagonal"
-                self.label_start = Corners.BOTTOM_LEFT
+                self.label_start = Corner.BOTTOM_LEFT
                 self.label_type = "AN"
                 self.rows = self.side * 2 - 1
                 self.cols = self.side * 2 - 1
@@ -317,7 +317,7 @@ class AbstractGameObject(BaseShape):
                 if self.stroke is None:
                     self.stroke = "black"
                 if self.label_start is None:
-                    self.label_start = Corners.BOTTOM_LEFT
+                    self.label_start = Corner.BOTTOM_LEFT
                 if self.label_type is None:
                     self.label_type = "AN"
             case _:
@@ -342,7 +342,7 @@ class AbstractGameObject(BaseShape):
                 )
 
     def _validate_choices(self) -> bool:
-        """Check user choices for valid selections."""
+        """Check and reset user choices for valid selections."""
         if self.label and self.label_type is None:
             self.label_type = "AN"
         if self.label_type is not None and self.label_type not in ["AN", "NN"]:
@@ -354,14 +354,14 @@ class AbstractGameObject(BaseShape):
             )
         if self.label_start is not None:
             match self.label_start:
-                case "TL" | Corners.TOP_LEFT:
-                    self.label_start = Corners.TOP_LEFT
-                case "TR" | Corners.TOP_RIGHT:
-                    self.label_start = Corners.TOP_RIGHT
-                case "BL" | Corners.BOTTOM_LEFT:
-                    self.label_start = Corners.BOTTOM_LEFT
-                case "BR" | Corners.BOTTOM_RIGHT:
-                    self.label_start = Corners.BOTTOM_RIGHT
+                case "TL" | Corner.TOP_LEFT:
+                    self.label_start = Corner.TOP_LEFT
+                case "TR" | Corner.TOP_RIGHT:
+                    self.label_start = Corner.TOP_RIGHT
+                case "BL" | Corner.BOTTOM_LEFT:
+                    self.label_start = Corner.BOTTOM_LEFT
+                case "BR" | Corner.BOTTOM_RIGHT:
+                    self.label_start = Corner.BOTTOM_RIGHT
                 case _:
                     feedback(
                         "The AbstractGame 'label_start' property must be one of: "
@@ -543,10 +543,10 @@ class AbstractGameObject(BaseShape):
         def hex_col_label():
             x, y = 0, 0
             match self.label_start:
-                case Corners.BOTTOM_RIGHT | Corners.BOTTOM_LEFT:  # eg. Shogi
+                case Corner.BOTTOM_RIGHT | Corner.BOTTOM_LEFT:  # eg. Shogi
                     x = adjacent_cell.se.x
                     y = adjacent_cell.s.y + shift * loffset_col * 1.5
-                case Corners.TOP_RIGHT | Corners.TOP_LEFT:
+                case Corner.TOP_RIGHT | Corner.TOP_LEFT:
                     x = adjacent_cell.nw.x
                     y = adjacent_cell.n.y  # + shift * loffset_col
                 case _:
@@ -558,19 +558,19 @@ class AbstractGameObject(BaseShape):
         # ---- label ranges
         if self.label:
             match self.label_start:
-                case Corners.TOP_RIGHT:  # eg. Shogi
+                case Corner.TOP_RIGHT:  # eg. Shogi
                     start_col, start_row = self.cols, 1
                     delta_row, delta_col = 1, -1
                     end_col, end_row = 0, self.rows + 1
-                case Corners.TOP_LEFT:  # eg. Hex
+                case Corner.TOP_LEFT:  # eg. Hex
                     start_col, start_row = 1, 1
                     delta_row, delta_col = 1, 1
                     end_col, end_row = self.cols, self.rows + 1
-                case Corners.BOTTOM_RIGHT:  # eg. ???
+                case Corner.BOTTOM_RIGHT:  # eg. ???
                     start_col, start_row = self.cols, self.rows
                     delta_row, delta_col = -1, -1
                     end_col, end_row = 1, 1
-                case Corners.BOTTOM_LEFT:  # default
+                case Corner.BOTTOM_LEFT:  # default
                     start_col, start_row = 1, self.rows
                     delta_row, delta_col = -1, 1
                     end_col, end_row = self.cols + 1, 0
@@ -592,11 +592,11 @@ class AbstractGameObject(BaseShape):
             lkeys["stroke"] = self.label_stroke
 
             # ---- column labels for label row
-            if self.label_start in [Corners.TOP_RIGHT, Corners.TOP_LEFT]:
+            if self.label_start in [Corner.TOP_RIGHT, Corner.TOP_LEFT]:
                 label_row = 1
                 shift = -1
                 row_shift = 1
-            elif self.label_start in [Corners.BOTTOM_RIGHT, Corners.BOTTOM_LEFT]:
+            elif self.label_start in [Corner.BOTTOM_RIGHT, Corner.BOTTOM_LEFT]:
                 label_row = self.rows
                 shift = 1
                 row_shift = -1
@@ -623,10 +623,10 @@ class AbstractGameObject(BaseShape):
                 adjacent_cell = self.board_layout.cells[(col_no, label_row)]
                 x, y = 0, 0
                 if self.board_type == "grid":
-                    if self.label_start in [Corners.BOTTOM_RIGHT, Corners.BOTTOM_LEFT]:
+                    if self.label_start in [Corner.BOTTOM_RIGHT, Corner.BOTTOM_LEFT]:
                         x = adjacent_cell.s.x
                         y = adjacent_cell.s.y + shift * loffset_col * 1.5
-                    elif self.label_start in [Corners.TOP_RIGHT, Corners.TOP_LEFT]:
+                    elif self.label_start in [Corner.TOP_RIGHT, Corner.TOP_LEFT]:
                         x = adjacent_cell.n.x
                         y = adjacent_cell.n.y + shift * loffset_col
                     else:
@@ -671,11 +671,11 @@ class AbstractGameObject(BaseShape):
                         x, y = hex_col_label()
 
             # ---- row labels
-            if self.label_start in [Corners.TOP_LEFT, Corners.BOTTOM_LEFT]:
+            if self.label_start in [Corner.TOP_LEFT, Corner.BOTTOM_LEFT]:
                 label_col = 1
                 shift = -1
                 col_shift = 1
-            elif self.label_start in [Corners.BOTTOM_RIGHT, Corners.TOP_RIGHT]:
+            elif self.label_start in [Corner.BOTTOM_RIGHT, Corner.TOP_RIGHT]:
                 label_col = self.cols
                 shift = 1
                 col_shift = -1
@@ -709,14 +709,14 @@ class AbstractGameObject(BaseShape):
                 # get cell geo to use for label position
                 adjacent_cell = self.board_layout.cells[(col_no, row_no)]
                 if self.board_type == "grid":
-                    if self.label_start in [Corners.TOP_LEFT, Corners.BOTTOM_LEFT]:
+                    if self.label_start in [Corner.TOP_LEFT, Corner.BOTTOM_LEFT]:
                         x = adjacent_cell.w.x + shift * loffset_row
                         y = adjacent_cell.w.y + (self.label_size * 0.5) / globals.units
                     else:
                         x = adjacent_cell.e.x + shift * loffset_row
                         y = adjacent_cell.e.y + (self.label_size * 0.5) / globals.units
                 elif self.board_type == "hexagonal":
-                    if self.label_start in [Corners.TOP_LEFT, Corners.BOTTOM_LEFT]:
+                    if self.label_start in [Corner.TOP_LEFT, Corner.BOTTOM_LEFT]:
                         x = adjacent_cell.w.x + shift * loffset_row
                         y = adjacent_cell.w.y + (self.label_size * 0.5) / globals.units
                     else:
@@ -775,7 +775,7 @@ class AbstractGameObject(BaseShape):
                 # TODO  - change labels for Go !! (skip the "I" col)
                 r_start, r_end, r_inc = self.rows, 0, -1
                 # ---- * label direction
-                if self.label_start in [Corners.BOTTOM_RIGHT, Corners.BOTTOM_LEFT]:
+                if self.label_start in [Corner.BOTTOM_RIGHT, Corner.BOTTOM_LEFT]:
                     r_start, r_end, r_inc = 1, self.rows + 1, 1
 
                 for row in range(r_start, r_end, r_inc):
@@ -1141,7 +1141,7 @@ class AbstractStateObject(BaseShape):
             match _lower(self.board.name):
                 case "chess":  # white at the bottom
                     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-                case "checkers" | "draughts":
+                case "checkers" | "draughts":  # white at the bottom
                     return "1R1R1R1R/R1R1R1R1/1R1R1R1R/8/8/W1W1W1W1/1W1W1W1W/W1W1W1W1"
                 case "go":
                     return ""
@@ -1307,7 +1307,7 @@ class AbstractStateObject(BaseShape):
         #     print(f'&&& cells_non_blank {index=} {row=}')
 
         # swop start and end of position matrix
-        if self.board.label_start in [Corners.TOP_LEFT, Corners.TOP_RIGHT]:
+        if self.board.label_start in [Corner.TOP_LEFT, Corner.TOP_RIGHT]:
             self.position_matrix.reverse()
         # print(f'&&& {self.position_matrix=}')
 
