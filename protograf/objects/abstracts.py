@@ -822,15 +822,21 @@ class AbstractGameObject(BaseShape):
                     fill=colr,
                 )
                 # print(f'&&& HEXES BOARD {self.board_layout.cells.keys()=}')
-                # ---- * default cell attributes (plus label); track non-blank cells
+
+                # ---- * get hexgrid in alpha-numeric form
+                diagonal_dict = geoms.hexgrid_diagonal_cells(  # "hexes in a diagonal"
+                    cols=self.cols, rows=self.rows, start_cell=self.label_start
+                )
+                hexgrid_alpha_coords = geoms.hexgrid_alphanumeric(
+                    diagonal_dict=diagonal_dict, start_cell=self.label_start, lower=True
+                )  # TODO - pass in case setting to this function!
+
+                # ---- * set cell attributes (plus label); track non-blank cells
                 for row in range(1, self.rows + 1):
                     non_blank = []
                     for col in range(1, self.cols + 1):
                         try:
-                            # TODO - pass in settings to this function!
-                            col_row = geoms.hexgrid_diagonal_coords(
-                                col=col, row=row, total_rows=self.rows
-                            )
+                            col_row = hexgrid_alpha_coords[(col, row)]
                             cell_id = f"{col_row[0]}{col_row[1]}"
                             cell_geo = self.board_layout.cells[(col, row)]
                             if not cell_geo.blank:

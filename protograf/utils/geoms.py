@@ -5,6 +5,7 @@ Mathematical utility functions for protograf
 
 # lib
 import cmath
+from functools import lru_cache
 import logging
 import math
 import sys
@@ -15,7 +16,7 @@ import numpy as np
 
 # local
 from protograf.utils.messaging import feedback
-from protograf.utils.structures import Point
+from protograf.utils.structures import Point, Corner
 from protograf.utils.support import numbers, round_tiny_float
 
 log = logging.getLogger(__name__)
@@ -1239,50 +1240,166 @@ def hexhex_label(ring, position, num_rings, rows_from="bottom", lower=True):
     return column, row
 
 
-def hexgrid_diagonal_coords(
-    col: int,
-    row: int,
-    total_rows: int,
-    first_row_shifted: bool = False,
-    row_number_from_bottom: bool = True,
-    lower: bool = True,
-) -> tuple[str, int]:
-    """
-    Convert a 1-based (row, col) coordinate for a pointy-topped
-    offset hex grid into a (diagonal_column, row_number) identifier.
-
-    The column identifies the left-sloping diagonal. All hexes in the same
-    horizontal row have the same numeric value.
+@lru_cache(maxsize=None)
+def hexgrid_diagonal_cells(cols: int, rows: int, start_cell: Corner) -> dict:
+    """Return dict keyed on diagonals angled away from the start_cell for pointy grid.
 
     Args:
-    - col (int):  1-based column, counted from the LEFT.
-    - row (int): 1-based row, counted from the TOP.
-    - total_rows (int): Number of rows in the grid.
-    - lower (bool): if True, make diagonal letter lowercase
-    - first_row_shifted (bool):
-          False:
-              Row 1:  O O O O
-              Row 2:   O O O O
-              Row 3:  O O O O
+        cols (int): number of columns in the hexagonal grid
+        rows (int): number of rows in the hexagonal grid
+        start_cell (Corner): the location of the cell for the first diagonal
 
-          True:
-              Row 1:   O O O O
-              Row 2:  O O O O
-              Row 3:   O O O O
+    Example:
 
+    For cols=5 rows=5 start_cell='bl', the result is:
+        {1: [[1, 5]],
+         2: [[2, 5], [1, 4], [1, 3]],
+         3: [[3, 5], [2, 4], [2, 3], [1, 2], [1, 1]],
+         4: [[4, 5], [3, 4], [3, 3], [2, 2], [2, 1]],
+         5: [[5, 5], [4, 4], [4, 3], [3, 2], [3, 1]],
+         6: [[5, 4], [5, 3], [4, 2], [4, 1]],
+         7: [[5, 2], [5, 1]]}
+
+    Doc Test:
+
+    >>> hexgrid_diagonal_cells(5, 5, Corner.TOP_LEFT)
+    {1: [[1, 1]], 2: [[2, 1], [1, 2], [1, 3]], 3: [[3, 1], [2, 2], [2, 3], [1, 4], [1, 5]], 4: [[4, 1], [3, 2], [3, 3], [2, 4], [2, 5]], 5: [[5, 1], [4, 2], [4, 3], [3, 4], [3, 5]], 6: [[5, 2], [5, 3], [4, 4], [4, 5]], 7: [[5, 4], [5, 5]]}
+    >>> hexgrid_diagonal_cells(5, 5, Corner.BOTTOM_LEFT)
+    {1: [[1, 5]], 2: [[2, 5], [1, 4], [1, 3]], 3: [[3, 5], [2, 4], [2, 3], [1, 2], [1, 1]], 4: [[4, 5], [3, 4], [3, 3], [2, 2], [2, 1]], 5: [[5, 5], [4, 4], [4, 3], [3, 2], [3, 1]], 6: [[5, 4], [5, 3], [4, 2], [4, 1]], 7: [[5, 2], [5, 1]]}
+    """
+    # validate
+    if start_cell not in [
+        Corner.BOTTOM_LEFT,
+        Corner.TOP_LEFT,
+        Corner.BOTTOM_RIGHT,
+        Corner.TOP_RIGHT,
+    ]:
+        raise ValueError("The start_cell must be of type Corner")
+
+    # setup variables
+    diagonals = {}
+    even_rows = 1 if rows % 2 == 0 else 0
+    even_cols = 1 if cols % 2 == 0 else 0
+    no_of_diagonals = cols + rows // 2 - even_rows + even_cols
+    odd_rows_in_grid = rows % 2 != 0
+    # print(f"{cols=} {rows=} {start_cell=} {no_of_diagonals=} {odd_rows_in_grid=}")
+
+    match start_cell:
+        case Corner.BOTTOM_LEFT:  # direction = "up_and_to_the_left"
+            start_row = rows
+            start_col = 1
+        case Corner.TOP_LEFT:  # direction = "down_and_to_the_left"
+            start_row = 1
+            start_col = 1
+        case Corner.BOTTOM_RIGHT:  # direction = "up_and_to_the_right"
+            start_row = rows
+            start_col = cols
+        case Corner.TOP_RIGHT:  # direction = "down_and_to_the_right"
+            start_row = 1
+            start_col = cols
+        case _:
+            raise ValueError(f"start_cell must be: bl, br, tl, tr; not {start_cell}")
+
+    diagonal = 1
+    row = start_row
+    col = start_col
+    path = []
+
+    while diagonal <= no_of_diagonals:
+        # breakpoint()
+        while True:
+            if (col <= cols and col >= 1) and (row <= rows and row >= 1):
+                path.append([col, row])
+
+            match start_cell:
+                case Corner.BOTTOM_LEFT:
+                    row -= 1
+                    even_row = 1 if row % 2 == 0 else 0
+                    col = col - 1 if even_row else col
+                case Corner.TOP_LEFT:
+                    row += 1
+                    even_row = 1 if row % 2 == 0 else 0
+                    col = col - 1 if even_row else col
+                case Corner.BOTTOM_RIGHT:
+                    row -= 1
+                    odd_row = row % 2 != 0
+                    col = col + 1 if odd_row else col
+                case Corner.TOP_RIGHT:
+                    row += 1
+                    odd_row = row % 2 != 0
+                    col = col + 1 if odd_row else col
+
+            match start_cell:
+                case Corner.BOTTOM_LEFT:
+                    if row < 1 or col < 1:
+                        break
+                case Corner.TOP_LEFT:
+                    if row > rows or col < 1:
+                        break
+                case Corner.BOTTOM_RIGHT:
+                    if row < 1 or col > cols:
+                        break
+                case Corner.TOP_RIGHT:
+                    if row > rows or col > cols:
+                        break
+
+        if path:
+            diagonals[diagonal] = path
+        diagonal += 1
+
+        match start_cell:
+            case Corner.BOTTOM_LEFT | Corner.TOP_LEFT:
+                row = start_row
+                col = diagonal  # shift-to-right
+            case Corner.BOTTOM_RIGHT | Corner.TOP_RIGHT:
+                row = start_row
+                col = cols - diagonal + 1  # shift-to-left
+
+        if col > cols or col < 1:  # CAN'T exceed cols; move up/down row(s) instead
+            match start_cell:
+                case Corner.BOTTOM_LEFT:
+                    row = row - (diagonal - row) * 2
+                    if odd_rows_in_grid:
+                        row += 1
+                    col = cols
+                case Corner.TOP_LEFT:
+                    row = (diagonal - rows) * 2
+                    col = cols
+                case Corner.BOTTOM_RIGHT:
+                    row = row - (diagonal - row) * 2
+                    if not odd_rows_in_grid:
+                        row += 1
+                    col = 1
+                case Corner.TOP_RIGHT:
+                    row = (diagonal - rows) * 2 + 1
+                    col = 1
+
+        path = []
+
+    return diagonals
+
+
+# @lru_cache(maxsize=None) - can't hash grid !!!
+def hexgrid_alphanumeric(
+    diagonal_dict: dict, start_cell: Corner, lower: bool = True
+) -> dict:
+    """
+    Create a dict of (diagonal_column, row_number) values keyed on each (col, row)
+    coordinates value in a pointy-topped, even-offset hex grid
+
+    Args:
+    - diagonal_dict (dict)): a dict with key being a diagonal number;
+      and value being a list of pairs of (col, row) values in that diagonal
+    - start_cell (Corner): the location of the cell for the first diagonal
+    - lower (bool): if True (default), make the diagonal letter lowercase
 
     Returns:
         tuple[str, int]: diagonal letter and the 1-based position of the row
 
     Doc Test:
-    >>> hexgrid_diagonal_coords(1, 1, 5)
-    ('c', 1)
-    >>> hexgrid_diagonal_coords(row=1, col=4, total_rows=5)
-    ('f', 4)
-    >>> hexgrid_diagonal_coords(row=5, col=1, total_rows=5)
-    ('a', 1)
-    >>> hexgrid_diagonal_coords(row=5, col=3, total_rows=5)
-    ('c', 1)
+    >>> grid = {1: [[1, 5]], 2: [[2, 5], [1, 4], [1, 3]], 3: [[3, 5], [2, 4], [2, 3], [1, 2], [1, 1]], 4: [[4, 5], [3, 4], [3, 3], [2, 2], [2, 1]], 5: [[5, 5], [4, 4], [4, 3], [3, 2], [3, 1]], 6: [[5, 4], [5, 3], [4, 2], [4, 1]], 7: [[5, 2], [5, 1]]}
+    >>> hexgrid_alphanumeric(diagonal_dict=grid, start_cell=Corner.BOTTOM_LEFT)
+    {(1, 5): ('a', 1), (2, 5): ('b', 1), (1, 4): ('b', 2), (1, 3): ('b', 3), (3, 5): ('c', 1), (2, 4): ('c', 2), (2, 3): ('c', 3), (1, 2): ('c', 4), (1, 1): ('c', 5), (4, 5): ('d', 1), (3, 4): ('d', 2), (3, 3): ('d', 3), (2, 2): ('d', 4), (2, 1): ('d', 5), (5, 5): ('e', 1), (4, 4): ('e', 2), (4, 3): ('e', 3), (3, 2): ('e', 4), (3, 1): ('e', 5), (5, 4): ('f', 2), (5, 3): ('f', 3), (4, 2): ('f', 4), (4, 1): ('f', 5), (5, 2): ('g', 4), (5, 1): ('g', 5)}
     """
 
     def numbers_to_letters(n: int) -> str:
@@ -1297,75 +1414,110 @@ def hexgrid_diagonal_coords(
                 return result
             n -= 1
 
-    if total_rows < 1:
-        raise ValueError("total_rows must be >= 1")
-    if row < 1 or row > total_rows:
-        raise ValueError(f"row must be between 1 and {total_rows}")
-    if col < 1:
-        raise ValueError("col must be >= 1")
+    result = {}
+    if not diagonal_dict:
+        return result
+    # validate
+    if not isinstance(diagonal_dict, dict):
+        raise ValueError(f"diagonal_dict must be a dict, not a {type(diagonal_dict)}")
+    if start_cell not in [
+        Corner.BOTTOM_LEFT,
+        Corner.TOP_LEFT,
+        Corner.BOTTOM_RIGHT,
+        Corner.TOP_RIGHT,
+    ]:
+        raise ValueError("The start_cell must be of type Corner")
 
-    rows_from_bottom = total_rows - row
+    total_rows = 1
+    for key, value in diagonal_dict.items():
+        for col_row in value:
+            total_rows = col_row[1] if col_row[1] > total_rows else total_rows
 
-    # ---------------------------------------------------------
-    # Determine the diagonal offset.
-    #
-    # For the layout:
-    #
-    #     C5 D5 E5 F5
-    #       C4 D4 E4 F4
-    #     B3 C3 D3 E3
-    #       B2 C2 D2 E2
-    #     A1 B1 C1 D1
-    #
-    # the left-most diagonal advances every TWO rows:
-    #
-    #     row 1 from bottom -> A
-    #     row 2 from bottom -> B
-    #     row 3 from bottom -> B
-    #     row 4 from bottom -> C
-    #     row 5 from bottom -> C
-    #
-    # Thus the row contribution is:
-    #
-    #     ceil(rows_from_bottom / 2)
-    #
-    # which is equivalent to:
-    #
-    #     (rows_from_bottom + 1) // 2
-    # ---------------------------------------------------------
+    for key, value in diagonal_dict.items():
+        # print(key, value, numbers_to_letters(key - 1))
+        for col_row in value:
+            diagonal_letter = numbers_to_letters(key - 1)
+            letter = numbers_to_letters(key)
+            if lower:
+                letter = diagonal_letter.lower()
+            if start_cell in [Corner.BOTTOM_LEFT, Corner.BOTTOM_RIGHT]:
+                _row = total_rows - col_row[1] + 1
+            else:
+                _row = col_row[1]
+            result[col_row[0], col_row[1]] = (letter, _row)
 
-    if first_row_shifted:
-        # If the first row is shifted, the alternating pattern
-        # is reversed relative to the bottom-left anchor.
-        # The diagonal offset therefore depends on whether the
-        # bottom row itself is shifted.
-        bottom_row_shifted = (total_rows - 1) % 2 == 0
-        if bottom_row_shifted:
-            row_diagonal_offset = rows_from_bottom // 2
-        else:
-            row_diagonal_offset = (rows_from_bottom + 1) // 2
-    else:
-        # Row 1 is unshifted and row 2 is shifted.
-        # For the displayed layout this produces:
-        #     0, 1, 1, 2, 2, 3, 3, ...
-        row_diagonal_offset = (rows_from_bottom + 1) // 2
+    return result
 
-    # Column contribution:
-    #     col 1 -> 0
-    #     col 2 -> 1
-    #     col 3 -> 2
-    diagonal_index = (col - 1) + row_diagonal_offset
-    diagonal_letter = numbers_to_letters(diagonal_index)
-    if lower:
-        diagonal_letter = diagonal_letter.lower()
 
-    # Determine the output row number
-    if row_number_from_bottom:
-        output_row = total_rows - row + 1
-    else:
-        output_row = row
+# @lru_cache(maxsize=None) - can't hash grid !!!
+def hexgrid_diagonal_coords(
+    col: int,
+    row: int,
+    diagonal_dict: dict,
+    number_from_bottom: bool = True,
+    lower: bool = True,
+) -> tuple[str, int]:
+    """
+    Convert a 1-based (row, col) coordinate for a pointy-topped
+    offset hex grid into a (diagonal_column, row_number) identifier.
 
-    return diagonal_letter, output_row
+    Args:
+    - col (int):  1-based column, counted from the LEFT.
+    - row (int): 1-based row, counted from the TOP.
+    - diagonal_dict (dict)): a dict with key being a diagonal number;
+      and value being a list of pairs of (col, row) values in that diagonal
+    - number_from_bottom(bool): if True (default), rows number from 1-upwards
+    - lower (bool): if True (default), make the diagonal letter lowercase
+
+    Returns:
+        tuple[str, int]: diagonal letter and the 1-based position of the row
+
+    Doc Test:
+    >>> grid = {1: [[1, 5]], 2: [[2, 5], [1, 4], [1, 3]], 3: [[3, 5], [2, 4], [2, 3], [1, 2], [1, 1]], 4: [[4, 5], [3, 4], [3, 3], [2, 2], [2, 1]], 5: [[5, 5], [4, 4], [4, 3], [3, 2], [3, 1]], 6: [[5, 4], [5, 3], [4, 2], [4, 1]], 7: [[5, 2], [5, 1]]}
+    >>> hexgrid_diagonal_coords(row=1, col=1, diagonal_dict=grid)
+    ('d', 5)
+    >>> hexgrid_diagonal_coords(row=1, col=4, diagonal_dict=grid)
+    ('g', 5)
+    >>> hexgrid_diagonal_coords(row=5, col=1, diagonal_dict=grid)
+    ('b', 1)
+    >>> hexgrid_diagonal_coords(row=5, col=3, diagonal_dict=grid)
+    ('d', 1)
+    """
+
+    def numbers_to_letters(n: int) -> str:
+        """
+        Convert 0 -> A, 1 -> B, ..., 25 -> Z, 26 -> AA, etc.
+        """
+        result = ""
+        while True:
+            n, remainder = divmod(n, 26)
+            result = chr(ord("A") + remainder) + result
+            if n == 0:
+                return result
+            n -= 1
+
+    if not diagonal_dict:
+        return None
+    if not isinstance(diagonal_dict, dict):
+        raise ValueError(f"diagonal_dict must be a dict, not a {type(diagonal_dict)}")
+
+    total_rows = 1
+    for key, value in diagonal_dict.items():
+        for col_row in value:
+            total_rows = col_row[1] if col_row[1] > total_rows else total_rows
+
+    for key, value in diagonal_dict.items():
+        if [col, row] in value:
+            diagonal_letter = numbers_to_letters(key)
+            if lower:
+                diagonal_letter = diagonal_letter.lower()
+            if number_from_bottom:
+                output_row = total_rows - row + 1
+            else:
+                output_row = row
+            return diagonal_letter, output_row
+
+    return None
 
 
 def equilateral_height(side: Any) -> float:
