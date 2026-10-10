@@ -79,7 +79,7 @@ Discussion  This example shows how to construct a board for a wargame |dash| in
             hexagon styles are used for overall appearance.
 
             Features are drawn either as bitmap PNG images pre-created in a
-            drawing package, or using the built-in vector shapes of *protograf*
+            drawing package, or using the built-in vector shapes of **protograf**
             itself.
 
             Of interest are:

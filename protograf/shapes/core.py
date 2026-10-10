@@ -9,12 +9,12 @@ import copy
 from functools import cached_property
 import logging
 import math
-import io
+import inspect
 import os
 from pathlib import Path
-from pprint import pprint
+
+# from pprint import pprint
 import sys
-from urllib.parse import urlparse
 
 # third party
 from PIL import Image, ImageEnhance, ImageOps
@@ -5259,6 +5259,21 @@ class CommonShape(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self._common_kwargs = common_kwargs
         self._kwargs = kwargs
+        # set properties NOT present in BaseShape
+        parent_props = self.get_parent_properties()
+        for key, value in kwargs.items():
+            if key not in parent_props.keys():
+                setattr(self, key, value)
+
+    def get_parent_properties(self):
+        parent_class = self.__class__.__bases__[0]
+        # filter out callables (functions/methods)
+        properties = [
+            (name, value)
+            for name, value in inspect.getmembers(parent_class)
+            if not callable(value) and not name.startswith("__")
+        ]
+        return dict(properties)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Not applicable."""

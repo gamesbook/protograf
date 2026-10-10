@@ -351,6 +351,29 @@ def as_float(
     return default
 
 
+def as_excel(num: int, lower: bool = False) -> str:
+    """Convert a number to its corresponding Excel column letter.
+
+    Doc Test:
+
+    >>> as_excel(1)
+    'A'
+    >>> as_excel(27)
+    'AA'
+    >>> as_excel(1, True)
+    'a'
+    """
+    if num < 1:
+        raise ValueError("num must be >= 1")
+    result = ""
+    while num:
+        num, rem = divmod(num - 1, 26)
+        result = chr(ord("A") + rem) + result
+    if lower:
+        result = result.lower()
+    return result
+
+
 def as_point(value) -> list | Point:
     """Convert one or more tuples to a Point or list of Points
 

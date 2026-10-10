@@ -8,8 +8,9 @@ This section deals with some of the additional commands available in
 :doc:`protograf <index>` that are not covered in detail elsewhere.
 
 You should already be familiar with all of the
-:doc:`Basic Concepts <basic_concepts>`,  and have created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
+:doc:`Basic Concepts <basic_concepts>`, the :doc:`Script Anatomy <acript anatomy>`,
+and have created some scripts of your own using the
+:doc:`Core Shapes <core_shapes>`.
 
 .. _table-of-contents-addcmd:
 

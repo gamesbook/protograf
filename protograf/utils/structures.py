@@ -484,6 +484,7 @@ class DocumentPage:
     height: float  # user units
     fill: tuple | None  # color (RGB/CYMK); "white"
     grid: float  # grid interval in user units
+    grid_dark: float  # dark grid interval in user units
     current: int  # current page number (from 0 on)
     gallery: tuple = (MAXIMUM_PAGE_WIDTH, MAXIMUM_PAGE_HEIGHT)  # maximum extent in pts
 

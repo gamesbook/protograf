@@ -32,6 +32,7 @@ python core/layouts/layouts_tracks.py --no-png -d /tmp/demo
 python core/layouts/layouts_repeat.py --no-png -d /tmp/demo
 # ---- examples: objects
 python objects/abstracts.py --no-png -d /tmp/demo
+python objects/abstracts_labels.py --no-png -d /tmp/demo
 python objects/cardbox.py --no-png -d /tmp/demo
 python objects/cubes.py --no-png -d /tmp/demo
 python objects/dice_d6.py --no-png -d /tmp/demo

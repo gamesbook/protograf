@@ -12,6 +12,7 @@ Create(filename="blank.pdf",
        margin=0.5,
        stroke_width=0.5,
        page_grid=0.5,
+       page_grid_dark=2,
        margin_debug=True,
 )
 

@@ -76,7 +76,7 @@ by name |dash| for example, Chess, Checkers (aka Draughts), Go or Shogi.
 Pieces can also be specified by the type of game that they are usually used
 with |dash| for example, Chess, Checkers (aka Draughts), Go or Shogi. It is
 also possible to create completely unique pieces either by using one or more
-of *protograf* shapes and/or images of your choice.
+of **protograf** shapes and/or images of your choice.
 
 - `AbstractGame Properties`_
 - `AbstractGame Board: Grid`_
@@ -114,6 +114,15 @@ The key properties that can be set for an AbstractGame are:
   with a predefined number of rows |dash| then this is the number of cells,
   in the vertical direction, for a regular grid; a default of  ``8`` is used
 
+
+.. IMPORTANT::
+
+    Unlike many other shapes or objects in **protograf**, the *height* property
+    is used to set the height of a cell on the board, and **not** the height
+    of the board itself |dash| this being derived from the combination of
+    the number of rows and columns as well the cell *height*.  The reason for
+    this is to support both square and hexagonal cells with a single property.
+
 Other useful properties that can be set for an AbstractGame are:
 
 * *fills*: a list of one or more :ref:`colors <basic-color>` in which to draw
@@ -123,6 +132,7 @@ Other useful properties that can be set for an AbstractGame are:
 * *frame*: if ``True``, draw a frame around a gridded board's outlines; use the
   normal styling options for the frame |dash| *frame_width*, *frame_stroke*,
   , *frame_fill*, *frame_dotted*, and/or *frame_dashed* to customize it
+* *height*: sets the height of a single cell ("edge-to-edge" for a hexagon)
 * *pattern*: an on/off design showing which cells should be blank i.e. unused
 * *intersections*: if ``True``, draw pieces on **grid intersections**, not
   grid spaces, and label the lines, not the spaces
@@ -145,10 +155,7 @@ Other useful properties that can be set for an AbstractGame are:
 * *pieces_resize*: a fractional value by which to resize the built-in piece
   shapes or images; this defaults to ``1`` |dash| note that this does **not**
   apply to custom-made shapes
-* *width* and *height* refer to the overall board size on the page; if omitted,
-  the board will be automatically sized to fit within the smallest available
-  space inside of the page margins.  The size of cells on the board are based
-  on these values, using the *rows* and *cols* values
+
 
 .. NOTE::
 
@@ -158,6 +165,10 @@ Other useful properties that can be set for an AbstractGame are:
     * *rows*: ``8`` (the same as Chess or Checkers board)
     * *cols*: ``8`` (the same as Chess or Checkers board)
     * *pieces*: ``checkers`` (simple black and white circles)
+
+    A board is sized to occupy as much space as possible, unless the *height*
+    of a cell is set, following which the space occupied is calculate using
+    the *rows* and *cols* values.
 
     Note also that the definitions of the board and pieces are **not**,
     generally speaking, the determinants of where the pieces get placed;
@@ -318,9 +329,9 @@ Example 3: HexHex Grid
 The term "hexhex" refers to a hexagonal grid that itself appears to look like
 a hexagon.
 
-This type of board is constructed by specifying the number of hexagons that
-appear along the edge or *side* of such a grid; the minimum |dash| and
-default |dash| value being ``2``.
+This type of board is constructed by specifying the number of *hexes* that
+appear along the edge or side of such a grid; the minimum |dash| and
+default |dash| *hexes* value being ``2``.
 
 .. |ah3| image:: ../images/objects/abstracts_hexagons_hexhex.png
    :width: 330
@@ -332,14 +343,14 @@ default |dash| value being ``2``.
 
         aghh = AbstractGame(
             name="hexhex",
-            side=4,
+            hexes=4,
             label=True)
         AbstractState(board=aghh)
 
       In this example the type of board is set via its *name* property to
       ``hexhex``.
 
-      The *side* property is set to ``4`` |dash| this results in a grid with
+      The *hexes* property is set to ``4`` |dash| this results in a grid with
       8 rows; and a maximum number of 9 columns in the centre.
 
 ===== ======
@@ -399,13 +410,13 @@ single ``O``.
 
       The *pattern* property shows, in string format, an arrangement of
       hexagons (``O``) and spaces (``.``). Note that the spaces are ignored
-      when constructing the board; they are there just to help visualise
+      when constructing the board; they are just used to help visualise
       the pattern being created.
 
       .. NOTE::
 
           It is important that the correct number of *rows* and *cols* are
-          set; the pattern has to fit exactly to these dimensions.
+          set; the pattern has to fit exactly in these dimensions.
 
 ===== ======
 
@@ -430,7 +441,7 @@ Custom Pieces
 
 You can supply your own set of shapes to be used with a game.
 
-Shapes can either be designed with *protograf's* built-in shapes, or with a
+Shapes can either be designed with **protograf**'s built-in shapes, or with a
 pre-create image.
 
 .. NOTE::
@@ -485,7 +496,7 @@ The properties that can be set for an AbstractState command are:
 * *positions*: details of where an AbstractGame's pieces go on the board;
   see below for details
 * *setup*: if set to ``True``, and the game is one whose initial position is
-  stored in *protograf*, then the pieces will be assigned to the board to
+  stored in **protograf**, then the pieces will be assigned to the board to
   match that defined setup
 * *markers*: a list of AbstractState markers; see below for details
 
@@ -532,7 +543,7 @@ This represents a situation where the first row has 9 empty points, a Black
 stone, and then 9 empty points; whereas the second row has a Black stone,
 followed by 9 empty points, and then another 9 empty points.
 
-The FEN-like notation is converted internally by *protograf* into
+The FEN-like notation is converted internally by **protograf** into
 `Piece-and-Dot Notation`_.
 
 Piece-and-Dot Notation

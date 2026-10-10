@@ -214,6 +214,26 @@ def page_setup():
                 color=stroke,
                 width=0.1,
             )
+    # ---- page grid_dark
+    if globals.page.grid_dark:
+        stroke = colrs.get_color(globals.debug_color)
+        grid_dark_size = globals.page.grid_dark * globals.units
+        cols = int(globals.page.size[0] // grid_dark_size)
+        rows = int(globals.page.size[1] // grid_dark_size)
+        for col in range(1, cols + 1):
+            globals.doc_page.draw_line(
+                (col * grid_dark_size, 0),
+                (col * grid_dark_size, globals.page.size[1]),
+                color=stroke,
+                width=1,
+            )
+        for row in range(1, rows + 1):
+            globals.doc_page.draw_line(
+                (0, row * grid_dark_size),
+                (globals.page.size[0], row * grid_dark_size),
+                color=stroke,
+                width=1,
+            )
 
 
 def Create(**kwargs):
@@ -310,6 +330,7 @@ def Create(**kwargs):
         height=_page[1] / globals.units,  # height in user units
         fill=colrs.get_color(kwargs.get("fill", globals.white)),
         grid=tools.as_float(kwargs.get("page_grid", 0), "page_grid"),
+        grid_dark=tools.as_float(kwargs.get("page_grid_dark", 0), "page_grid_dark"),
         current=0,
     )
     # ---- fonts
@@ -556,6 +577,7 @@ def Load(**kwargs):
             height=page.rect.height / globals.units,
             fill=colrs.get_color(kwargs.get("fill", globals.white)),
             grid=tools.as_float(kwargs.get("page_grid", 0), "page_grid"),
+            grid_dark=tools.as_float(kwargs.get("page_grid_dark", 0), "page_grid_dark"),
             current=0,
         )
     globals.doc_page = globals.document.new_page(

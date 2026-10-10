@@ -220,7 +220,6 @@ AbstractState(
 PageBreak()
 Text(common=header, text="GridLine: paths: multi style")
 hexgrid = Hexagons(
-    # side=0.25,
     x=1, y=1,
     rows=3, cols=3,
     orientation="pointy",
@@ -230,7 +229,6 @@ ahsp = AbstractGame(
     name="hexagons",
     x=5, y=5,
     height=1,
-    # side=0.25,
     rows=3, cols=3,
     default=thick
 )

@@ -109,8 +109,11 @@ To customise the command, set its properties as follows:
 - **margin_right** - set the the right margin
 - **margin_debug** - set to ``True`` to show the margin as a dotted blue line
 - **page_grid** - if set to a number, will display a squared grid of thin
-  horizontal and vertical lines, set a distance "unit" apart |dash| where the distance depends on the
-  current *units*
+  horizontal and vertical lines, set a distance "unit" apart |dash| where the
+  distance depends on the current *units*
+- **page_grid_dark** - if set to a number, will display a squared grid of
+  thick horizontal and vertical lines, set a distance "unit" apart |dash|
+  where the distance depends on the current *units*
 - **units** - these can be ``cm`` (centimetres), ``in`` (inches), ``mm``
   (millimetres), or ``points``; the default is ``cm``
 
@@ -141,8 +144,9 @@ Example 2. Grid and Margin Display
 
 ===== ======
 |cr1| Here is an example of a customised ``Create`` command, for an A8-sized
-      page in portrait mode, with margins being 0.5 cm each. A grid of 0.5 cm
-      is displayed and the margins are shown as dotted lines.
+      page in portrait mode, with margins being 0.5 cm each. A thin grid with
+      a spacing of 0.5 cm and a thicker grid with a spacing of 2.0 cm are
+      both displayed, and the margins are shown as dotted lines.
 
       This type of setup is useful when working on a design but is typically
       not shown as part of a final product.
@@ -154,6 +158,7 @@ Example 2. Grid and Margin Display
             paper='A8',
             margin=0.5,
             page_grid=0.5,
+            page_grid_dark=2,
             margin_debug=True,
         )
 

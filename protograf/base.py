@@ -1598,10 +1598,10 @@ class BaseShape:
                     and attr[0] != "_"
                 ):
                     # print(f'### Common {attr=} {base=} {type(base)=} {common_attr=}')
-                    common_attr = getattr(self.common, attr)
-                    base_attr = getattr(base, attr)
-                    # print(f'### Common {attr=} {base_attr=}')
+                    common_attr = getattr(self.common, attr, None)
+                    base_attr = getattr(base, attr, None)
                     if common_attr != base_attr:
+                        # print(f"### Common {attr=} {base_attr=}")
                         setattr(self, attr, common_attr)
 
         # ---- SET offset properties to correct units
@@ -2705,6 +2705,11 @@ class BaseShape:
         xpt = round(xy.x / units - margin_left, 10)
         ypt = round(xy.y / units - margin_top, 10)
         return Point(xpt, ypt)
+
+    def _commons(self, prop: str) -> object:
+        """re"""
+        if self.common:
+            return vars(self.common).get(prop)
 
     def _v2p(self, value: Point, margin_offset: bool = True) -> Point:
         """Convert Point value using user units to a Point using points units."""
