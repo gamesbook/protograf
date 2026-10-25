@@ -287,6 +287,7 @@ ShapeProperties = namedtuple(
         "lineJoin",
         "dashes",
         "fill_opacity",
+        "stroke_opacity",
         "morph",
         "closePath",
     ],

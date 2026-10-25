@@ -48,7 +48,7 @@ places in the documentation:
 - **command** - an instruction that is specified in a **protograf** script;
   see a full list in :doc:`Commands <commands>`
 - **default**  - a value set by **protograf** if no other is given;
-  for example, the line length defaults to being 1 centimetre long, and a
+  for example, a line's length defaults to being 1 centimetre long, and a
   line's color defaults to black
 - **list** - a number of comma-separated values enclosed in square brackets
   e.g. ``[1, 2, 3]`` |dash| which are usually assigned to a property
@@ -192,7 +192,8 @@ Everything in **protograf** that needs to be displayed or drawn or
 positioned must be placed at a **position** on the page; i.e. each thing
 must have both a horizontal position - its **x** value - and a vertical
 position - its **y** value. These respectively represent the distances
-from the left- and top-edge of a page or a card.
+from the left- and top-edge of a page or a card. A single point contains
+both **x** and **y** values.
 
 **Location** is a more general term; it can be a combination of the **x**
 and **y** positions; it could be a row and/or column identifier; it
@@ -410,7 +411,7 @@ Styling-orientated Terms
 -  **dashed** - allows a line to be broken into a series of short lines,
    separated by spaces defined in a list; the first number is the length of
    the dash; the second is the length of the space between two dashes |dash|
-   note that sizes will be rounded to the nearest whole point value;
+   note that sizes will be rounded to the nearest whole points value;
    so ``2cm``, which is equivalent to ``56.693`` points, will be changed to
    ``57`` points
 -  **_ends** - this is part of a line property e.g. *stroke_ends* that changes
@@ -422,9 +423,9 @@ Styling-orientated Terms
    *lowercase*, or *capitalise* it
 -  **transparency** - a percentage value from 1 to 100 that determines how
    "see through" a shape, or line, or area is; where ``1`` means it is not at
-   all transparent and `100` means it is completely transparent.  It is also
-   possible to use a fractional number e.g. ``0.5`` equates to 50%. Some
-   programs use the term *opacity*; but note that this is the **inverse** of
+   all transparent (the default) and `100` means it is completely transparent.
+   It is also possible to use a fractional number e.g. ``0.5`` equates to 50%.
+   Some programs use the term *opacity*; but note that this is the **inverse** of
    transparency.
 -  **wave_style** - this can be 'sawtooth' or 'wave' and causes the line to
    be drawn in that pattern, rather than as a straight line; the height of

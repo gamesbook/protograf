@@ -228,6 +228,7 @@ Hexagons(
 
 PageBreak()
 
+
 # ---- gridlines - paths
 Blueprint(stroke_width=0.5)
 Text(common=header, text="GridLine: paths: multi style")
@@ -270,7 +271,6 @@ hexgrid = Hexagons(
     x=0, y=0.1,
     rows=6, cols=5,
 )
-
 road = "ne=,se=,ne=,n"
 GridLine(
     hexgrid,
@@ -316,6 +316,65 @@ Hexagons(
     coord_elevation='top',
     fill=None
 )
+PageBreak()
+
+# ---- gridlines - paths+edges - offset grid
+Blueprint(stroke_width=0.5)
+Text(common=header, text="GridLine: paths+edges: offset")
+hexgrid = Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    hex_offset="odd",
+)
+road = "ne=,se=,ne=,n"
+GridLine(
+    hexgrid,
+    start="0102",
+    point="nw",
+    paths=road,
+    stroke="grey",
+    stroke_width=4
+)
+GridLine(
+    hexgrid,
+    start="0102",
+    point="nw",
+    paths=road,
+    stroke="silver",
+    stroke_width=2
+)
+
+GridLine(
+    hexgrid,
+    start="0104",
+    point="sw",
+    edges="ne,ne,e,se,se,sw,sw,w,nw,nw",
+    stroke="tan",
+    stroke_width=6,
+    stroke_ends="rounded"
+)
+GridLine(
+    hexgrid,
+    start="0504",
+    point="se",
+    edges="nw,nw,w,sw,sw,se,se,e,ne,ne",
+    stroke="palegreen",
+    stroke_width=6,
+    stroke_ends="rounded"
+)
+
+Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    dot=0.02,
+    coord_elevation='top',
+    fill=None,
+    hex_offset="odd",
+)
+
+
 
 Save(
     output='png',
@@ -335,5 +394,6 @@ Save(
         "hexgrid_edges_multi_style",
         "hexgrid_paths_multi_style",
         "hexgrid_paths_edges_custom",
+        "hexgrid_paths_edges_custom_odd",  # not used in docs
     ]
 )

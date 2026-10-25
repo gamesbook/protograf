@@ -400,6 +400,12 @@ def GridLine(
         loc = grid.cell(start)  # get_starting_location(start)
         from_edge = perbis
         to_edge = directions[0]
+        # impact col/row changes for HexOrientation.FLAT
+        if grid.hex_offset.lower() == "odd":
+            grid_offset = True
+        else:
+            grid_offset = False
+
         for index in range(0, len(directions)):
             # ---- perbii // FLAT hex
             perbii = {
@@ -450,18 +456,32 @@ def GridLine(
                 continue
             col, row = 0, 0
             _to_edge = to_edge.replace("=", "")
-            if _to_edge in ["se", "ne"]:
-                col = 1
-            if _to_edge in ["nw", "sw"]:
-                col = -1
-            if _to_edge in ["nw", "ne"]:
-                row = -1 if loc.col % 2 == 0 else 0  # even column 0,2,4
-            if _to_edge in ["sw", "se"]:
-                row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
-            if _to_edge in ["n"]:
-                row = -1
-            if _to_edge in ["s"]:
-                row = 1
+            if grid_offset:
+                if _to_edge in ["se", "ne"]:
+                    col = 1
+                if _to_edge in ["nw", "sw"]:
+                    col = -1
+                if _to_edge in ["nw", "ne"]:
+                    row = 0 if loc.col % 2 == 0 else -1  # even column 0,2,4
+                if _to_edge in ["sw", "se"]:
+                    row = 0 if loc.col % 2 == 1 else 1  # odd column 1,3,5
+                if _to_edge in ["n"]:
+                    row = -1
+                if _to_edge in ["s"]:
+                    row = 1
+            else:
+                if _to_edge in ["se", "ne"]:
+                    col = 1
+                if _to_edge in ["nw", "sw"]:
+                    col = -1
+                if _to_edge in ["nw", "ne"]:
+                    row = -1 if loc.col % 2 == 0 else 0  # even column 0,2,4
+                if _to_edge in ["sw", "se"]:
+                    row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
+                if _to_edge in ["n"]:
+                    row = -1
+                if _to_edge in ["s"]:
+                    row = 1
             col = loc.col + col
             row = loc.row + row
             loc = grid.cell((col, row))  # get_starting_location("", col=col, row=row)

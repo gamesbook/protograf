@@ -3335,8 +3335,8 @@ The key properties to draw stripes are:
   will be calculated to give 0a size that will result in equally sized stripes
   and gaps
 
-In addition, the usual properties for stroke, stroke_width, fill and
-transparency can also be set.
+In addition, the usual properties for stroke, stroke_width, stroke_transparency,
+fill, and transparency can also be set.
 
 
 .. |rs1| image:: images/custom/rectangle/stripes.png

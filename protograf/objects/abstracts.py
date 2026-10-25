@@ -557,6 +557,7 @@ class AbstractGameObject(BaseShape):
                 rkwargs["fill"] = self.frame_fill
                 rkwargs["stroke"] = self.frame_stroke
                 rkwargs["stroke_width"] = self.frame_width
+                rkwargs["stroke_transparency"] = self.frame_stroke_transparency
                 rkwargs["dashed"] = self.frame_dashed
                 rkwargs["dotted"] = self.frame_dotted
                 pymu_props = tools.get_pymupdf_props(**rkwargs)
@@ -568,6 +569,7 @@ class AbstractGameObject(BaseShape):
                     lineCap=pymu_props.lineCap,
                     dashes=pymu_props.dashes,
                     fill_opacity=pymu_props.fill_opacity,
+                    stroke_opacity=pymu_props.stroke_opacity,
                     # radius=None,
                 )
             case _:

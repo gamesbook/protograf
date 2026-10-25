@@ -650,6 +650,7 @@ class DominoObject(DiceObject):
                 index=ID,
                 stroke=self.centre_line_stroke or self.stroke,
                 stroke_width=self.centre_line_stroke_width or self.stroke_width,
+                stroke_transparency=self.centre_line_transparency,
                 stroke_ends=self.centre_line_ends,
                 dashed=self.centre_line_dashed,
                 dotted=self.centre_line_dotted,

@@ -1000,6 +1000,7 @@ class BandShape(BaseShape):
             fill=None,
             stroke_width=self.lanes_stroke_width,
             stroke_ends=self.lanes_ends,
+            stroke_transparency=self.lanes_transparency,
             dashed=self.lanes_dashed,
             dotted=self.lanes_dotted,
         )
@@ -1042,6 +1043,7 @@ class BandShape(BaseShape):
             stroke=self.sections_stroke,
             stroke_width=self.sections_stroke_width,
             stroke_ends=self.sections_ends,
+            stroke_transparency=self.sections_transparency,
             dashed=self.sections_dashed,
             dotted=self.sections_dotted,
         )
@@ -2728,6 +2730,7 @@ class RhombusShape(BaseShape):
             stroke=self.hatches_stroke,
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
+            stroke_transparency=self.hatches_transparency,
             dashed=self.hatches_dashed,
             dotted=self.hatches_dotted,
             rotation=rotation,
@@ -2892,6 +2895,7 @@ class RhombusShape(BaseShape):
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[0],
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
                 fill=slices_colors[0],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -2905,6 +2909,7 @@ class RhombusShape(BaseShape):
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[1],
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
                 fill=slices_colors[1],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -2920,6 +2925,7 @@ class RhombusShape(BaseShape):
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[0],
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
                 fill=slices_colors[0],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -2933,6 +2939,7 @@ class RhombusShape(BaseShape):
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[1],
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
                 fill=slices_colors[1],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -2954,6 +2961,7 @@ class RhombusShape(BaseShape):
                     index=ID,
                     stroke=self.slices_stroke or slices_colors[key],
                     stroke_ends=self.slices_ends,
+                    stroke_transparency=self.slices_stroke_transparency,
                     fill=slices_colors[key],
                     transparency=self.slices_transparency,
                     closed=True,
@@ -3745,6 +3753,7 @@ class StarShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[sid],
                 stroke_width=0.01,  # self.slices_stroke_width or 0.01,
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
                 fill=slices_colors[sid],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -3762,6 +3771,7 @@ class StarShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[sid],
                 stroke_width=0.01,  # self.slices_stroke_width or 0.01,
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
                 fill=slices_colors[sid],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -4118,6 +4128,7 @@ class TextShape(BaseShape):
             rkwargs["fill"] = self.box_fill
             rkwargs["stroke"] = self.box_stroke
             rkwargs["stroke_width"] = self.box_stroke_width or self.stroke_width
+            rkwargs["stroke_transparency"] = self.box_stroke_transparency
             rkwargs["dashed"] = self.box_dashed
             rkwargs["dotted"] = self.box_dotted
             rkwargs["transparency"] = self.box_transparency
@@ -4130,6 +4141,7 @@ class TextShape(BaseShape):
                 lineCap=pymu_props.lineCap,
                 dashes=pymu_props.dashes,
                 fill_opacity=pymu_props.fill_opacity,
+                stroke_opacity=pymu_props.stroke_opacity,
             )
             # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
 
@@ -4872,6 +4884,7 @@ class TriangleShape(BaseShape):
             stroke=self.hatches_stroke,
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
+            stroke_transparency=self.hatches_transparency,
             dashed=self.hatches_dashed,
             dotted=self.hatches_dotted,
             rotation=rotation,
@@ -5035,6 +5048,7 @@ class TriangleShape(BaseShape):
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[sid],
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
                 fill=slices_colors[sid],
                 transparency=self.slices_transparency,
                 closed=True,

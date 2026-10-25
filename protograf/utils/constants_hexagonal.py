@@ -5,6 +5,9 @@ Constants used in protograf for edges in hexagonal grids
 
 # lib
 
+# ---- NON-offset grid ***
+# top-left hex is at the top-left
+
 # input: vertex; direction
 # output: delta col; delta row
 EVEN_COL_EVEN_ROW = {
@@ -47,7 +50,7 @@ EVEN_COL_EVEN_ROW = {
 }
 
 EVEN_COL_ODD_ROW = {
-    ("ne", "ne"): (1, 0),
+    ("ne", "ne"): (1, -1),
     ("ne", "e"): (1, -1),
     ("ne", "se"): (0, 0),
     ("ne", "sw"): (0, 0),
@@ -78,7 +81,7 @@ EVEN_COL_ODD_ROW = {
     ("w", "w"): (-1, 0),
     ("w", "nw"): (-1, -1),
     ("nw", "ne"): (0, 0),
-    ("nw", "e"): (0, -1),
+    ("nw", "e"): (0, 0),
     ("nw", "se"): (0, 0),
     ("nw", "sw"): (0, 0),
     ("nw", "w"): (-1, -1),
@@ -119,7 +122,7 @@ ODD_COL_EVEN_ROW = {
     ("w", "w"): (-1, 1),
     ("w", "nw"): (-1, 0),
     ("nw", "ne"): (0, 0),
-    ("nw", "e"): (0, -1),
+    ("nw", "e"): (0, 0),
     ("nw", "se"): (0, 0),
     ("nw", "sw"): (0, 0),
     ("nw", "w"): (-1, 0),
@@ -167,8 +170,8 @@ ODD_COL_ODD_ROW = {
     ("nw", "nw"): (-1, 0),
 }
 
-# ---- offset grid
-# top-left hex shfited down
+# ---- offset grid ***
+# top-left hex is shifted down a half-hex
 
 # input: vertex; direction
 # output: delta col; delta row
@@ -327,7 +330,7 @@ ODD_COL_ODD_ROW_OFFSET = {
     ("w", "w"): (-1, 0),
     ("w", "nw"): (-1, -1),
     ("nw", "ne"): (0, 0),
-    ("nw", "e"): (0, -1),
+    ("nw", "e"): (0, 0),
     ("nw", "se"): (0, 0),
     ("nw", "sw"): (0, 0),
     ("nw", "w"): (-1, -1),

@@ -260,6 +260,7 @@ class CardBoxObject(BaseShape):
             pargs = {}
             pargs["stroke"] = self.fold_stroke
             pargs["stroke_width"] = self.fold_stroke_width
+            pargs["stroke_transparency"] = self.fold_transparency
             pargs["dotted"] = self.fold_dotted
             pargs["dashed"] = self.fold_dashed
             pargs["closed"] = False

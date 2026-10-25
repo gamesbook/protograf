@@ -4294,7 +4294,8 @@ the desired output:
 - `Radii Shapes`_
 - `Perbii Shapes`_
 - `Text Descriptions`_
-- `Transparency`_
+- `Transparency: fill (area)`_
+- `Transparency: stroke (line)`_
 - `Vertex Shapes`_
 - `Wave Styles`_
 
@@ -5100,8 +5101,8 @@ Example 2. Label Offsets
 
 .. _coreTransparency:
 
-Transparency
-~~~~~~~~~~~~
+Transparency: fill (area)
+~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <shapes-common-properties_>`_
 
 All `Enclosed Shapes`_, that have a *fill*, can have a transparency value set
@@ -5149,6 +5150,30 @@ visible - then set the *fill* value to ``None``.
       When overdrawn, there is a color change in the overlapping section
       i.e. "bleed through" occurs.
 ===== ======
+
+
+.. _coreStrokeTransparency:
+
+Transparency: stroke (line)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+Most shapes, that have a *stroke*, can have a *stroke_transparency* value
+set that will affect the transparency of the line around that shape.
+
+If a shape is a line, then the transparency is commonly identified by the
+property name as prefix, with an underscore, followed by ``transparency``.
+For example; ``radii_transparency``, ``perbii_transparency`` or
+``hatches_transparency``.
+
+If a shape is an area, then the transparency is commonly identified by the
+property name as prefix, with an underscore, followed by ``stroke`` with an
+underscore, followed by ``transparency``.  For example;
+``slices_stroke_transparency`` or ``petals_stroke_transparency``.
+
+If the line needs to be completely transparent - i.e. no color at all being
+visible - then set the *stroke* value to ``None``.
+
 
 .. _coreCentreShape:
 

@@ -1867,6 +1867,7 @@ def get_pymupdf_props(
         stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
     else:
         stroke = defaults.get("stroke", None)
+    stroke_width = kwargs.get("stroke_width", None)
     # ---- transparency / opacity
     opacity = 1
     _transparency = kwargs.get("transparency", defaults.get("transparency"))
@@ -1875,7 +1876,14 @@ def get_pymupdf_props(
         if _transparency >= 1:
             _transparency = _transparency / 100.0
         opacity = 1 - _transparency
-    stroke_width = kwargs.get("stroke_width", None)
+    # ---- stroke_transparency / stroke_opacity
+    stroke_opacity = 1
+    _stroke_transparency = kwargs.get("stroke_transparency")
+    if _stroke_transparency:
+        _stroke_transparency = as_float(_stroke_transparency, "stroke_transparency")
+        if _stroke_transparency >= 1:
+            _stroke_transparency = _stroke_transparency / 100.0
+        stroke_opacity = 1 - _stroke_transparency
     # ---- set line end style
     stroke_cap = 0  # default is "sharp"
     line_join = kwargs.get("lineJoin", 0)  # default is "sharp"
@@ -1951,6 +1959,7 @@ def get_pymupdf_props(
         lineJoin=line_join,
         dashes=dashes,
         fill_opacity=opacity,
+        stroke_opacity=stroke_opacity,
         morph=morph,
         closePath=closed,
     )
@@ -1979,6 +1988,7 @@ def set_canvas_props(
                 # lineJoin=pymu_props.lineJoin,
                 dashes=pymu_props.dashes,
                 fill_opacity=pymu_props.fill_opacity,
+                stroke_opacity=pymu_props.stroke_opacity,
                 morph=pymu_props.morph,
                 closePath=pymu_props.closePath,
             )

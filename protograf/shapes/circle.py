@@ -338,6 +338,7 @@ class CircleShape(BaseShape):
             index=ID,
             stroke=self.hatches_stroke,
             stroke_width=self.hatches_stroke_width,
+            stroke_transparency=self.hatches_transparency,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
             dotted=self.hatches_dotted,
@@ -472,6 +473,7 @@ class CircleShape(BaseShape):
                     index=ID,
                     stroke=_radii_stroke,
                     stroke_width=self.radii_stroke_width,
+                    stroke_transparency=self.radii_transparency,
                     stroke_ends=self.radii_ends,
                     dashed=self.radii_dashed,
                     dotted=self.radii_dotted,
@@ -650,6 +652,7 @@ class CircleShape(BaseShape):
                 fill=self.petals_fill,
                 stroke=self.petals_stroke,
                 stroke_width=self.petals_stroke_width,
+                stroke_transparency=self.petals_stroke_transparency,
                 stroke_ends=self.petals_ends,
                 dashed=self.petals_dashed,
                 dotted=self.petals_dotted,
@@ -726,12 +729,13 @@ class CircleShape(BaseShape):
                 cnv.draw_sector(centre, start, slice_angle, fullSector=True)
                 self.set_canvas_props(
                     index=ID,
-                    fill=_color,
-                    transparency=self.slices_transparency,
                     stroke=_color,
                     stroke_width=0.001,
-                    dashed=None,
-                    dotted=None,
+                    stroke_transparency=self.slices_stroke_transparency,
+                    dashed=self.slices_dashed,
+                    dotted=self.slices_dotted,
+                    fill=_color,
+                    transparency=self.slices_transparency,
                 )
             angle += slice_angle
 
@@ -932,13 +936,10 @@ class CircleShape(BaseShape):
                 (gx + self._u.radius * 2.0, gy + deltag),
             )
             # done
-            # gargs = kwargs
-            # gargs["stroke"] = self.grid_marks_stroke
-            # gargs["stroke_width"] = self.grid_marks_stroke_width
-            # self.set_canvas_props(cnv=cnv, index=ID, **gargs)
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["stroke_transparency"] = self.grid_marks_transparency
             gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
         # ---- set calculated top-left in user units
