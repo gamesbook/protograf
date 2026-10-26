@@ -8,7 +8,7 @@ This section deals with some of the additional commands available in
 :doc:`protograf <index>` that are not covered in detail elsewhere.
 
 You should already be familiar with all of the
-:doc:`Basic Concepts <basic_concepts>`, the :doc:`Script Anatomy <acript anatomy>`,
+:doc:`Basic Concepts <basic_concepts>`, the :doc:`Script Anatomy <script_anatomy>`,
 and have created some scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 

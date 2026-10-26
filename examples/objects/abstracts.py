@@ -485,6 +485,7 @@ aml = AbstractGame(default=thick,
 )
 AbstractState(
     board=aml,
+    markers_transparency=50,
     markers=[
         'a a1 c1',
         'ac a1 c2',
@@ -495,6 +496,7 @@ AbstractState(
         'h e4',
         's d2',
         'x a2',
+        "#7FFF00 d5 b2"
     ]
 )
 
@@ -514,7 +516,7 @@ AbstractState(
     markers=[
         'a a1 c1',
         'ac a1 c2',
-        'd a3',
+        ' d a3 d3 e1 ',
         'l b4 a5 b5 c4',
         'lc c4 e5',
         'c c3',

@@ -14,6 +14,7 @@ protograf Changes
 - Patch errors with GridLine edges on Hexagons grid
 - Add `stroke_transparency` for a range of line types
 _ Update library dependencies for security
+- Upgrade Abstract marker shortcuts for multiple cells
 
 2026-10-19 (0.6.0)
 ------------------

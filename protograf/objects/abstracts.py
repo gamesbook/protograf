@@ -47,11 +47,7 @@ from .abstracts_pieces import (
 
 
 class AbstractGameObject(BaseShape):
-    """Create an AbstractGame for a given canvas.
-
-    Ref:
-
-    """
+    """Create an AbstractGame for a given canvas."""
 
     def __init__(self, _object=None, canvas=None, **kwargs):
 
@@ -1255,11 +1251,7 @@ class AbstractGameObject(BaseShape):
 
 
 class AbstractStateObject(BaseShape):
-    """Draw AbstractState composite shape on a given canvas.
-
-    Reference:
-
-    """
+    """Draw AbstractState composite shape on a given canvas."""
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
@@ -1283,6 +1275,14 @@ class AbstractStateObject(BaseShape):
         )
         self.markers_fraction = tools.as_float(
             self.markers_fraction, "markers_fraction", minimum=0
+        )
+        self.markers_transparency = (
+            self._commons("markers_transparency")
+            or kwargs.get("markers_transparency")
+            or 1
+        )
+        self.markers_transparency = tools.as_float(
+            self.markers_transparency, "markers_transparency", minimum=0
         )
         self.markers_shapes = (
             self._commons("markers_shapes") or kwargs.get("markers_shapes") or None
@@ -1475,21 +1475,8 @@ class AbstractStateObject(BaseShape):
                     )
         return position_list
 
-    def draw_annotations(self):
-        """Draw annotation elements on the board."""
-        if self.annotations:
-            for anno in self.annotations:
-                if not isinstance(anno, BaseShape):
-                    feedback(
-                        "The AbstractState 'annotations' property must be a list of shapes, "
-                        f" not a '{type(anno).__name__}'.",
-                        True,
-                        True,
-                    )
-                anno.draw()
-
-    def draw_single_marker(self, mark: str, grid_refs: list):
-        """Draw one marker element on the board."""
+    def draw_single_element(self, mark: str, grid_refs: list):
+        """Draw one element on the board."""
         from protograf.protos import Circle, Dot, Hexagon, Line, Square
         from protograf.shapes import HexShape, RectangleShape
 
@@ -1511,26 +1498,61 @@ class AbstractStateObject(BaseShape):
         # default props
         stroke = self.markers_stroke
         stroke_width = ht_pts * self.markers_fraction
+        stroke_transparency = self.markers_transparency
         offset = tools.points(stroke_width) / 2.0
         def_kwargs = {
             "stroke": stroke,
             "stroke_width": stroke_width,
-            # "transparency": 50,  # TODO - support pmupdf "stoke_opacity"
+            "stroke_transparency": stroke_transparency,
         }
         # user props
         usr_kwargs = {}
         # If duplicate keys, the last dictionary unpacked overwrites previous values.
 
         # multiple grid_refs => used for line or arrow
-        links = []
-        if len(grid_refs) > 2:
-            links = [link.centre for link in grid_refs]
+        grid_locs = [loc.centre for loc in grid_refs]
 
+        # ---- color-in-a-cell
+        if mark[0] == "#":  # color-in a cell
+            match self.board.board_type:
+                case AbstractBoardType.GRID:
+                    skwargs = {
+                        "x": None,
+                        "y": None,
+                        "fill": mark,
+                        "stroke": mark,
+                        "height": ht - 2 * offset,
+                        "width": ht - 2 * offset,
+                    }
+                    for loc in grid_locs:
+                        kwargs = {**def_kwargs, **usr_kwargs, **skwargs, "cxy": loc}
+                        Square(**kwargs)
+                case AbstractBoardType.HEXAGONAL:
+                    hkwargs = {
+                        "x": None,
+                        "y": None,
+                        "fill": mark,
+                        "stroke": mark,
+                        "height": ht - 2 * offset,
+                        "orientation": "pointy",
+                    }
+                    for loc in grid_locs:
+                        kwargs = {**def_kwargs, **usr_kwargs, **hkwargs, "cxy": loc}
+                        Hexagon(**kwargs)
+                case AbstractBoardType.TRIANGULAR:
+                    raise NotImplementedError(
+                        "Sorry, a triangular board is not available yet."
+                    )
+                case _:
+                    self.game_name_error()
+            return
+
+        # ---- draw a shape
         match mark.lower():
             case "a" | "ac":  # arrow / curved
                 check_grid(grid_refs, "arrow (a)", 2)
-                if links:
-                    akwargs = {"links": links, "stroke_ends": "rounded"}
+                if grid_locs:
+                    akwargs = {"links": grid_locs, "stroke_ends": "rounded"}
                 else:
                     cntr1 = grid_refs[1].centre
                     akwargs = {
@@ -1553,45 +1575,45 @@ class AbstractStateObject(BaseShape):
                 ckwargs = {
                     "x": cntr0.x,
                     "y": cntr0.y,
-                    "cxy": cntr0,
                     "radius": rd - offset,
                     "orientation": "pointy",
                 }
-                kwargs = {**def_kwargs, **usr_kwargs, **ckwargs}
-                Circle(**kwargs)
+                for loc in grid_locs:
+                    kwargs = {**def_kwargs, **usr_kwargs, **ckwargs, "cxy": loc}
+                    Circle(**kwargs)
             case "d":  # dot
                 dkwargs = {
                     "x": cntr0.x,
                     "y": cntr0.y,
-                    "cxy": cntr0,
                     "dot_width": stroke_width,
                 }
-                kwargs = {**def_kwargs, **usr_kwargs, **dkwargs}
-                Dot(**kwargs)
+                for loc in grid_locs:
+                    kwargs = {**def_kwargs, **usr_kwargs, **dkwargs, "cxy": loc}
+                    Dot(**kwargs)
             case "h":  # hexagon
                 hkwargs = {
                     "x": None,
                     "y": None,
-                    "cxy": cntr0,
                     "height": ht - 2 * offset,
                     "orientation": "pointy",
                 }
-                kwargs = {**def_kwargs, **usr_kwargs, **hkwargs}
-                Hexagon(**kwargs)
+                for loc in grid_locs:
+                    kwargs = {**def_kwargs, **usr_kwargs, **hkwargs, "cxy": loc}
+                    Hexagon(**kwargs)
             case "s":  # square
                 skwargs = {
                     "x": None,
                     "y": None,
-                    "cxy": cntr0,
                     "height": ht - 2 * offset,
                     "width": ht - 2 * offset,
                 }
-                kwargs = {**def_kwargs, **usr_kwargs, **skwargs}
-                Square(**kwargs)
+                for loc in grid_locs:
+                    kwargs = {**def_kwargs, **usr_kwargs, **skwargs, "cxy": loc}
+                    Square(**kwargs)
             case "l" | "lc":  # line / curve
                 check_grid(grid_refs, "line (l)", 2)
-                if links:
-                    lkwargs = {"links": links, "stroke_ends": "rounded"}
+                if grid_locs:
+                    lkwargs = {"links": grid_locs, "stroke_ends": "rounded"}
                 else:
                     cntr1 = grid_refs[1].centre
                     lkwargs = {
@@ -1610,88 +1632,118 @@ class AbstractStateObject(BaseShape):
                 kwargs = {**def_kwargs, **usr_kwargs, **lkwargs}
                 Line(**kwargs)
             case "x":  # cross "X"
-                if grid_refs[0].type in ["HexShape", HexShape]:
-                    xkwargs = {
-                        "x": grid_refs[0].sw.x + offset,
-                        "y": grid_refs[0].sw.y - offset,
-                        "x1": grid_refs[0].ne.x - offset,
-                        "y1": grid_refs[0].ne.y + offset,
-                        "stroke_ends": "rounded",
-                    }
-                    kwargs = {**def_kwargs, **usr_kwargs, **xkwargs}
-                    Line(**kwargs)
-                    zkwargs = {
-                        "x": grid_refs[0].nw.x + offset,
-                        "y": grid_refs[0].nw.y + offset,
-                        "x1": grid_refs[0].se.x - offset,
-                        "y1": grid_refs[0].se.y - offset,
-                        "stroke_ends": "rounded",
-                    }
-                    kwargs = {**def_kwargs, **usr_kwargs, **zkwargs}
-                    Line(**kwargs)
-                elif grid_refs[0].type in ["RectangleShape", RectangleShape]:
-                    xkwargs = {
-                        "x": grid_refs[0].sw.x + offset,
-                        "y": grid_refs[0].sw.y - offset,
-                        "x1": grid_refs[0].ne.x - offset,
-                        "y1": grid_refs[0].ne.y + offset,
-                        "stroke_ends": "rounded",
-                    }
-                    kwargs = {**def_kwargs, **usr_kwargs, **xkwargs}
-                    Line(**kwargs)
-                    zkwargs = {
-                        "x": grid_refs[0].nw.x + offset,
-                        "y": grid_refs[0].nw.y + offset,
-                        "x1": grid_refs[0].se.x - offset,
-                        "y1": grid_refs[0].se.y - offset,
-                        "stroke_ends": "rounded",
-                    }
-                    kwargs = {**def_kwargs, **usr_kwargs, **zkwargs}
-                    Line(**kwargs)
+                match self.board.board_type:
+                    case AbstractBoardType.GRID:
+                        for loc in grid_refs:
+                            xkwargs = {
+                                "x": loc.sw.x + offset,
+                                "y": loc.sw.y - offset,
+                                "x1": loc.ne.x - offset,
+                                "y1": loc.ne.y + offset,
+                                "stroke_ends": "rounded",
+                            }
+                            kwargs = {**def_kwargs, **usr_kwargs, **xkwargs}
+                            Line(**kwargs)
+                            zkwargs = {
+                                "x": loc.nw.x + offset,
+                                "y": loc.nw.y + offset,
+                                "x1": loc.se.x - offset,
+                                "y1": loc.se.y - offset,
+                                "stroke_ends": "rounded",
+                            }
+                            kwargs = {**def_kwargs, **usr_kwargs, **zkwargs}
+                            Line(**kwargs)
+                    case AbstractBoardType.HEXAGONAL:
+                        for loc in grid_refs:
+                            xkwargs = {
+                                "x": loc.sw.x + offset,
+                                "y": loc.sw.y - offset,
+                                "x1": loc.ne.x - offset,
+                                "y1": loc.ne.y + offset,
+                                "stroke_ends": "rounded",
+                            }
+                            kwargs = {**def_kwargs, **usr_kwargs, **xkwargs}
+                            Line(**kwargs)
+                            zkwargs = {
+                                "x": loc.nw.x + offset,
+                                "y": loc.nw.y + offset,
+                                "x1": loc.se.x - offset,
+                                "y1": loc.se.y - offset,
+                                "stroke_ends": "rounded",
+                            }
+                            kwargs = {**def_kwargs, **usr_kwargs, **zkwargs}
+                            Line(**kwargs)
+                    case AbstractBoardType.TRIANGULAR:
+                        raise NotImplementedError(
+                            "Sorry, a triangular board is not available yet."
+                        )
+                    case _:
+                        self.game_name_error()
+
+    def process_multiple_elements(self, mark: str, elements_group: str):
+        """."""
+        allowed_marks = ["a", "ac", "c", "d", "h", "x", "s", "l", "lc"]
+        marks = tools.sequence_split(
+            mark, sep=" ", to_int=False, unique=False, clean=True
+        )
+        if marks[0].lower() not in allowed_marks and marks[0][0] != "#":
+            feedback(
+                f'The AbstractGame "{elements_group}" shortcut must start with one of'
+                f' "{allowed_marks}", or be a color, not "{marks[0]}".',
+                True,
+                True,
+            )
+        if len(marks) < 2:
+            feedback(
+                f'The AbstractGame "{elements_group}" shortcut must contain a key, or color'
+                f' followed by one or more grid references, not "{mark}".',
+                True,
+                True,
+            )
+        grid_refs = []
+        for _grid_mark in marks[1:]:
+            if _grid_mark == "":
+                continue
+            try:
+                _grid = getattr(self.board, _grid_mark.lower())
+                grid_refs.append(_grid)
+            except AttributeError:
+                try:
+                    _grid = getattr(self.board, _grid_mark.upper())
+                    grid_refs.append(_grid)
+                except AttributeError:
+                    feedback(
+                        f'The AbstractGame "{elements_group}" shortcut grid reference'
+                        f' "{_grid_mark}" is a not valid for this game.',
+                        True,
+                        True,
+                    )
+        if grid_refs:
+            self.draw_single_element(marks[0], grid_refs)
+
+    def draw_annotations(self):
+        """Draw annotation elements on the board."""
+        if self.annotations:
+            for anno in self.annotations:
+                if isinstance(anno, str):
+                    self.process_multiple_elements(
+                        mark=anno, elements_group="annotations"
+                    )
+                elif isinstance(anno, BaseShape):
+                    anno.draw()
                 else:
-                    raise NotImplementedError(
-                        f"Unable to handle cell type {grid_refs[0].type}"
+                    feedback(
+                        "The AbstractState 'annotations' property must be a list of shapes, "
+                        f" or a string, not a '{type(anno).__name__}'.",
+                        True,
+                        True,
                     )
 
     def draw_markers(self):
         """Draw marker elements on the board."""
-        allowed_marks = ["a", "ac", "c", "d", "h", "x", "s", "l", "lc"]
         for mark in self.markers:
             if isinstance(mark, str):
-                marks = tools.sequence_split(mark, sep=" ", to_int=False, unique=False)
-                if marks[0].lower() not in allowed_marks:
-                    feedback(
-                        'The AbstractGame "markers" shortcut must start with one of'
-                        f' "{allowed_marks}" not "{marks[0]}".',
-                        True,
-                        True,
-                    )
-                if len(marks) < 2:
-                    feedback(
-                        'The AbstractGame "markers" shortcut must contain a key,'
-                        f' followed by one or more grid references, not "{mark}".',
-                        True,
-                        True,
-                    )
-                # breakpoint()
-                grid_refs = []
-                for _grid_mark in marks[1:]:
-                    try:
-                        _grid = getattr(self.board, _grid_mark.lower())
-                        grid_refs.append(_grid)
-                    except AttributeError:
-                        try:
-                            _grid = getattr(self.board, _grid_mark.upper())
-                            grid_refs.append(_grid)
-                        except AttributeError:
-                            feedback(
-                                'The AbstractGame "markers" shortcut grid reference'
-                                f' "{_grid_mark}" is a not valid for this game.',
-                                True,
-                                True,
-                            )
-                if grid_refs:
-                    self.draw_single_marker(marks[0], grid_refs)
+                self.process_multiple_elements(mark=mark, elements_group="markers")
             elif isinstance(mark, BaseShape):
                 mark.draw()
             else:
@@ -1710,13 +1762,6 @@ class AbstractStateObject(BaseShape):
                 True,
                 True,
             )
-        # for index, row in enumerate(self.board.cells_non_blank):
-        #     print(f'&&& cells_non_blank {index=} {row=}')
-
-        # swop start and end of position matrix
-        # if self.board.label_start in [Corner.TOP_LEFT, Corner.TOP_RIGHT]:
-        #     self.position_matrix.reverse()
-        # print(f'&&& {self.position_matrix=}')
 
         for row_no, row in enumerate(self.position_matrix):
             for col_no, col in enumerate(row):
