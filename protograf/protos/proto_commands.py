@@ -405,8 +405,16 @@ def Create(**kwargs):
         globals.filename = os.path.join(globals.pargs.directory, _filename)
     except SystemExit:
         print("Ignoring ArgumentParser exit!")
+    except argparse.ArgumentError as err:
+        feedback(
+            f"Unable to run the script with those arguments ({err}).",
+            True,
+        )
     except Exception as err:
-        globals.pargs = None
+        feedback(
+            f"Unable to run the script. Unexpected error: {err}.",
+            True,
+        )
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf.Document
     globals.doc_page = globals.document.new_page(
@@ -924,7 +932,7 @@ def Save(**kwargs):
     compression = kwargs.get("compression", 0)  # compress output
 
     # ---- directory
-    if globals.pargs.directory:
+    if globals.pargs and globals.pargs.directory:
         globals.directory = globals.pargs.directory
     elif directory:
         globals.directory = directory
@@ -933,8 +941,8 @@ def Save(**kwargs):
     # print(f'$$$ SAVE {globals.directory=}')
     if not os.path.exists(globals.directory):
         feedback(
-            f'Cannot find the directory "{
-                globals.directory}" - please create this first.',
+            f'Cannot find the directory "{globals.directory}'
+            " - please create this first.",
             True,
         )
 
@@ -1459,6 +1467,7 @@ def Layout(grid, **kwargs):
     layout_grid_fill = kwargs.get("gridlines_fill", None)
     layout_grid_stroke = colrs.get_color(_grid_stroke)
     layout_grid_stroke_width = kwargs.get("gridlines_stroke_width", WIDTH)
+    layout_grid_stroke_transparency = kwargs.get("gridlines_stroke_transparency", 1.0)
     layout_grid_dotted = kwargs.get("gridlines_dotted", False)
     layout_grid_dashed = kwargs.get("gridlines_dashed", None)
     layout_grid_transparency = kwargs.get("gridlines_transparency", None)
@@ -1483,8 +1492,7 @@ def Layout(grid, **kwargs):
                 shape = corner[1]
                 if _lower(value) not in ["nw", "ne", "sw", "se", "*"]:
                     feedback(
-                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{
-                            value}")!',
+                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{value}")!',
                         True,
                     )
                 if not isinstance(shape, BaseShape):
@@ -1539,6 +1547,7 @@ def Layout(grid, **kwargs):
                     width=grid.total_width,
                     stroke=layout_grid_stroke,
                     stroke_width=layout_grid_stroke_width,
+                    stroke_transparency=layout_grid_stroke_transparency,
                     stroke_ends=layout_grid_ends,
                     dotted=layout_grid_dotted,
                     dashed=layout_grid_dashed,
@@ -1548,6 +1557,7 @@ def Layout(grid, **kwargs):
                     hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_transparency=layout_grid_stroke_transparency,
                     hatches_ends=layout_grid_ends,
                     hatches_dotted=layout_grid_dotted,
                     hatches_dashed=layout_grid_dashed,
@@ -1594,6 +1604,7 @@ def Layout(grid, **kwargs):
                     width=grid.total_width,
                     stroke=layout_grid_stroke,
                     stroke_width=layout_grid_stroke_width,
+                    stroke_transparency=self.layout_grid_stroke_transparency,
                     stroke_ends=layout_grid_ends,
                     dotted=layout_grid_dotted,
                     dashed=layout_grid_dashed,
@@ -1603,6 +1614,7 @@ def Layout(grid, **kwargs):
                     hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_transparency=self.layout_grid_stroke_transparency,
                     hatches_ends=layout_grid_ends,
                     hatches_dotted=layout_grid_dotted,
                     hatches_dashed=layout_grid_dashed,
@@ -1654,6 +1666,7 @@ def Layout(grid, **kwargs):
                     side=grid.total_width,
                     stroke=layout_grid_stroke,
                     stroke_width=layout_grid_stroke_width,
+                    stroke_transparency=self.layout_grid_stroke_transparency,
                     stroke_ends=layout_grid_ends,
                     dotted=layout_grid_dotted,
                     dashed=layout_grid_dashed,
@@ -1663,6 +1676,7 @@ def Layout(grid, **kwargs):
                     hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_transparency=self.layout_grid_stroke_transparency,
                     hatches_ends=layout_grid_ends,
                     hatches_dotted=layout_grid_dotted,
                     hatches_dashed=layout_grid_dashed,

@@ -1,11 +1,21 @@
 protograf Changes
 =================
 
-2026-00-00 (0.6.1)
+2026-00-00 (0.6.2)
 ------------------
 - [PLANNED-1] Upgrade Abstract (hex lines grid; SGF demo)
 - [PLANNED-2] Expand geo coverage for minor shapes
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
+
+2026-10-26 (0.6.1)
+------------------
+- Add Railway Line example to Objects example
+- Add `wavy` line style for Rectangle
+- Patch errors with GridLine edges on Hexagons grid
+- Add `stroke_transparency` for a range of line types
+_ Update library dependencies for security
+- Upgrade Abstract marker shortcuts for multiple cells
+- Move AbstractBoard and AbstractGame into separate modules
 
 2026-10-19 (0.6.0)
 ------------------

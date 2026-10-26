@@ -20,6 +20,7 @@ class ProtografGrid(ABC):
         self.rows = rows
         self.cols = cols
         self.kwargs = kwargs
+        self.common = kwargs.get("common", None)
         self.locales = []  # should be list of Locale namedtuples
         self.cells = {}  # store ShapeGeometry keyed on location
 
@@ -27,3 +28,8 @@ class ProtografGrid(ABC):
     def cell(self):
         """All grids must be able to return a grid cell."""
         pass
+
+    def _commons(self, prop: str) -> object:
+        """re"""
+        if self.common:
+            return vars(self.common).get(prop)

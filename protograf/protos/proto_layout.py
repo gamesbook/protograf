@@ -79,6 +79,9 @@ class LayoutGrid:
         self.layout_grid_fill = kwargs.get("gridlines_fill", None)
         self.layout_grid_stroke = colrs.get_color(_grid_stroke)
         self.layout_grid_stroke_width = kwargs.get("gridlines_stroke_width", WIDTH)
+        self.layout_grid_stroke_transparency = kwargs.get(
+            "gridlines_stroke_transparency", 1.0
+        )
         self.layout_grid_dotted = kwargs.get("gridlines_dotted", False)
         self.layout_grid_dashed = kwargs.get("gridlines_dashed", None)
         self.layout_grid_transparency = kwargs.get("gridlines_transparency", None)
@@ -213,10 +216,12 @@ class LayoutGrid:
                                 width=width,
                                 stroke=self.layout_grid_stroke,
                                 stroke_width=self.layout_grid_stroke_width,
+                                stroke_transparency=self.layout_grid_stroke_transparency,
                                 stroke_ends=self.layout_grid_ends,
                                 dotted=self.layout_grid_dotted,
                                 dashed=self.layout_grid_dashed,
                                 fill=self.layout_grid_fill,
+                                transparency=self.layout_grid_transparency,
                             )
                 case _:
                     feedback(
@@ -260,6 +265,7 @@ class LayoutGrid:
                             width=self.grid.total_width,
                             stroke=self.layout_grid_stroke,
                             stroke_width=self.layout_grid_stroke_width,
+                            stroke_transparency=self.layout_grid_stroke_transparency,
                             stroke_ends=self.layout_grid_ends,
                             dotted=self.layout_grid_dotted,
                             dashed=self.layout_grid_dashed,
@@ -269,6 +275,7 @@ class LayoutGrid:
                             hatches=gridlines_config,
                             hatches_stroke=self.layout_grid_stroke,
                             hatches_stroke_width=self.layout_grid_stroke_width,
+                            hatches_transparency=self.layout_grid_stroke_transparency,
                             hatches_ends=self.layout_grid_ends,
                             hatches_dotted=self.layout_grid_dotted,
                             hatches_dashed=self.layout_grid_dashed,
@@ -318,6 +325,7 @@ class LayoutGrid:
                             width=self.grid.total_width,
                             stroke=self.layout_grid_stroke,
                             stroke_width=self.layout_grid_stroke_width,
+                            stroke_transparency=self.layout_grid_stroke_transparency,
                             stroke_ends=self.layout_grid_ends,
                             dotted=self.layout_grid_dotted,
                             dashed=self.layout_grid_dashed,
@@ -327,6 +335,7 @@ class LayoutGrid:
                             hatches=gridlines_config,
                             hatches_stroke=self.layout_grid_stroke,
                             hatches_stroke_width=self.layout_grid_stroke_width,
+                            hatches_transparency=self.layout_grid_transparency,
                             hatches_ends=self.layout_grid_ends,
                             hatches_dotted=self.layout_grid_dotted,
                             hatches_dashed=self.layout_grid_dashed,
@@ -382,6 +391,7 @@ class LayoutGrid:
                             side=self.grid.total_width,
                             stroke=self.layout_grid_stroke,
                             stroke_width=self.layout_grid_stroke_width,
+                            stroke_transparency=self.layout_grid_stroke_transparency,
                             stroke_ends=self.layout_grid_ends,
                             dotted=self.layout_grid_dotted,
                             dashed=self.layout_grid_dashed,
@@ -391,6 +401,7 @@ class LayoutGrid:
                             hatches=gridlines_config,
                             hatches_stroke=self.layout_grid_stroke,
                             hatches_stroke_width=self.layout_grid_stroke_width,
+                            hatches_transparency=self.layout_grid_transparency,
                             hatches_ends=self.layout_grid_ends,
                             hatches_dotted=self.layout_grid_dotted,
                             hatches_dashed=self.layout_grid_dashed,

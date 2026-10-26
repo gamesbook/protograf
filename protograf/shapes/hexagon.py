@@ -673,6 +673,7 @@ class HexShape(BaseShape):
             keys["font_name"] = self.coord_font_name
             keys["font_size"] = self.coord_font_size
             keys["stroke"] = self.coord_stroke
+            keys["stroke_transparency"] = self.coord_transparency
             coord_offset = self.unit(self.coord_offset)
             if self.coord_elevation in ["t", "top"]:
                 self.draw_multi_string(
@@ -836,6 +837,7 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.hatches_stroke,
             stroke_width=self.hatches_stroke_width,
+            stroke_transparency=self.hatches_transparency,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
             dotted=self.hatches_dotted,
@@ -853,6 +855,7 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.link_stroke,
             stroke_width=self.link_stroke_width,
+            stroke_transparency=self.link_transparency,
         )
         _links = links.split(",")
         for _link in _links:
@@ -1127,6 +1130,7 @@ class HexShape(BaseShape):
             fill=None,
             stroke=self.paths_stroke or self.stroke,
             stroke_width=self.paths_stroke_width or self.stroke_width,
+            stroke_transparency=self.paths_transparency,
             stroke_ends=self.paths_ends,
             dashed=self.paths_dashed,
             dotted=self.paths_dotted,
@@ -1289,6 +1293,7 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.perbii_stroke,
             stroke_width=self.perbii_stroke_width,
+            stroke_transparency=self.perbii_transparency,
             stroke_ends=self.perbii_ends,
             dashed=self.perbii_dashed,
             dotted=self.perbii_dotted,
@@ -1340,7 +1345,10 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_transparency=self.radii_transparency,
             stroke_ends=self.radii_ends,
+            dashed=self.radii_dashed,
+            dotted=self.radii_dotted,
         )
 
     def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
@@ -1378,6 +1386,9 @@ class HexShape(BaseShape):
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[sid],
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
+                dashed=self.slices_dashed,
+                dotted=self.slices_dotted,
                 fill=slices_colors[sid],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -1500,6 +1511,7 @@ class HexShape(BaseShape):
             stroke=self.spikes_stroke,
             fill=spikes_fill,
             stroke_width=self.spikes_stroke_width,
+            stroke_transparency=self.spikes_transparency,
             stroke_ends=self.spikes_ends,
             dashed=self.spikes_dashed,
             dotted=self.spikes_dotted,
@@ -1885,6 +1897,7 @@ class HexShape(BaseShape):
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["stroke_transparency"] = self.grid_marks_transparency
             gargs["stroke_ends"] = self.grid_marks_ends
             gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)

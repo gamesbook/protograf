@@ -1154,10 +1154,23 @@ The shortcuts, prefixed by one or two letters are:
 - ``h``: draw a **hexagon** inside a cell
 - ``x``: draw an **X** inside a cell (between diagonally opposite vertices)
 
-Along with this prefix, there also needs to be the reference for a cell or,
-in the case of line or arrow, a reference for a second cell.  These appear
-together in a string, and a list of these strings is then assigned to the
-*markers* property and drawn in that order.
+These shapes are always drawn in "outline" mode; that is to say, there is
+no fill color for the area shapes.
+
+The other shortcut that can be used is that of a color, referenced by its
+:ref:`RGB hexadecimal <termsColor>` value. This is a single color used to fill
+the cell |dash| a hexagon on a hexagonal board and a square on a grid board.
+(Note that, unlike in most other places in **protograf**, the hexadecimal form
+is the only way to specify color here.)
+
+Along with this prefix, there also needs to be a reference for at least one
+cell or, in the case of line or arrow, a reference for at least two cells
+|dash| the start and end locations.  For all shortcuts, it is possible to
+supply a list of multiple locations in which that shape appears.
+
+All these details appear together in a single string for a single shape, and
+one or these strings is then assigned to the *markers* property list, and
+is drawn in that order.
 
 Some basic customisation is possible:
 
@@ -1165,6 +1178,8 @@ Some basic customisation is possible:
   to ``yellow``
 - *markers_fraction*: sets the width of all the shortcut markers lines as a
   fraction of the cell size; this defaults to ``0.1`` (one tenth)
+- *markers_transparency*: sets the transparency of all the shortcut markers;
+  this defaults to no transparency
 
 The two different styles of creating markers can be mixed together in the
 same list.
@@ -1185,6 +1200,7 @@ same list.
         )
         AbstractState(
             board=aml,
+            markers_transparency=50,
             markers=[
                 'a a1 c1',
                 'ac a1 c2',
@@ -1195,11 +1211,12 @@ same list.
                 'h e4',
                 's d2',
                 'x a2',
+                '#7FFF00 d5 b2',
             ]
         )
 
       In this example, markers are drawn with default color and stroke
-      thickness.
+      thickness, but the *markers_transparency* is set to ``50`` percent.
 
       Markers are drawn on a ``hexhex`` board; as can be seen, the square
       marker does not really suit this style of cell.
@@ -1209,6 +1226,9 @@ same list.
       is drawn between the centre of each cell in the sequence.  This
       drawing method is making use of a Line's
       :ref:`Links <lineLinksShapes>` property.
+
+      In this example, two cells |dash| ``b2`` and ``d5`` |dash| are
+      completely "colored in" with a green color defined by ``#7FFF00``.
 
 ===== ======
 
@@ -1232,7 +1252,7 @@ same list.
             markers=[
                 'a a1 c1',
                 'ac a1 c2',
-                'd a3',
+                'd a3 d3 e1',
                 'l b4 a5 b5 c4',
                 'lc c4 e5',
                 'c c3',
@@ -1243,11 +1263,15 @@ same list.
         )
 
       In this example, the markers styles are changed: *markers_stroke*
-      (their color) is set to ``red``; while the *markers_fraction is set to
+      (their color) is set to ``red``; while the *markers_fraction* is set to
       ``0.05`` |dash| the line thickness relative to the cell size.
 
       Markers are drawn on a ``grid`` board; as can be seen, the hexagon
       marker does not really suit this style of cell.
+
+      In this example, the *d* (dot) marker has a number of different
+      grid references listed with it |dash| this means that the dot is
+      drawn at the centres of all of those cells.
 
 ===== ======
 

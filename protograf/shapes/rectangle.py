@@ -1057,6 +1057,7 @@ class RectangleShape(BaseShape):
             index=ID,
             stroke=self.hatches_stroke,
             stroke_width=self.hatches_stroke_width,
+            stroke_transparency=self.hatches_transparency,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
             dotted=self.hatches_dotted,
@@ -1104,8 +1105,10 @@ class RectangleShape(BaseShape):
         cy = vertices[3].y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
+            fill=None,  # lanes are just lines`
             stroke=self.lanes_stroke,
             stroke_width=self.lanes_stroke_width,
+            stroke_transparency=self.lanes_transparency,
             stroke_ends=self.lanes_ends,
             dashed=self.lanes_dashed,
             dotted=self.lanes_dotted,
@@ -1145,8 +1148,10 @@ class RectangleShape(BaseShape):
         cy = vertices[3].y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
+            fill=None,  # sections are just lines
             stroke=self.sections_stroke,
             stroke_width=self.sections_stroke_width,
+            stroke_transparency=self.sections_transparency,
             stroke_ends=self.sections_ends,
             dashed=self.sections_dashed,
             dotted=self.sections_dotted,
@@ -1234,6 +1239,7 @@ class RectangleShape(BaseShape):
             index=ID,
             stroke=self.perbii_stroke,
             stroke_width=self.perbii_stroke_width,
+            stroke_transparency=self.perbii_transparency,
             stroke_ends=self.perbii_ends,
             dashed=self.perbii_dashed,
             dotted=self.perbii_dotted,
@@ -1270,6 +1276,7 @@ class RectangleShape(BaseShape):
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_transparency=self.radii_transparency,
             stroke_ends=self.radii_ends,
             dashed=self.radii_dashed,
             dotted=self.radii_dotted,
@@ -1307,6 +1314,9 @@ class RectangleShape(BaseShape):
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[0],
                 stroke_ends=self.slices_ends,
+                stroke_transparency=self.slices_stroke_transparency,
+                dashed=self.slices_dashed,
+                dotted=self.slices_dotted,
                 fill=slices_colors[0],
                 transparency=self.slices_transparency,
                 closed=True,
@@ -1380,6 +1390,7 @@ class RectangleShape(BaseShape):
                 fill=self.stripes_fill,
                 stroke=self.stripes_stroke,
                 stroke_width=self.stripes_stroke_width,
+                stroke_transparency=self.stripes_stroke_transparency,
                 transparency=self.stripes_transparency,
                 dashed=self.stripes_dashed,
                 dotted=self.stripes_dotted,
@@ -2092,11 +2103,23 @@ class RectangleShape(BaseShape):
                     # ---- * draw  - normal
                     else:
                         # feedback(f'*** RECT  normal {radius=} {kwargs=}')
-                        cnv.draw_rect(
-                            (x, y, x + self._u.width, y + self._u.height), radius=radius
-                        )
-                        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-                        self._debug(cnv, vertices=self.vertexes)
+                        if kwargs.get("wave_style"):
+                            # breakpoint()
+                            trx = x + self._u.width
+                            bry = y + self._u.height
+                            wh = kwargs.get("wave_height") * self.units
+                            cnv.draw_squiggle((x, y), (trx, y), wh)
+                            cnv.draw_squiggle((trx, y), (trx, bry), wh)
+                            cnv.draw_squiggle((trx, bry), (x, bry), wh)
+                            cnv.draw_squiggle((x, bry), (x, y), wh)
+                            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                        else:
+                            cnv.draw_rect(
+                                (x, y, x + self._u.width, y + self._u.height),
+                                radius=radius,
+                            )
+                            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                            self._debug(cnv, vertices=self.vertexes)
                     # ---- * add borders (lines override)
                     if self.borders:
                         if isinstance(self.borders, tuple):
@@ -2263,6 +2286,7 @@ class RectangleShape(BaseShape):
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["stroke_transparency"] = self.grid_marks_transparency
             gargs["stroke_ends"] = self.grid_marks_ends
             gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)

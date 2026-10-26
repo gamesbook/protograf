@@ -41,15 +41,31 @@ class Hexagons(ProtografGrid):
 
         """
         super().__init__(rows=rows, cols=cols, **kwargs)
-        self.sides = kwargs.get("sides", 0)
+        # ---- internal properties
         self.hidden = None
         if kwargs.get("hidden"):
             self.hidden = tools.integer_pairs(kwargs.get("hidden"), "hidden")
         self._draw_grid = kwargs.get("_draw_grid", True)
-        self.hex_layout = kwargs.get("hex_layout", "")  # default is rectangular
-        self.pattern = kwargs.get("pattern", None)  # used by AbstractGame
-        self.user = kwargs.get("user", "Hexagons")  # the calling Shape
-        self.hex_shape = kwargs.get("hex_shape", None)  # use another shape...
+        # ---- user properties
+        self.sides = self._commons("sides") or kwargs.get("sides") or 0
+        self.hex_layout = (
+            self._commons("hex_layout") or kwargs.get("hex_layout") or ""
+        )  # default is rectangular
+        self.pattern = (
+            self._commons("pattern") or kwargs.get("pattern") or None
+        )  # used by AbstractGame
+        self.user = (
+            self._commons("user") or kwargs.get("user") or "Hexagons"
+        )  # the calling Shape
+        self.hex_shape = (
+            self._commons("hex_shape") or kwargs.get("hex_shape") or None
+        )  # use another shape...
+        self.hex_offset = (
+            self._commons("hex_offset") or kwargs.get("hex_offset") or "even"
+        )
+        # ---- args override from common
+        self.rows = tools.as_int(self._commons("rows"), "rows") or self.rows
+        self.cols = tools.as_int(self._commons("cols"), "cols") or self.cols
         # ---- custom properties
         self.is_blank = False  # track if a cell is blank
         self.locales = []  # will be created by specific draw_* method

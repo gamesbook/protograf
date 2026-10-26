@@ -354,4 +354,20 @@ Dot(cxy=loc, fill_stroke="aqua", dot_width=8)
 Dot(cxy=ci.geo.c, fill_stroke="tomato", dot_width=16)
 Line(xy=ci.geo.c, xy1=loc, stroke="white", dotted=True)
 
+
+Text(common=header_font, x=8, y=7.5,
+     text="Railway Track\n- superimposed Polyline snail curves")
+the_track = Common(
+    snail="(1.5 45 2) a0 (1.5 315 2)",
+    y=8, x=1)
+Polyline(
+    common=the_track,
+    stroke_width=2,
+    stroke="black")
+Polyline(
+    common=the_track,
+    stroke_width=7,
+    stroke="brown",
+    dashed=[0.075, 0.15])
+
 Save()

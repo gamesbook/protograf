@@ -339,6 +339,9 @@ class PolyominoObject(RectangleShape):
                 cnv.draw_line(Point(line[0].x, line[0].y), Point(line[1].x, line[1].y))
             kwargs["stroke"] = self.outline_stroke or self.stroke
             kwargs["stroke_width"] = self.outline_width or self.stroke_width
+            kwargs["stroke_transparency"] = self.outline_transparency
+            kwargs["dotted"] = self.outline_dotted
+            kwargs["dashed"] = self.outline_dashed
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
