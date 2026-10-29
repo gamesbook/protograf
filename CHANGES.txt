@@ -3,6 +3,7 @@ protograf Changes
 
 2026-00-00 (0.6.2)
 ------------------
+- Patch error drawing offset pointy Hexagonal grid
 - [PLANNED-1] Upgrade Abstract (hex lines grid; SGF demo)
 - [PLANNED-2] Expand geo coverage for minor shapes
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line

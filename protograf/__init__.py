@@ -12,7 +12,7 @@ from protograf.utils.constants import SIN_60, COS_60, TAN_60, PAPER, HEX_HD
 from protograf.utils.structures import Point
 
 # imports below for use by users directly in scripts
-from protograf.utils.support import file_exists, cairo_pentagon_snail, steps, letters
+from protograf.utils.support import file_exists, cairo_pentagon_snail, steps, letters, excel_column
 from protograf.utils.tools import split
 from math import sqrt, floor
 from .globals import unit

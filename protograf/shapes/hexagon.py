@@ -256,7 +256,8 @@ class HexShape(BaseShape):
                     if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
                         x = (
                             self.col * geo.height_flat
-                            + geo.half
+                            # + geo.half
+                            + geo.half_flat
                             + self._u.x
                             + self._o.delta_x
                         )
