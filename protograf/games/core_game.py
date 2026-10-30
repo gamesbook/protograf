@@ -183,6 +183,16 @@ class CoreGameObject(BaseShape):
         """Geometry of AbstractGameObject - alias for geo."""
         return self.geo
 
+    def odd(self, number: int) -> bool:
+        if number % 2 != 0:
+            return True
+        return False
+
+    def even(self, number: int) -> bool:
+        if number % 2 == 0:
+            return True
+        return False
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractGameObject on a given canvas."""
         kwargs = self.kwargs | kwargs

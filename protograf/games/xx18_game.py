@@ -81,13 +81,17 @@ class XX18GameObject(CoreGameObject):
     """Create a XX18GameObject for a given canvas."""
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- 18xx game
-
         self.game_class = "XX18Game"
+        self.board_type = AbstractBoardType.HEXAGONAL
         self.board_pattern = "hexagonal"
-        self.label_lower = not self.label_uppercase
+        if self.frame:
+            feedback(
+                f"The {self.game_class} 'frame' property cannot be used.",
+                True,
+                True,
+            )
         # ---- orientation
         self.orientation = (
             self._commons("orientation") or kwargs.get("orientation") or "pointy"
@@ -101,6 +105,10 @@ class XX18GameObject(CoreGameObject):
                 f'Invalid orientation "{self.orientation}" for {self.game_class}'
             )
         # ---- add in defaults from games
+        if not self.rows:
+            self.rows = 9
+        if not self.cols:
+            self.cols = 11
         self.set_options_by_game(**kwargs)  # MUST be before call to validate!
         self._validate_choices()
         # ---- 18xx default colors
@@ -238,49 +246,14 @@ class XX18GameObject(CoreGameObject):
                     "Cannot process label_start of {self.label_start}"
                 )
 
-            # ---- grid column labels
-            if self.board_type == AbstractBoardType.GRID:
-                col_num = 1
-                for col_no in range(start_col, end_col, delta_col):
-                    # skip blank columns at start OR end of row
-                    active_cells = self.cells_non_blank[label_row - 1]
-                    col_exists = any(
-                        len(tup) > 1 and tup[0] == col_no for tup in active_cells
-                    )
-                    if not col_exists:
-                        continue
-                    col_value = str(col_num)
-                    if self.label_type in ["AN", "AA"]:
-                        col_value = tools.alpha_column(col_num, lower=self.label_lower)
-                    else:
-                        col_value = str(col_num)
-                    # get cell geo to use for label position
-                    adjacent_cell = self.board_layout.cells[(col_no, label_row)]
-                    x, y = 0, 0
-                    if self.label_start in [Corner.BOTTOM_RIGHT, Corner.BOTTOM_LEFT]:
-                        x = adjacent_cell.s.x
-                        y = (
-                            adjacent_cell.s.y
-                            + shift * lbl_offset_col * 1.5
-                            - lbl_intersect
-                        )
-                    elif self.label_start in [Corner.TOP_RIGHT, Corner.TOP_LEFT]:
-                        x = adjacent_cell.n.x
-                        y = adjacent_cell.n.y + shift * lbl_offset_col + lbl_intersect
-                    else:
-                        raise NotImplementedError(
-                            "Cannot process label_start of {self.label_start}"
-                        )
-                    Text(col_value, x=x, y=y, **lkeys)
-                    col_num += 1
             # ---- hex column labels
-            elif self.board_type == AbstractBoardType.HEXAGONAL:
+            if self.board_type == AbstractBoardType.HEXAGONAL:
                 non_blank_col_no = 1  # do NOT label blank diagonals
                 for _, dcells in self.hexgrid_diagonals.items():
                     # print(f'&&& {dcells=} {non_blank_col_no=}')
                     for value in dcells:
                         col_no, row_no = value[0], value[1]
-                        col_value = tools.as_excel(non_blank_col_no, self.label_lower)
+                        col_value = tools.as_excel(non_blank_col_no, False)
                         adjacent_cell = self.board_layout.cells[(col_no, row_no)]
                         if not adjacent_cell.blank:
                             x, y = hex_col_label()
@@ -288,9 +261,6 @@ class XX18GameObject(CoreGameObject):
                             # print(f'&&& {col_value=} {col_no=} {row_no=}')
                             non_blank_col_no += 1
                             break  # label done; next diagonal, please!
-            # ---- tri column labels
-            elif self.board_type == AbstractBoardType.TRIANGULAR:
-                raise NotImplementedError(f"No labels for {self.board_type} grid!")
             else:
                 raise NotImplementedError(
                     "No labels can be drawn for this type of board!"
@@ -314,7 +284,7 @@ class XX18GameObject(CoreGameObject):
             row_num = 1
             for row_no in range(start_row, end_row, delta_row):
                 if self.label_type in ["AA", "NA"]:
-                    row_value = tools.alpha_column(row_num, lower=self.label_lower)
+                    row_value = tools.alpha_column(row_num, lower=False)
                 else:
                     row_value = str(row_num)
                 col_no = label_col  # label col can be at start or end
@@ -389,16 +359,6 @@ class XX18GameObject(CoreGameObject):
         )
         # print(f'&&& XX18 BOARD {self.board_layout.cells.keys()=}')
 
-        # ---- * get hexgrid in alpha-numeric form
-        self.hexgrid_diagonals = geoms.hexgrid_diagonal_cells(
-            cols=self.cols, rows=self.rows, start_cell=self.label_start
-        )
-        self.hexgrid_alpha_coords = geoms.hexgrid_alphanumeric(
-            diagonal_dict=self.hexgrid_diagonals,
-            start_cell=self.label_start,
-            lower=self.label_lower,
-        )
-
         # ---- * track non-blank cells
         for row in range(1, self.rows + 1):
             non_blank = []
@@ -416,41 +376,32 @@ class XX18GameObject(CoreGameObject):
             self.cells_non_blank.append(non_blank)  # per-row list of non-blank
 
         # ---- * set cell attributes (plus label)
-        non_blank_col_no = 0  # do NOT label **fully blank** diagonal
-        for _, dcells in self.hexgrid_diagonals.items():
-            # print(f'\n&&& {diagonal=} {dcells=}')
-            use_diagonal = False
-            for value in dcells:
-                target_cell = self.board_layout.cells[(value[0], value[1])]
-                if not target_cell.blank:
-                    use_diagonal = True
-                    break
-            if use_diagonal:
-                non_blank_col_no += 1
-                for value in dcells:
-                    # print(f'&&& {diagonal=} {non_blank_col_no=} {value=}')
-                    try:
-                        col, row = value[0], value[1]
-                        if self.label_start in [
-                            Corner.BOTTOM_LEFT,
-                            Corner.BOTTOM_RIGHT,
-                        ]:
-                            row_num = self.rows - row + 1
+        for row in range(1, self.rows + 1):
+            for col in range(1, self.cols + 1):
+                try:
+                    cell_geo = self.board_layout.cells[(col, row)]
+                    if self.orientation == HexOrientationName.POINTY.value:
+                        row_alpha = tools.as_excel(row, False)
+                        if self.odd(row):
+                            col_num = col * 2 - 1
                         else:
-                            row_num = row
-                        cell_geo = self.board_layout.cells[(col, row)]
-                        col_alpha = tools.as_excel(non_blank_col_no, self.label_lower)
+                            col_num = col * 2
+                        cell_id = f"{row_alpha}{col_num}"
+                    elif self.orientation == HexOrientationName.FLAT.value:
+                        col_alpha = tools.as_excel(col, False)
+                        row_num = row * 2 - 1
+                        if self.even(col):
+                            row_num += 1
                         cell_id = f"{col_alpha}{row_num}"
-                        cell_geo_label = cell_geo._replace(name=cell_id)
-                        # print(f"&&& HEX {value=} name={cell_id}")
-                        setattr(self, cell_id, cell_geo_label)
-                    except Exception as err:
-                        feedback(
-                            f"Unable to process hex cell: col={value[0]}, "
-                            f"row={value[1]} ({err})",
-                            True,
-                            True,
-                        )
+                    cell_geo_label = cell_geo._replace(name=cell_id)
+                    print(f"&&& HEX {row=} {col=} name={cell_id}")
+                    setattr(self, cell_id, cell_geo_label)
+                except Exception as err:
+                    feedback(
+                        f"Unable to process hex cell: {col=} {row=} ({err})",
+                        True,
+                        True,
+                    )
 
     def process_locations(self, feature, location: str = None) -> list:
         """Draw Town shape at hex location(s).

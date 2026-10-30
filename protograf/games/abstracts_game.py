@@ -49,9 +49,7 @@ class AbstractGameObject(CoreGameObject):
     """Create an AbstractGame for a given canvas."""
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-
         super().__init__(_object=_object, canvas=canvas, **kwargs)
-
         # ---- abstract game
         self.game_class = "AbstractGame"
         self.board_pattern = "default"

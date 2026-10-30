@@ -68,7 +68,7 @@ class AbstractStateObject(CoreStateObject):
         self.annotations = (
             self._commons("annotations") or kwargs.get("annotations") or None
         )
-        # --- internal properties
+        # ---- internal properties
         self.game_class = "AbstractState"
         self.position_shapes = []
         self._validate_choices()
