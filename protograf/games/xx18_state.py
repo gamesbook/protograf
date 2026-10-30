@@ -26,10 +26,11 @@ from protograf.utils.structures import (  # named tuples; enums
 from protograf.utils.tools import _lower
 
 # local
-from .abstracts_game import AbstractGameObject
+# local
+from .core_state import CoreStateObject
 
 
-class XX18StateObject(BaseShape):
+class XX18StateObject(CoreStateObject):
     """Draw XX18State composite shape on a given canvas."""
 
     def __init__(self, _object=None, canvas=None, **kwargs):

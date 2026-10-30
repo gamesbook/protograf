@@ -57,12 +57,6 @@ from protograf.objects import (
     TetrominoObject,
     StarFieldObject,
 )
-from protograf.games import (
-    AbstractStateObject,
-    AbstractGameObject,
-    XX18GameObject,
-    XX18StateObject,
-)
 
 # local
 from . import utils  # globals_set, validate_globals, margins
@@ -1108,13 +1102,17 @@ def AbstractGame(row=None, col=None, **kwargs):
     <base>
 
     """
+    from protograf.games.abstracts_game import AbstractGameObject
+
     kwargs = utils.margins(**kwargs)
     absboard = AbstractGameObject(canvas=globals.canvas, **kwargs)
     # absboard.draw()
     return absboard
 
 
-def abstractboard(*args, **kwargs):
+def abstractgame(*args, **kwargs):
+    from protograf.games.abstracts_game import AbstractGameObject
+
     kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return AbstractGameObject(_object=_obj, canvas=globals.canvas, **kwargs)
@@ -1141,10 +1139,20 @@ def AbstractState(row=None, col=None, **kwargs):
     <base>
 
     """
+    from protograf.games.abstracts_state import AbstractStateObject
+
     kwargs = utils.margins(**kwargs)
     absgame = AbstractStateObject(canvas=globals.canvas, **kwargs)
     absgame.draw()
     return absgame
+
+
+def abstractstate(*args, **kwargs):
+    from protograf.games.abstracts_state import AbstractStateObject
+
+    kwargs = utils.margins(**kwargs)
+    _obj = args[0] if args else None
+    return AbstractStateObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 # ---- games: XX18 (18XX) ====
@@ -1178,13 +1186,17 @@ def XX18Game(row=None, col=None, **kwargs):
     <base>
 
     """
+    from protograf.games.xx18_game import XX18GameObject
+
     kwargs = utils.margins(**kwargs)
     absboard = XX18GameObject(canvas=globals.canvas, **kwargs)
     # absboard.draw()
     return absboard
 
 
-def XX18board(*args, **kwargs):
+def xx18game(*args, **kwargs):
+    from protograf.games.xx18_game import XX18GameObject
+
     kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return XX18GameObject(_object=_obj, canvas=globals.canvas, **kwargs)
@@ -1210,22 +1222,20 @@ def XX18State(row=None, col=None, **kwargs):
     <base>
 
     """
+    from protograf.games.xx18_state import XX18StateObject
+
     kwargs = utils.margins(**kwargs)
     absgame = XX18StateObject(canvas=globals.canvas, **kwargs)
     absgame.draw()
     return absgame
 
 
-def XX18game(*args, **kwargs):
+def xx18state(*args, **kwargs):
+    from protograf.games.xx18_state import XX18StateObject
+
     kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return XX18StateObject(_object=_obj, canvas=globals.canvas, **kwargs)
-
-
-def abstractgame(*args, **kwargs):
-    kwargs = utils.margins(**kwargs)
-    _obj = args[0] if args else None
-    return AbstractStateObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 # ---- objects (various) ====

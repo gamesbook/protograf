@@ -25,7 +25,7 @@ from protograf.utils.structures import (  # named tuples; enums
 from protograf.utils.tools import _lower
 
 # local
-from . import CoreStateObject
+from .core_state import CoreStateObject
 
 
 class AbstractStateObject(CoreStateObject):

@@ -6,7 +6,8 @@ from ._version import __version__, __version_info__
 # protos
 from protograf.protos import *
 from protograf.objects import *
-from protograf.games import *
+
+# from protograf.games import *  # circular
 
 # utils
 from protograf.utils.geoms import point_from_angle
