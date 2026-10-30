@@ -14,7 +14,6 @@ import re
 
 # module
 from protograf import globals
-from protograf.base import BaseShape
 from protograf.shapes import ImageShape
 from protograf.utils import tools
 from protograf.utils.messaging import feedback
@@ -26,10 +25,10 @@ from protograf.utils.structures import (  # named tuples; enums
 from protograf.utils.tools import _lower
 
 # local
-from .abstracts_game import AbstractGameObject
+from . import CoreStateObject
 
 
-class AbstractStateObject(BaseShape):
+class AbstractStateObject(CoreStateObject):
     """Draw AbstractState composite shape on a given canvas."""
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -70,6 +69,7 @@ class AbstractStateObject(BaseShape):
             self._commons("annotations") or kwargs.get("annotations") or None
         )
         # --- internal properties
+        self.game_class = "AbstractState"
         self.position_shapes = []
         self._validate_choices()
         # ---- set positions
@@ -79,7 +79,7 @@ class AbstractStateObject(BaseShape):
     def game_name_error(self):
         """Generate feedback if incorrect game name used."""
         feedback(
-            "The AbstractGame 'name' property must be one of the following: "
+            f"The {self.game_class} 'name' property must be one of the following: "
             f" Chess, Go, Checkers, Shogi, Hex, HexHex, or grid (not '{self.board.name}').",
             True,
             True,
@@ -113,87 +113,6 @@ class AbstractStateObject(BaseShape):
                         )
                     return ""
         return self.positions  # leave "as set by user" for processing
-
-    def _validate_choices(self) -> bool:
-        """Check user choices for valid selections."""
-        if self.board is None:
-            feedback(
-                "The AbstractState 'board' property must be set!",
-                True,
-                True,
-            )
-        if not isinstance(self.board, AbstractGameObject):
-            feedback(
-                "The AbstractGame 'board' property must be an AbstractGame shape, "
-                f" not a '{type(self.board.name).__name__}'.",
-                True,
-                True,
-            )
-            if self.board.pieces is not None:
-                if not isinstance(self.board.pieces, (list, tuple)):
-                    feedback(
-                        "The AbstractGame 'pieces' property must be a list of pieces, "
-                        f" not a '{type(self.board.pieces).__name__}'.",
-                        True,
-                        True,
-                    )
-        if self.positions is not None:
-            if not isinstance(self.positions, str):
-                feedback(
-                    "The AbstractState 'positions' property must"
-                    " be a string with positions setting or layout, "
-                    f" not a '{type(self.positions).__name__}'.",
-                    True,
-                    True,
-                )
-        if self.moves is not None:
-            if not isinstance(self.moves, (list, tuple)):
-                feedback(
-                    "The AbstractState 'moves' property must be a list of moves, "
-                    f" not a '{type(self.moves).__name__}'.",
-                    True,
-                    True,
-                )
-        if self.markers is not None:
-            if not isinstance(self.markers, (list, tuple)):
-                feedback(
-                    "The AbstractState 'markers' property must be a list of elements, "
-                    f" not a '{type(self.markers).__name__}'.",
-                    True,
-                    True,
-                )
-        if self.markers_shapes is not None:
-            if not isinstance(self.markers_shapes, (list, tuple)):
-                feedback(
-                    "The AbstractState 'markers_shapes' property must be a list of elements, "
-                    f" not a '{type(self.markers_shapes).__name__}'.",
-                    True,
-                    True,
-                )
-        if self.annotations is not None:
-            if not isinstance(self.annotations, (list, tuple)):
-                feedback(
-                    "The AbstractState 'annotations' property must be a list of elements, "
-                    f" not a '{type(self.annotations).__name__}'.",
-                    True,
-                    True,
-                )
-        return True
-
-    @property
-    def shape_centre(self) -> Point:
-        """Centre of AbstractStateObject."""
-        return None
-
-    @property
-    def geo(self) -> ShapeGeometry:
-        """Geometry of AbstractStateObject in user units."""
-        return None
-
-    @property
-    def geometry(self) -> ShapeGeometry:
-        """Geometry of AbstractStateObject - alias for geo."""
-        return self.geo
 
     def process_positions(self) -> list:
         """Convert positions into a list of AbstractPiece objects."""
@@ -510,6 +429,8 @@ class AbstractStateObject(BaseShape):
 
     def draw_annotations(self):
         """Draw annotation elements on the board."""
+        from protograf.base import BaseShape
+
         if self.annotations:
             for anno in self.annotations:
                 if isinstance(anno, str):
@@ -528,6 +449,8 @@ class AbstractStateObject(BaseShape):
 
     def draw_markers(self):
         """Draw marker elements on the board."""
+        from protograf.base import BaseShape
+
         for mark in self.markers:
             if isinstance(mark, str):
                 self.process_multiple_elements(mark=mark, elements_group="markers")
@@ -543,6 +466,8 @@ class AbstractStateObject(BaseShape):
 
     def draw_pieces(self):
         """Draw the piece shapes on a given canvas using their character IDs."""
+        from protograf.base import BaseShape
+
         if not self.board.pieces or not isinstance(self.board.pieces, dict):
             feedback(
                 "The board's pieces have not been setup correctly!",

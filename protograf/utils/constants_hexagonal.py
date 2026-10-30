@@ -6,58 +6,58 @@ Constants used in protograf for edges in hexagonal grids
 # lib
 
 # ---- grid directions across a flat side
-FLAT_TOP_GRID = ['n', 'ne', 'se', 's', 'sw', 'nw']
-POINTY_TOP_GRID = ['ne', 'e', 'se', 'sw', 'w', 'nw']
+FLAT_TOP_GRID = ["n", "ne", "se", "s", "sw", "nw"]
+POINTY_TOP_GRID = ["ne", "e", "se", "sw", "w", "nw"]
 
 # ---- directions of vertices at ends of a flat side
 FLAT_TOP_GRID_VERTEX_PAIRS = {
-    'n': ('nw', 'ne'),
-    'ne': ('ne', 'e'),
-    'se': ('e', 'se'),
-    's': ('se', 'sw'),
-    'sw': ('sw', 'w'),
-    'nw': ('w', 'nw')
+    "n": ("nw", "ne"),
+    "ne": ("ne", "e"),
+    "se": ("e", "se"),
+    "s": ("se", "sw"),
+    "sw": ("sw", "w"),
+    "nw": ("w", "nw"),
 }
 POINTY_TOP_GRID_VERTEX_PAIRS = {
-    'ne': ('n', 'ne'),
-    'e': ('ne', 'se'),
-    'se': ('se', 's'),
-    'sw': ('s', 'sw'),
-    'w': ('sw', 'nw'),
-    'nw': ('nw', 'n')
+    "ne": ("n", "ne"),
+    "e": ("ne", "se"),
+    "se": ("se", "s"),
+    "sw": ("s", "sw"),
+    "w": ("sw", "nw"),
+    "nw": ("nw", "n"),
 }
 # ---- col/row change across a flat side
 POINTY_TOP_GRID_NON_OFFSET_COLROW = {
-    'ne': (0, -1),
-    'e': (1, 0),
-    'se': (0, 1),
-    'sw': (-1, 1),
-    'w': (-1, 0),
-    'nw': (-1, -1),
+    "ne": (0, -1),
+    "e": (1, 0),
+    "se": (0, 1),
+    "sw": (-1, 1),
+    "w": (-1, 0),
+    "nw": (-1, -1),
 }
 POINTY_TOP_GRID_OFFSET_COLROW = {
-    'ne': (1, -1),
-    'e': (1, 0),
-    'se': (1, 1),
-    'sw': (0, 1),
-    'w': (-1, 0),
-    'nw': (0, -1),
+    "ne": (1, -1),
+    "e": (1, 0),
+    "se": (1, 1),
+    "sw": (0, 1),
+    "w": (-1, 0),
+    "nw": (0, -1),
 }
 FLAT_TOP_GRID_NON_OFFSET_COLROW = {
-    'n': (0, -1),
-    'ne': (1, -1),
-    'se': (1, 0),
-    's': (0, 1),
-    'sw': (-1, 0),
-    'nw': (-1, -1),
+    "n": (0, -1),
+    "ne": (1, -1),
+    "se": (1, 0),
+    "s": (0, 1),
+    "sw": (-1, 0),
+    "nw": (-1, -1),
 }
 FLAT_TOP_GRID_OFFSET_COLROW = {
-    'n': (0, -1),
-    'ne': (1, 0),
-    'se': (1, 1),
-    's': (0, 1),
-    'sw': (-1, 1),
-    'nw': (-1, 0),
+    "n": (0, -1),
+    "ne": (1, 0),
+    "se": (1, 1),
+    "s": (0, 1),
+    "sw": (-1, 1),
+    "nw": (-1, 0),
 }
 
 # ---- NON-offset grid ***

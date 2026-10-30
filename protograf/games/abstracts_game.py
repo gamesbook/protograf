@@ -32,6 +32,7 @@ from protograf.utils.structures import (  # named tuples; enums
 from protograf.utils.tools import _lower
 
 # local
+from .core_game import CoreGameObject
 from .abstracts_pieces import (
     piece_shape,
     NAMED_CHESS_BLACK,
@@ -44,88 +45,19 @@ from .abstracts_pieces import (
 )
 
 
-class AbstractGameObject(BaseShape):
+class AbstractGameObject(CoreGameObject):
     """Create an AbstractGame for a given canvas."""
 
     def __init__(self, _object=None, canvas=None, **kwargs):
 
         super().__init__(_object=_object, canvas=canvas, **kwargs)
-        # self.kwargs = kwargs
-        # self.set_unit_properties()
-        # self.cnv = (
-        #     canvas if canvas else globals.canvas
-        # )  # a new Page/Shape may now exist
-        # ---- unique properties
-        self.name = self._commons("name") or kwargs.get("name") or "grid"
-        self.cell_shape = (
-            self._commons("cell_shape") or kwargs.get("cell_shape") or None
-        )
-        self.cell_size = self._commons("height") or kwargs.get("height") or 1
-        self.cell_size = tools.as_float(self.cell_size, "height")
-        self.areas = (
-            self._commons("areas") or kwargs.get("areas") or None
-        )  # MUST be none; set by user
-        self.fills = (
-            self._commons("fills") or kwargs.get("fills") or None
-        )  # MUST be none; set by user OR game
-        self.frame = self._commons("frame") or kwargs.get("frame") or False
-        self.pattern = self._commons("pattern") or kwargs.get("pattern") or None
-        self.intersections = (
-            self._commons("intersections") or kwargs.get("intersections") or False
-        )
-        # if not self.label
-        self.label = self._commons("label") or kwargs.get("label") or None
-        self.label_start = (
-            self._commons("label_start") or kwargs.get("label_start") or None
-        )
-        self.label_type = (
-            self._commons("label_type") or kwargs.get("label_type") or None
-        )
-        self.label_uppercase = (
-            self._commons("label_uppercase") or kwargs.get("label_uppercase") or False
-        )
 
-        self.label_offset = tools.as_float(
-            kwargs.get("label_offset", 0), "label_offset"
-        )
-        self.label_offset_col = tools.as_float(
-            kwargs.get("label_offset_col", self.label_offset), "label_offset_col"
-        )
-        self.label_offset_row = tools.as_float(
-            kwargs.get("label_offset_row", self.label_offset), "label_offset_row"
-        )
-
-        self.pieces = self._commons("pieces") or kwargs.get("pieces") or []
-        self.pieces_type = (
-            self._commons("pieces_type") or kwargs.get("pieces_type") or None
-        )  # Shogi can change!
-        self.hexes = (
-            self._commons("hexes") or kwargs.get("hexes") or 2
-        )  # override default in base.py
-        self.hexes = tools.as_int(self.hexes, "hexes", minimum=2, allow_none=True)
-        # ---- custom / internal properties
+        # ---- abstract game
+        self.game_class = "AbstractGame"
         self.board_pattern = "default"
         self.board_type = AbstractBoardType.GRID
         self.label_lower = not self.label_uppercase
         self.orientation = HexOrientationName.POINTY.value  # set for HexHex & Hex Grid
-        self.grid_kwargs = {}  # used when drawing intersections lines
-        # ---- calculated properties
-        # ---- cell dimensions: side of square; hexagon/triangle height; circle diameter
-        if self._commons("height") or kwargs.get("height"):
-            self.auto_size = False
-            self.page_width = None
-            self.page_height = None
-        else:
-            self.auto_size = True
-            self.page_width = (
-                globals.page.width - globals.margins.left - globals.margins.right
-            )
-            self.page_height = (
-                globals.page.height - globals.margins.top - globals.margins.bottom
-            )
-        self.cells_non_blank = []  # (col,row) pairs of non-blank cells PER ROW
-        self.hexgrid_diagonals = None  # hexes in a diagonal
-        self.hexgrid_alpha_coords = None  # grid coordinates dict, keyed on (col,row)
         # ---- add in defaults from games
         self.set_options_by_game(**kwargs)  # MUST be before call to validate!
         self._validate_choices()
@@ -134,50 +66,6 @@ class AbstractGameObject(BaseShape):
         self.pieces = self.setup_pieces(self.pieces_type, self.pieces)
         # ---- setup board
         self.setup_board()
-
-    def hexhex_size(self, text) -> int:
-        """Find one or more digits at the end of the string."""
-        match = re.search(r"\d+$", text)
-        if match:
-            number = match.group()
-            return int(number)
-
-    def hexhex_pattern(self, side: int = 2) -> str:
-        """Create a O-and-. pattern layout for a hexhex board.
-
-        Args:
-            side (int): number of hexagons along an edge
-        """
-
-        def _split_gap(number: int):
-            if number % 2 != 0:  # odd
-                return number // 2, number // 2 + 1
-            return number // 2, number // 2  # even
-
-        width = side * 2 - 1
-        row_size = side
-        add = True
-        hexes = ""
-        even = 0
-        while True:
-            gap = width - row_size
-            small, big = _split_gap(gap)
-            prefix = " " if even else ""
-            if side % 2 != 0:  # odd side
-                hexes += prefix + ". " * small + "O " * row_size + ". " * big + "\n"
-            else:  # even side
-                hexes += prefix + ". " * big + "O " * row_size + ". " * small + "\n"
-            even = 1 if even != 1 else 0
-            if add:
-                row_size += 1
-            else:
-                row_size -= 1
-            if row_size == width:
-                add = False
-            if row_size < side:
-                break
-        # print(f'&&& {hexes=}')
-        return hexes
 
     def game_name_error(self):
         """Generate feedback if incorrect game name used."""
@@ -369,7 +257,7 @@ class AbstractGameObject(BaseShape):
                     )
                 case _:
                     feedback(
-                        "Cannot auto-calculate cell size for a '{self.name}' AbstractGame.",
+                        f"Cannot auto-calculate cell size for a '{self.name}' {self.game_class}.",
                         alert=True,
                     )
 
@@ -379,7 +267,7 @@ class AbstractGameObject(BaseShape):
             self.label_type = "AN"
         if self.label_type is not None and self.label_type not in ["AN", "NN"]:
             feedback(
-                "The AbstractGame 'label_type' property must be 'AN' or 'NN'; "
+                f"The {self.game_class} 'label_type' property must be 'AN' or 'NN'; "
                 f" not '{self.label_type}'.",
                 True,
                 True,
@@ -404,14 +292,14 @@ class AbstractGameObject(BaseShape):
         if self.pieces is not None:
             if not isinstance(self.pieces, (list, tuple)):
                 feedback(
-                    "The AbstractGame 'pieces' property must be a list of pieces, "
+                    f"The {self.game_class} 'pieces' property must be a list of pieces, "
                     f" not a '{type(self.pieces).__name__}'.",
                     True,
                     True,
                 )
         if not isinstance(self.name, (type(None), str)):
             feedback(
-                "The AbstractGame 'name' property must be a string, "
+                f"The {self.game_class} 'name' property must be a string, "
                 f" not a '{type(self.name).__name__}'.",
                 True,
                 True,
@@ -448,7 +336,7 @@ class AbstractGameObject(BaseShape):
         if self.areas:
             if not isinstance(self.areas, (list, tuple)):
                 feedback(
-                    "The AbstractGame 'areas' property must be a list of shapes, "
+                    f"The {self.game_class} 'areas' property must be a list of shapes, "
                     f" not a '{type(self.areas).__name__}'.",
                     True,
                     True,
@@ -456,7 +344,7 @@ class AbstractGameObject(BaseShape):
             for area in self.areas:
                 if not isinstance(area, BaseShape):
                     feedback(
-                        "The AbstractGame 'areas' property must contain a list of shapes, "
+                        f"The {self.game_class} 'areas' property must contain a list of shapes, "
                         f" it cannot contain a '{type(area).__name__}'.",
                         True,
                         True,
@@ -509,27 +397,6 @@ class AbstractGameObject(BaseShape):
             )
 
         return True
-
-    @property
-    def shape_centre(self) -> Point:
-        """Centre of AbstractGameObject."""
-        return None
-
-    @property
-    def geo(self) -> ShapeGeometry:
-        """Geometry of AbstractGameObject in user units."""
-        return ShapeGeometry()
-
-    @property
-    def geometry(self) -> ShapeGeometry:
-        """Geometry of AbstractGameObject - alias for geo."""
-        return self.geo
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw the AbstractGameObject on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
 
     def draw_frame(self):
         """Draw the board's frame on a given canvas."""
@@ -740,7 +607,7 @@ class AbstractGameObject(BaseShape):
                 else:
                     row_value = str(row_num)
                 col_no = label_col  # label col can be at start or end
-                # print(f"{row_no=} {col_no=}") ; breakpoint()
+                # print(f"{row_no=} {col_no=}") ; #breakpoint()
                 # skip blank columns at start of a hexagonal grid row
                 if self.board_type == AbstractBoardType.HEXAGONAL:
                     active_cells = self.cells_non_blank[row_no - 1]
@@ -889,7 +756,7 @@ class AbstractGameObject(BaseShape):
                     orientation=HexOrientationName.POINTY.value,  # hard-coded: HexGrid
                     _draw_grid=False,
                     pattern=self.pattern,
-                    user="AbstractGame",
+                    user=f"{self.game_class}",
                     # single hexagon properties:-
                     height=self.cell_size,
                     stroke=self.stroke,
@@ -1089,14 +956,14 @@ class AbstractGameObject(BaseShape):
         for _piece in pieces_list:
             if not isinstance(_piece, (list, tuple)):
                 feedback(
-                    "The AbstractGame 'pieces' property must contain a list of lists,"
+                    f"The {self.game_class} 'pieces' property must contain a list of lists,"
                     f" not a '{type(self.name).__name__}'.",
                     True,
                     True,
                 )
             if len(_piece) < 2:
                 feedback(
-                    "Each item in the AbstractGame 'pieces' property must"
+                    f"Each item in the {self.game_class} 'pieces' property must"
                     " contain a piece identity and its pattern,"
                     f" so not '{_piece}'.",
                     True,
@@ -1105,7 +972,7 @@ class AbstractGameObject(BaseShape):
             piece_id = _piece[0]
             if not isinstance(piece_id, str) or _piece == ".":
                 feedback(
-                    "Each item in the AbstractGame 'pieces' property must"
+                    f"Each item in the {self.game_class} 'pieces' property must"
                     " have a single character piece identity,"
                     f" not '{piece_id}'.",
                     True,
@@ -1113,7 +980,7 @@ class AbstractGameObject(BaseShape):
                 )
             if len(piece_id) != 1:
                 feedback(
-                    "Each item in the AbstractGame 'pieces' property must"
+                    f"Each item in the {self.game_class} 'pieces' property must"
                     " have a single character piece identity,"
                     f" not '{piece_id}'.",
                     True,
@@ -1234,7 +1101,7 @@ class AbstractGameObject(BaseShape):
                                     )
                         case _:
                             feedback(
-                                "The AbstractGame name for the piece must be chosen"
+                                f"The {self.game_class} name for the piece must be chosen"
                                 " from one of the following games: "
                                 f" Chess, Go, Shogi, or Checkers (not '{self.name}').",
                                 True,

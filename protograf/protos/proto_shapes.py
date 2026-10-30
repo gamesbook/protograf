@@ -47,8 +47,6 @@ from protograf.shapes.core import (
     BandShape,
 )
 from protograf.objects import (
-    AbstractStateObject,
-    AbstractGameObject,
     CardBoxObject,
     CubeObject,
     D6Object,
@@ -58,6 +56,12 @@ from protograf.objects import (
     RaceTrackObject,
     TetrominoObject,
     StarFieldObject,
+)
+from protograf.games import (
+    AbstractStateObject,
+    AbstractGameObject,
+    XX18GameObject,
+    XX18StateObject,
 )
 
 # local
@@ -1071,7 +1075,7 @@ def band(row=None, col=None, **kwargs):
     return BandShape(canvas=globals.canvas, **kwargs)
 
 
-# ---- objects ====
+# ---- games: Abstract ====
 
 
 @docstring_base
@@ -1088,15 +1092,11 @@ def AbstractGame(row=None, col=None, **kwargs):
     - name (str): the name of a type of board (default is Checkers)
     - colors (list): a list of one or more Colors in which to draw alternating
       board spaces (default is `white`)
-    - hairs (bool): if True, draw small lines extending outwards from board
-      gridlines of one-quarter cell size
     - labels (bool): if True, draw labels along board edges, using notation
       appropriate to the type of board; Chess notation is the common default
     - grid_align (bool): if True, draw pieces on grid intersections, not grid
       spaces
     - pieces (list|str): details of pieces that will be placed on the board
-    - pieces_resize (float): a fractional value by which to resize the piece
-      shapes or images (default: 1.0)
     - rows (int): if no game name (which has a predefined number of rows) is
       set, these are the number of cells in the vertical direction for a
       regular grid (default: 8)
@@ -1104,7 +1104,6 @@ def AbstractGame(row=None, col=None, **kwargs):
       set, these are the number of cells in the horizontal direction for a
       regular grid (default: 8)
     - annotations (list): a list of game annotations (optional)
-
 
     <base>
 
@@ -1137,6 +1136,7 @@ def AbstractState(row=None, col=None, **kwargs):
     - positions (str): details of where an AbstractGameObject's pieces go
       on the board display
     - annotations (list): a list of state annotations (optional)
+    - markers (list): a list of state markers (optional)
 
     <base>
 
@@ -1147,10 +1147,88 @@ def AbstractState(row=None, col=None, **kwargs):
     return absgame
 
 
+# ---- games: XX18 (18XX) ====
+
+
+@docstring_base
+def XX18Game(row=None, col=None, **kwargs):
+    """Store an XX18GameObject for the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is located.
+    - col (int): column in which the shape is located.
+
+    Kwargs:
+
+    - name (str): the name of a type of board
+    - labels (bool): if True, draw labels along board edges, using notation
+      appropriate to the type of grid; 1830 notation is the common default
+    - grid_align (bool): if True, draw pieces on grid intersections, not grid
+      spaces
+    - rows (int): if no game name (which has a predefined number of rows) is
+      set, these are the number of cells in the vertical direction for a
+      regular grid (default: 8)
+    - cols (int): if no game name (which has a predefined number of rows) is
+      set, these are the number of cells in the horizontal direction for a
+      regular grid (default: 8)
+    - annotations (list): a list of game annotations (optional)
+
+
+    <base>
+
+    """
+    kwargs = utils.margins(**kwargs)
+    absboard = XX18GameObject(canvas=globals.canvas, **kwargs)
+    # absboard.draw()
+    return absboard
+
+
+def XX18board(*args, **kwargs):
+    kwargs = utils.margins(**kwargs)
+    _obj = args[0] if args else None
+    return XX18GameObject(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+def XX18State(row=None, col=None, **kwargs):
+    """Draw an XX18StateObject on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - board (str): an XX18GameObject (default board type is Checkers)
+      which should be displayed
+    - features (str): details of where an XX18GameObject's features
+      appear on the board display
+    - markers (list): a list of state markers (optional)
+
+    <base>
+
+    """
+    kwargs = utils.margins(**kwargs)
+    absgame = XX18StateObject(canvas=globals.canvas, **kwargs)
+    absgame.draw()
+    return absgame
+
+
+def XX18game(*args, **kwargs):
+    kwargs = utils.margins(**kwargs)
+    _obj = args[0] if args else None
+    return XX18StateObject(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
 def abstractgame(*args, **kwargs):
     kwargs = utils.margins(**kwargs)
     _obj = args[0] if args else None
     return AbstractStateObject(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+# ---- objects (various) ====
 
 
 @docstring_base

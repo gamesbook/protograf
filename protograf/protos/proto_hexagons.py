@@ -165,7 +165,6 @@ class Hexagons(ProtografGrid):
                     )
         return pattern_list
 
-
     def create_frames_rectangle(self):
         """Create lines for frames around hexagons in a rectangle."""
         from protograf.protos import hexagon
@@ -209,7 +208,6 @@ class Hexagons(ProtografGrid):
                         # self.cells[(col + 1, row + 1)] = shape_geo  # 1-based for cells
                         # # feedback(f'$$$ Hexagons.cells {col+1=},{row+1=} {shape_geo.blank=}')
                         # self.locales.append(_locale)
-
 
     def draw_hexagons(
         self, rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True

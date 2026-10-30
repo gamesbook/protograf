@@ -297,16 +297,16 @@ COLORS_SVG = {
 
 # 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
 COLORS_18XX = {
-    "18xx_ground": "#fdd9b5",  # sandy tan
-    "18xx_yellow": "#fdee00",  # aureolin
-    "18xx_green": "#00a550",  # pigment green
-    "18xx_russet": "#cd7f32",  # bronze
-    "18xx_grey": "#acacac",  # silver chalice
-    "18xx_brown": "#7b3f00",  # chocolate
-    "18xx_red": "#dc143c",  # crimson
-    "18xx_blue": "#007fff",  # azure
-    "18xx_barrier": "#660000",  # blood red
-    "18xx_white": "#ffffff",  # white
+    "ground": "#fdd9b5",  # sandy tan
+    "yellow": "#fdee00",  # aureolin
+    "green": "#00a550",  # pigment green
+    "russet": "#cd7f32",  # bronze
+    "grey": "#acacac",  # silver chalice
+    "brown": "#7b3f00",  # chocolate
+    "red": "#dc143c",  # crimson
+    "blue": "#007fff",  # azure
+    "barrier": "#660000",  # blood red
+    "white": "#ffffff",  # white
 }
 
 BUILT_IN_FONTS = [
