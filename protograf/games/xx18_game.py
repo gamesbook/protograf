@@ -10,41 +10,45 @@ Outline:
 The 18xx map "blueprint" feature covers:
 
 * depiction of towns as filled-in circles
-* depiction of cities (single, double) as open circles
-* depiction of track, curved and straight; by itself or extending from a city
+* depiction of cities (single, double) as open circles; may include
+  the railroad logo or a custom shape or text inset into it
+* depiction of revenue (single, double) as circle with an amount
+* depiction of track, curved or straight; by itself or extending from a city
 * depiction of terminal spikes running off the board (short, medium and long)
 * depiction of blocked hex-sides (as lines)
 * depiction of private railways (in-hex; across hexes)
 * depiction of icons for various in-hex features; including mountains (two sizes),
   hills, swamp, river, port, desert, mine, coal and oilrig
-* setting of a single letter
+* setting of a single piece of text
 * display of hex coordinates along the edges of the map
 * depiction of a custom shape in a hex
 * depiction of a circle on a hex-side (at a perbii position)
 * depiction of a river running along a hex-side
-* coloring of a whole hex
+* coloring ("fill") of a whole hex
 * setting of a shaded rectangular area (typically red and at the edge of the map)
 * creation of a small multi-line table to appear in a hex
   (typically income per stage of the game)
 
 The blueprint will also provide:
 * standard, named 18xx colors
-* ability to set the map font to use
+* ability to set the map fonts (of different sizes) to use
 * ability to put labels next to icons, towns or cities (above, below, left of, right of)
-* ability to put text inside a city circle
 
-In-hex features, for example, cities, towns, icons, or letter, will by default appear
-at the centre of a hex. These can be repositioned using a combination of direction
-(in compass degrees) and distance of the feature's center from the hex center (as a percentage of the hex radius).
+In-hex features, for example, cities, towns, icons, or lettering, will by default
+appear at the centre of a hex. These can be repositioned using a combination of
+direction (in degrees clockwise from east) and distance of the feature's center
+from the hex center (as a fraction of the hex radius).
 
-Positioning of features on hex edges will be done using standard compass directions;
-"ne" for northeast, "s" for south, etc., and distance as a fraction from the centre.
+Positioning of features, such as lines or numbered circles, on hex edges will
+be done using standard compass directions; "ne" for northeast, "s" for south, etc.,
+and will be centred on that edge.
 
 Drawing will be done following the order in which features are provided.
 """
 
 # lib
 import re
+import math
 
 # third party
 
@@ -69,12 +73,39 @@ from protograf.utils.tools import _lower
 # local
 from .core_game import CoreGameObject
 
-# constants
+# ---- constants
 XX18_HEX_HEIGHT = 4.399  # cm
-XX18_HEX_SIDE = 2.54  # cm
-XX18_CITY_DIAMETER = 0.5  # cm
-XX18_TOWN_DIAMETER = 0.35  # cm
-XX18_MTN_SIDE = 0.5  # cm; equilateral triangle
+XX18_HEX_SIDE = XX18_HEX_HEIGHT / math.sqrt(3)  # cm
+XX18_HEX_DIAMETER = 2 * XX18_HEX_SIDE
+XX18_CITY_DIAMETER = 1.45  # cm
+XX18_TOWN_DIAMETER = 0.45  # cm
+XX18_PRIVATE_DIAMETER = 0.35  # cm
+XX18_REVENUE_DIAMETER = 0.8  # cm
+XX18_MTN_SIDE = 0.6  # cm; equilateral triangle
+XX18_SYMBOL_SET = [
+    "coal",
+    "hill",
+    "desert",
+    "mine",
+    "oil",
+    "port",
+    "river",
+    "swamp",
+]
+XX18_FEATURE_SET = XX18_SYMBOL_SET + [
+    "town",
+    "city",
+    "mountain",
+    "private",
+    "revenue",
+    "fill",
+]
+XX18_LABEL_POSITION = ["above", "below", "left", "right"]
+XX18_STROKE_WIDTH = 1
+XX18_TEXT_SMALL = 12
+XX18_TEXT_MEDIUM = 14
+XX18_TEXT_LARGE = 16
+XX18_TEXT_FONT = "Times New Roman"
 
 
 class XX18GameObject(CoreGameObject):
@@ -82,10 +113,15 @@ class XX18GameObject(CoreGameObject):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # ---- class props
+        self.features = self._commons("features") or kwargs.get("features") or []
+        print(f"&&& {self.features=}")
         # ---- 18xx game
+        self.cell_size = XX18_HEX_HEIGHT
         self.game_class = "XX18Game"
         self.board_type = AbstractBoardType.HEXAGONAL
         self.board_pattern = "hexagonal"
+        self.cells = {}  # track cell geo by grid-reference key
         if self.frame:
             feedback(
                 f"The {self.game_class} 'frame' property cannot be used.",
@@ -104,11 +140,11 @@ class XX18GameObject(CoreGameObject):
             raise ValueError(
                 f'Invalid orientation "{self.orientation}" for {self.game_class}'
             )
-        # ---- add in defaults from games
+        # ---- add in defaults
         if not self.rows:
-            self.rows = 9
+            self.rows = 8
         if not self.cols:
-            self.cols = 11
+            self.cols = 8
         self.set_options_by_game(**kwargs)  # MUST be before call to validate!
         self._validate_choices()
         # ---- 18xx default colors
@@ -353,7 +389,7 @@ class XX18GameObject(CoreGameObject):
             # single hexagon properties:-
             height=self.cell_size,
             stroke=self.stroke,
-            stroke_width=self.stroke_width,
+            stroke_width=XX18_STROKE_WIDTH,
             fill=colr,
             # hex_shape=self.cell_shape,  # insert centre_image into hex?
         )
@@ -394,8 +430,9 @@ class XX18GameObject(CoreGameObject):
                             row_num += 1
                         cell_id = f"{col_alpha}{row_num}"
                     cell_geo_label = cell_geo._replace(name=cell_id)
-                    print(f"&&& HEX {row=} {col=} name={cell_id}")
+                    # print(f"&&& HEX {row=} {col=} name={cell_id}")
                     setattr(self, cell_id, cell_geo_label)
+                    self.cells[cell_id] = cell_geo
                 except Exception as err:
                     feedback(
                         f"Unable to process hex cell: {col=} {row=} ({err})",
@@ -403,8 +440,8 @@ class XX18GameObject(CoreGameObject):
                         True,
                     )
 
-    def process_locations(self, feature, location: str = None) -> list:
-        """Draw Town shape at hex location(s).
+    def process_locations(self, location: str = None, name: str = None) -> list:
+        """Extract one or more location(s) from a string.
 
         Args:
             location (str): grid reference or references for one or more cells
@@ -412,32 +449,228 @@ class XX18GameObject(CoreGameObject):
         if not location:
             return []
         if location is not None and not isinstance(location, str):
+            _loc = "Location(s)"
+            if name:
+                _loc = f"The {name} location(s)"
             feedback(
-                f"The {feature} 'location' property must be a string; not '{location}'.",
+                f"{_loc} must be a string; not '{location}'.",
                 True,
                 True,
             )
-        _locations = location.split(location)
-        # TODO - check locs exist and convert each to a col/row tuple
+        if " " in location:
+            _locations = tools.split(location, separator=" ", clean=True)
+        else:
+            _locations = [location]
+        # check each location exists in the grid
+        for _loc in _locations:
+            if _loc not in self.cells.keys():
+                feedback(
+                    f'The hexagon reference "{_loc}" is not on this board.',
+                    True,
+                    True,
+                )
         return _locations
 
+    def process_feature(self, feature: tuple = None) -> list:
+        """Process a feature from its tuple
+
+        Args:
+            location (str): grid reference or references for one or more cells
+
+        Notes:
+            * The feature (tuple) should contain in this order:
+                cellID (str): the alphanumeric grid coordinate of the hex
+                feature (str): the name of the feature or symbol to draw
+                direction (float): optional, degrees (default zero)
+                distance (float): optional, fraction (default zero)
+                label (str): a label for the feature or symbol (default "")
+
+            * For a private railroad, which has a start and end hex, the
+              start settings are the ones above, and then the following extras
+              need to be supplied:
+                cellID (str): the alphanumeric grid coordinate of the end hex
+                direction (float): optional, degrees (default zero) in end hex
+                distance (float): optional, fraction (default zero) in end hex
+              It is possible for start end hex to be the same
+
+        """
+        # ---- validate input
+        if not feature:
+            return []
+        if feature is not None and not isinstance(feature, (tuple, list)):
+            feedback(
+                f"Feature must contain a set of values; not '{feature}'.",
+                True,
+                True,
+            )
+        if len(feature) < 2:
+            feedback(
+                f"Feature must contain at least two values; not '{feature}'.",
+                True,
+                True,
+            )
+        self.process_locations(feature[0])  # sanity check
+        # ---- feature property values
+        kwargs = {}
+        ftype = feature[1]
+        if ftype not in XX18_FEATURE_SET:
+            feedback(
+                f"The feature '{ftype}' is not available;",
+                f" choose from: {XX18_FEATURE_SET}.",
+                True,
+                True,
+            )
+        fdirection, fdistance, flabel, flabel_pos = 0, 0, "", None
+        if len(feature) >= 3:
+            _fdir = feature[2]
+            fdirection = tools.as_float(_fdir, "direction")
+        if len(feature) >= 4:
+            _fdist = feature[3]
+            fdistance = tools.as_float(_fdist, "distance")
+        if len(feature) >= 5:
+            flabel = str(feature[4])
+        if len(feature) >= 6 and ftype != "private":  # see below; private overloads
+            flabel_pos = feature[5]
+            if flabel_pos not in XX18_LABEL_POSITION:
+                feedback(
+                    f"The label positions '{feature[5]}' is not available;",
+                    f" choose from: {XX18_LABEL_POSITION}.",
+                    True,
+                    True,
+                )
+            kwargs["label_position"] = flabel_pos
+        print(f"&&& {feature[0]=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
+        # ---- feature to function
+        match ftype:
+            case "city":
+                self.city(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    **kwargs,
+                )
+            case "fill":
+                self.fill_hex(
+                    location=feature[0],
+                    color=flabel,
+                    **kwargs,
+                )
+            case "town":
+                self.town(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    **kwargs,
+                )
+            case "mountain":
+                self.mountain(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    **kwargs,
+                )
+            case "private":
+                flocation1, fdirection1, fdistance1 = "", 0, 0
+                if len(feature) >= 6:
+                    flocation1 = str(feature[5])
+                    if flocation1 in ["", None]:
+                        flocation1 = feature[0]
+                if len(feature) >= 7:
+                    _fdir1 = feature[6]
+                    fdirection1 = tools.as_float(_fdir1, "direction")
+                if len(feature) >= 8:
+                    _fdist1 = feature[7]
+                    fdistance1 = tools.as_float(_fdist1, "distance")
+
+                if len(feature) >= 9:
+                    flabel_pos = feature[8]
+                    if flabel_pos not in XX18_LABEL_POSITION:
+                        feedback(
+                            f"The label position '{feature[8]}' is not available;",
+                            f" choose from: {XX18_LABEL_POSITION}.",
+                            True,
+                            True,
+                        )
+                    kwargs["label_position"] = flabel_pos
+                print(f"&&& private {flocation1=} {fdirection1=} {fdistance1=}")
+                self.private(
+                    label=flabel,
+                    location=feature[0],
+                    direction=fdirection,
+                    distance=fdistance,
+                    location1=flocation1,
+                    direction1=fdirection1,
+                    distance1=fdistance1,
+                    **kwargs,
+                )
+            case "revenue":
+                self.revenue(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    **kwargs,
+                )
+            case _:
+                self.symbol(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    **kwargs,
+                )
+
+    def feature_location(
+        self, geo: ShapeGeometry, direction: float = None, distance: float = None
+    ) -> Point:
+        """Get a feature's centre Point."""
+        if direction is not None and distance is not None:
+            length = distance * XX18_HEX_SIDE  # fraction of radius
+            fcentre = geoms.point_from_angle(geo.centre, length, direction)
+        else:
+            fcentre = geo.centre
+        return fcentre
+
     def town(
-        self, location: str = None, offset: str = None, label: str = None, **kwargs
+        self,
+        location: str = None,
+        label: str = None,
+        direction: float = None,
+        distance: float = None,
+        **kwargs,
     ):
         """Draw Town shape at hex location(s).
 
         Args:
             location (str): grid reference or references for one or more cells
-            offset (str): direction (degrees) and distance from hex centre
-            label (str): the name of the town
+            label (str): the name of the Town
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
         """
-        _locations = self.process_locations("town", location)
+        from protograf.protos import Circle
+
+        _locations = self.process_locations(location, "town")
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            Circle(
+                cxy=ccentre,
+                radius=XX18_TOWN_DIAMETER / 2.0,
+                fill_stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+            )
+            if label:
+                print("TODO")
 
     def city(
         self,
         location: str = None,
-        offset: str = None,
         label: str = None,
+        direction: float = None,
+        distance: float = None,
         shape: str = None,
         **kwargs,
     ):
@@ -445,46 +678,200 @@ class XX18GameObject(CoreGameObject):
 
         Args:
             location (str): grid reference or references for one or more cells
-            offset (str): direction (degrees) and distance from hex centre
             label (str): the name of the city
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
             shape (Shape): the shape to be drawn inside the city
         """
-        _locations = self.process_locations("city", location)
+        from protograf.protos import Circle
 
-    def mountain(self, location: str = None, offset: str = None, **kwargs):
+        _locations = self.process_locations(location, "city")
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            Circle(
+                cxy=ccentre,
+                radius=XX18_CITY_DIAMETER / 2.0,
+                fill="white",
+                stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+                centre_shape=shape,
+            )
+            if label:
+                print("TODO")
+
+    def revenue(
+        self,
+        location: str = None,
+        label: str = None,
+        direction: float = None,
+        distance: float = None,
+        **kwargs,
+    ):
+        """Draw Revenue shape at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            label (str): the value of the revenue
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
+        """
+        from protograf.protos import Circle
+
+        _locations = self.process_locations(location, "revenue")
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            Circle(
+                cxy=ccentre,
+                radius=XX18_REVENUE_DIAMETER / 2.0,
+                fill=None,
+                stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+                label=label if label else "",
+                label_size=XX18_TEXT_MEDIUM,
+            )
+
+    def fill_hex(
+        self,
+        location: str = None,
+        color: object = None,
+        **kwargs,
+    ):
+        """Fill in color at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            color (color): a color reference
+        """
+        from protograf.protos import Hexagon
+
+        _locations = self.process_locations(location, "fill")
+        the_color = colrs.get_color(color)
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = geo.centre
+            Hexagon(
+                cxy=ccentre,
+                height=XX18_HEX_HEIGHT,
+                fill=the_color,
+                stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+                orientation=self.orientation,
+            )
+
+    def mountain(
+        self,
+        location: str = None,
+        label: str = None,
+        direction: float = None,
+        distance: float = None,
+        **kwargs,
+    ):
         """Draw Mountain shape at hex location(s).
 
         Args:
             location (str): grid reference or references for one or more cells
-            offset (str): direction (degrees) and distance from hex centre
+            label (str): the cost of the mountain
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
         """
-        _locations = self.process_locations("mountain", location)
+        from protograf.protos import Triangle
 
-    def feature(
-        self, location: str = None, offset: str = None, name: str = None, **kwargs
+        _locations = self.process_locations(location, "revenue")
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            Triangle(
+                cx=ccentre.x,
+                cy=ccentre.y,
+                side=XX18_MTN_SIDE,
+                stroke_width=XX18_STROKE_WIDTH,
+                fill="black",
+            )
+
+    def private(
+        self,
+        label: str = None,
+        location: str = None,
+        direction: float = None,
+        distance: float = None,
+        location1: str = None,
+        direction1: float = None,
+        distance1: float = None,
+        **kwargs,
     ):
-        """Draw a Feature shape at hex location(s).
+        """Draw Private Railroad at hex location(s).
+
+        Args:
+            label (str): the name of the Private Railroad
+            location (str): grid reference or references for start cell
+            direction (float): degrees clockwise from East in start cell
+            distance (float): distance from hex centre in start cell
+            location1 (str): grid reference or references for start cell
+            direction1 (float): degrees clockwise from East in end cell
+            distance1 (float): distance from hex centre in end cell
+        """
+        from protograf.protos import Circle, Line
+
+        _locations = self.process_locations(location, "private-start")
+        _locations1 = self.process_locations(location1, "private-end")
+        if _locations and _locations1:
+            _loc = _locations[0]
+            _loc1 = _locations1[0]
+            geo = self.cells.get(_loc)
+            geo1 = self.cells.get(_loc1)
+            ccentre = self.feature_location(geo, direction, distance)
+            ccentre1 = self.feature_location(geo1, direction1, distance1)
+            pcs = Circle(
+                cxy=ccentre,
+                radius=XX18_PRIVATE_DIAMETER / 2.0,
+                fill=None,
+                stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+                # label=label if label else "",
+                # label_size=XX18_TEXT_MEDIUM,
+            )
+            pce = Circle(
+                cxy=ccentre1,
+                radius=XX18_PRIVATE_DIAMETER / 2.0,
+                fill=None,
+                stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+                # label=label if label else "",
+                # label_size=XX18_TEXT_MEDIUM,
+            )
+            Line(
+                links=[pcs, pce],
+                stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+            )
+
+        if label:
+            print("TODO")
+
+    def symbol(
+        self,
+        location: str = None,
+        label: str = None,
+        direction: float = None,
+        distance: float = None,
+        name: str = None,
+        **kwargs,
+    ):
+        """Draw a symbol/shape at hex location(s).
 
         Args:
             location (str): grid reference or references for one or more cells
-            name (str): name of the feature
-            offset (str): direction (degrees) and distance from hex centre
+            label (str): the label for the symbol
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
         """
-        feature_set = [
-            "coal",
-            "hill",
-            "desert",
-            "mine",
-            "oil",
-            "port",
-            "river",
-            "swamp",
-        ]
-        if name not in feature_set:
+        if name not in XX18_SYMBOL_SET:
             feedback(
-                f"The feature 'name' property cannot be '{name}';",
-                f" choose from: {feature_set}.",
+                f"The symbol 'name' property cannot be '{name}';",
+                f" choose from: {XX18_SYMBOL_SET}.",
                 True,
                 True,
             )
-        _locations = self.process_locations(f"{name} feature", location)
+        _locations = self.process_locations(location, f"{name} symbol")

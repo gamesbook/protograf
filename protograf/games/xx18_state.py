@@ -39,14 +39,19 @@ class XX18StateObject(CoreStateObject):
         self.game_class = "XX18State"
         # ---- unique properties
         self.board = self._commons("board") or kwargs.get("board") or None
-        self.features = self._commons("features") or kwargs.get("features") or []
 
     def draw_features(self):
         """Draw feature elements on the board."""
-        from protograf.base import BaseShape
-
-        for feature in self.features:
-            pass
+        if self.board.features is not None and not isinstance(
+            self.board.features, (tuple, list)
+        ):
+            feedback(
+                f"Feature must contain a set of values; not '{self.board.features}'.",
+                True,
+                True,
+            )
+        for feature in self.board.features:
+            self.board.process_feature(feature)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the XX18StateObject on a given canvas."""
@@ -65,5 +70,5 @@ class XX18StateObject(CoreStateObject):
         if self.board.label is True:
             self.board.draw_labels()
         # ---- draw the features on the board
-        if self.features:
+        if self.board.features:
             self.draw_features()
