@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="90" height="90" viewBox="0 0 90 90">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100" viewBox="0 0 100 100">
   <title>hills.svg</title>
   <g id="Layer_1" data-name="Layer 1">
     <g>
-      <path d="M32.395 56.49 L45.915 42.24 C52.385 35.42 61.915 35.3 68.475 41.96 L82.825 56.49 Z" fill="#000000"/>
-      <path d="M48.085 37.75 C40.445 31.52 30.255 32.16 23.175 39.64 L7.175 56.49 L29.075 56.49 L43.495 41.3 C44.83 39.884 46.379 38.686 48.085 37.75 Z" fill="#000000"/>
+      <path d="M33.583 81.691 L51.192 42.387 C59.619 23.577 72.031 23.246 80.575 41.615 L99.266 81.691 Z" fill="#000000"/>
+      <path d="M54.018 30.003 C44.067 12.82 30.795 14.585 21.574 35.217 L0.734 81.691 L29.259 81.691 L48.039 39.795 C49.778 35.89 51.796 32.585 54.018 30.003 Z" fill="#000000"/>
     </g>
   </g>
 </svg>

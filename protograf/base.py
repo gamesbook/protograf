@@ -306,6 +306,9 @@ class BaseCanvas:
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
+        self.label_align = self.defaults.get(
+            "label_align", "centre"
+        )  # centre,left,right,justify
         self.label_transparency = self.defaults.get("label_transparency", 1.0)
         self.label_mx = self.defaults.get("label_mx", 0.0)
         self.label_my = self.defaults.get("label_my", 0.0)
@@ -1069,6 +1072,9 @@ class BaseShape:
         self.label_stroke_width = self.kw_float(
             kwargs.get("label_stroke_width", self.stroke_width)
         )
+        self.label_align = kwargs.get(
+            "label_align", "centre"
+        )  # centre,left,right,justify
         self.label_transparency = self.kw_float(kwargs.get("label_transparency", 1.0))
         self.label_mx = self.kw_float(kwargs.get("label_mx", 0.0))
         self.label_my = self.kw_float(kwargs.get("label_my", 0.0))
@@ -3148,7 +3154,7 @@ class BaseShape:
                     origin = muPoint(px - tl / 2.0, py)
                 elif align in ["right", "r"]:
                     origin = muPoint(px - tl, py)
-                else:
+                else:  # left
                     origin = point
                 # feedback(f"### move relative {align=} {valign=} {point=} {origin=}")
             return origin  # lower-left for text string
@@ -3185,14 +3191,14 @@ class BaseShape:
                 None,
                 True,
             )
-        elif self.align:
+        elif align:
             point = move_string_start(
                 string,
                 muPoint(xm, ym),
                 font,
                 keys["fontsize"],
                 rotation,
-                self.align,
+                align,
                 self.valign,
                 False,
             )
@@ -3300,7 +3306,6 @@ class BaseShape:
             self.label = f"{ID}"
         ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
-        # feedback(f' @@@ base.draw_label {ID=} {ttext=}')
         if ttext is not None or ttext != "":
             _ttext = str(ttext)
             yl = yl + (self.label_size / 3.0) if centred else yl
@@ -3310,6 +3315,8 @@ class BaseShape:
             kwargs["font_size"] = self.label_size
             kwargs["stroke"] = kwargs.get("label_stroke", self.label_stroke)
             kwargs["stroke_transparency"] = self.label_transparency
+            align = kwargs.get("label_align", "centre")
+            # if ttext: feedback(f' @@@ base.draw_label {ID=} {ttext=} {align=} {x=} {y=}')
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
                 point_to_rotate = muPoint(x, y)
@@ -3329,7 +3336,13 @@ class BaseShape:
             else:
                 # self.dot = 0.05; self.draw_dot(canvas, x, y)
                 self.draw_multi_string(
-                    canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
+                    canvas,
+                    x,
+                    y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
                 )
             if isinstance(canvas, muShape):
                 canvas.commit()

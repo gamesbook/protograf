@@ -32,6 +32,7 @@ The 18xx map "blueprint" feature covers:
 * setting of a shaded rectangular area (typically red and at the edge of the map)
 * creation of a small multi-line table to appear in a hex
   (typically income per stage of the game)
+* depiction of a river (only approximate course) as "wavy line"
 
 The blueprint will also provide:
 * standard, named 18xx colors
@@ -104,14 +105,19 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "mountain",
     "private",
     "revenue",
+    "tile_letter",
+    "tile-letter",
+    "tileletter",
     "fill",
 ]
 XX18_LABEL_POSITION = ["above", "below", "left", "right"]
 XX18_STROKE_WIDTH = 1
-XX18_TEXT_SMALL = 12
-XX18_TEXT_MEDIUM = 14
+XX18_TEXT_SMALL = 11
+XX18_TEXT_MEDIUM = 13
 XX18_TEXT_LARGE = 16
-XX18_TEXT_FONT = "Times New Roman"
+XX18_TEXT_EXTRA = 20
+XX18_TEXT_FONT = "Times-Roman"
+XX18_TEXT_FONT_BOLD = "Times-Bold"
 XX18_RESOURCES = "resources/xx18/symbols/"
 
 
@@ -621,6 +627,14 @@ class XX18GameObject(CoreGameObject):
                     distance=fdistance,
                     **kwargs,
                 )
+            case "tile_letter" | "tile-letter" | "tileletter":
+                self.tile_letter(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    **kwargs,
+                )
             case _:
                 self.symbol(
                     location=feature[0],
@@ -641,6 +655,62 @@ class XX18GameObject(CoreGameObject):
         else:
             fcentre = geo.centre
         return fcentre
+
+    def process_label(
+        self,
+        label: str,
+        position: str = "below",
+        base_shift: float = 0.0,
+        text_size: str = "medium",
+    ) -> dict:
+        """Create label properties for a feature or symbol."""
+        kwargs = {}
+        label_mx = 0.0
+        heading, title, _label = "", "", ""
+        label_align = "centre"
+        match text_size:
+            case "small":
+                font_size = XX18_TEXT_SMALL
+            case "medium":
+                font_size = XX18_TEXT_MEDIUM
+            case "large":
+                font_size = XX18_TEXT_LARGE
+            case _:
+                raise ValueError(
+                    f'Text size "{text_size}" is not available for label processing'
+                )
+        if label:
+            shift = base_shift + self.label_size / self.units / 3.0
+            match position:
+                case "above":
+                    heading = label
+                case "below":
+                    title = label
+                case "left":
+                    _label = label
+                    label_mx = -shift
+                    label_align = "right"
+                case "right":
+                    _label = label
+                    label_mx = shift
+                    label_align = "left"
+        else:
+            label = ""
+
+        kwargs["heading"] = heading
+        kwargs["heading_size"] = font_size
+        kwargs["heading_font"] = XX18_TEXT_FONT
+
+        kwargs["title"] = title
+        kwargs["title_size"] = font_size
+        kwargs["title_font"] = XX18_TEXT_FONT
+
+        kwargs["label"] = _label
+        kwargs["label_mx"] = label_mx
+        kwargs["label_align"] = label_align
+        kwargs["label_size"] = font_size
+        kwargs["label_font"] = XX18_TEXT_FONT
+        return kwargs
 
     def town(
         self,
@@ -664,14 +734,15 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
+            label_position = kwargs.get("label_position", "below")
+            kwargs = self.process_label(label, label_position, XX18_TOWN_DIAMETER / 2.0)
             Circle(
                 cxy=ccentre,
                 radius=XX18_TOWN_DIAMETER / 2.0,
                 fill_stroke="black",
                 stroke_width=XX18_STROKE_WIDTH,
+                **kwargs,
             )
-            if label:
-                print("TODO")
 
     def city(
         self,
@@ -697,6 +768,10 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
+            label_position = kwargs.get("label_position", "below")
+            kwargs = self.process_label(
+                label, label_position, XX18_CITY_DIAMETER / 2.0, "medium"
+            )
             Circle(
                 cxy=ccentre,
                 radius=XX18_CITY_DIAMETER / 2.0,
@@ -704,9 +779,8 @@ class XX18GameObject(CoreGameObject):
                 stroke="black",
                 stroke_width=XX18_STROKE_WIDTH,
                 centre_shape=shape,
+                **kwargs,
             )
-            if label:
-                print("TODO")
 
     def revenue(
         self,
@@ -738,6 +812,38 @@ class XX18GameObject(CoreGameObject):
                 stroke_width=XX18_STROKE_WIDTH,
                 label=label if label else "",
                 label_size=XX18_TEXT_MEDIUM,
+            )
+
+    def tile_letter(
+        self,
+        location: str = None,
+        label: str = None,
+        direction: float = None,
+        distance: float = None,
+        **kwargs,
+    ):
+        """Draw Tile Letter at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            label (str): the character for the tile letter
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
+        """
+        from protograf.protos import Text
+
+        _locations = self.process_locations(location, "revenue")
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            letter = label if label else ""
+            Text(
+                text=letter,
+                xy=ccentre,
+                stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+                font_size=XX18_TEXT_EXTRA,
+                font_name=XX18_TEXT_FONT_BOLD,
             )
 
     def fill_hex(
@@ -790,12 +896,17 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
+            label_position = kwargs.get("label_position", "below")
+            kwargs = self.process_label(
+                label, label_position, XX18_MTN_SIDE / 2.0, "small"
+            )
             Triangle(
                 cx=ccentre.x,
                 cy=ccentre.y,
                 side=XX18_MTN_SIDE,
                 stroke_width=XX18_STROKE_WIDTH,
                 fill="black",
+                **kwargs,
             )
 
     def private(
@@ -838,7 +949,7 @@ class XX18GameObject(CoreGameObject):
                 stroke="black",
                 stroke_width=XX18_STROKE_WIDTH,
                 # label=label if label else "",
-                # label_size=XX18_TEXT_MEDIUM,
+                # label_size=XX18_TEXT_SMALL,
             )
             pce = Circle(
                 cxy=ccentre1,
@@ -847,7 +958,7 @@ class XX18GameObject(CoreGameObject):
                 stroke="black",
                 stroke_width=XX18_STROKE_WIDTH,
                 # label=label if label else "",
-                # label_size=XX18_TEXT_MEDIUM,
+                # label_size=XX18_TEXT_SMALL,
             )
             Line(
                 links=[pcs, pce],
@@ -883,8 +994,6 @@ class XX18GameObject(CoreGameObject):
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/coal.svg")
             case "hills":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/hills.svg")
-                kwargs["width"] = 1.5
-                kwargs["height"] = 1.5
             case "desert":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/desert.svg")
             case "mine":
@@ -910,4 +1019,7 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            Image(_file, cxy=ccentre, **kwargs)
+            label_position = kwargs.get("label_position", "below")
+            offset = 0.5
+            lwargs = self.process_label(label, label_position, offset, "small")
+            Image(_file, cxy=ccentre, **{**kwargs, **lwargs})
