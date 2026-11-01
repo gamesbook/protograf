@@ -2,10 +2,14 @@
 """
 protograf 18XX games
 
+Credits:
+    * All symbols are sources from the  Noun Project (https://thenounproject.com)
+      and are licensed under CC BY 3.0; see resources/xx18/symbols/CREDITS.md
+
 Notes:
     * all arrays, such the cells of a board, are (col,row) with 1-based values
 
-Outline:
+Summary of functions:
 
 The 18xx map "blueprint" feature covers:
 
@@ -47,6 +51,7 @@ Drawing will be done following the order in which features are provided.
 """
 
 # lib
+from importlib.resources import files
 import re
 import math
 
@@ -79,14 +84,15 @@ XX18_HEX_SIDE = XX18_HEX_HEIGHT / math.sqrt(3)  # cm
 XX18_HEX_DIAMETER = 2 * XX18_HEX_SIDE
 XX18_CITY_DIAMETER = 1.45  # cm
 XX18_TOWN_DIAMETER = 0.45  # cm
-XX18_PRIVATE_DIAMETER = 0.35  # cm
+XX18_PRIVATE_DIAMETER = 0.4  # cm
 XX18_REVENUE_DIAMETER = 0.8  # cm
 XX18_MTN_SIDE = 0.6  # cm; equilateral triangle
 XX18_SYMBOL_SET = [
     "coal",
-    "hill",
+    "hills",
     "desert",
     "mine",
+    "mountains",
     "oil",
     "port",
     "river",
@@ -106,6 +112,7 @@ XX18_TEXT_SMALL = 12
 XX18_TEXT_MEDIUM = 14
 XX18_TEXT_LARGE = 16
 XX18_TEXT_FONT = "Times New Roman"
+XX18_RESOURCES = "resources/xx18/symbols/"
 
 
 class XX18GameObject(CoreGameObject):
@@ -620,6 +627,7 @@ class XX18GameObject(CoreGameObject):
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
+                    name=ftype,
                     **kwargs,
                 )
 
@@ -866,12 +874,40 @@ class XX18GameObject(CoreGameObject):
             label (str): the label for the symbol
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
+            name (str): the name the symbol
         """
-        if name not in XX18_SYMBOL_SET:
-            feedback(
-                f"The symbol 'name' property cannot be '{name}';",
-                f" choose from: {XX18_SYMBOL_SET}.",
-                True,
-                True,
-            )
+        from protograf.protos import Image
+
+        match name:
+            case "coal":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/coal.svg")
+            case "hills":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/hills.svg")
+                kwargs["width"] = 1.5
+                kwargs["height"] = 1.5
+            case "desert":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/desert.svg")
+            case "mine":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/mine.svg")
+            case "mountains":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/mountains.svg")
+            case "oil":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/oil.svg")
+            case "port":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/port.svg")
+            case "river":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/river.svg")
+            case "swamp":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/swamp.svg")
+            case _:
+                feedback(
+                    f"The symbol 'name' property cannot be '{name}';",
+                    f" choose from: {XX18_SYMBOL_SET}.",
+                    True,
+                    True,
+                )
         _locations = self.process_locations(location, f"{name} symbol")
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            Image(_file, cxy=ccentre, **kwargs)
