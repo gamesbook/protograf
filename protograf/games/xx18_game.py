@@ -16,7 +16,7 @@ The 18xx map "blueprint" feature covers:
 * depiction of towns as filled-in circles
 * depiction of cities (single, double) as open circles; may include
   the railroad logo or a custom shape or text inset into it
-* depiction of revenue (single, double) as circle with an amount
+* depiction of revenue as circle with an amount
 * depiction of track, curved or straight; by itself or extending from a city
 * depiction of terminal spikes running off the board (short, medium and long)
 * depiction of blocked hex-sides (as lines)
@@ -107,8 +107,8 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "revenue",
     "tile_letter",
     "tile-letter",
-    "tileletter",
     "fill",
+    "block",
 ]
 XX18_LABEL_POSITION = ["above", "below", "left", "right"]
 XX18_STROKE_WIDTH = 1
@@ -484,6 +484,36 @@ class XX18GameObject(CoreGameObject):
                 )
         return _locations
 
+    def feature_position(self, position: tuple | str = None) -> tuple:
+        """Extract either (direction, distance) tuple or string from a string."""
+        if not position:
+            return None, None
+        if isinstance(position, (list, tuple)):
+            if len(position) < 2:
+                feedback(
+                    f"Position must contain at least two values; not '{position}'.",
+                    True,
+                    True,
+                )
+            direction, distance = 0, 0
+            _fdir = position[0]
+            direction = tools.as_float(_fdir, "direction")
+            if len(position) >= 1:
+                _fdist = position[1]
+                distance = tools.as_float(_fdist, "distance")
+            return direction, distance
+        elif isinstance(position, str):
+            # TODO - validate hexside position !
+            print("hexside: {position}")
+            return position, None
+        else:
+            feedback(
+                f'The position must be a set of two numbers or a hex side, not "{position}"',
+                True,
+                True,
+            )
+            return None, None
+
     def process_feature(self, feature: tuple = None) -> list:
         """Process a feature from its tuple
 
@@ -492,11 +522,15 @@ class XX18GameObject(CoreGameObject):
 
         Notes:
             * The feature (tuple) should contain in this order:
-                cellID (str): the alphanumeric grid coordinate of the hex
-                feature (str): the name of the feature or symbol to draw
-                direction (float): optional, degrees (default zero)
-                distance (float): optional, fraction (default zero)
-                label (str): a label for the feature or symbol (default "")
+                  cellID (str): the alphanumeric grid coordinate of the hex
+                  position (tuple | str): either a tuple of
+                      direction (float): optional, degrees
+                      distance (float): optional, fraction
+                    or a string of:
+                      hex-side directions
+                    or None
+                  label (str): a label for the feature or symbol (default "")
+                  label_position (str): the position for label (above, below, L, R)
 
             * For a private railroad, which has a start and end hex, the
               start settings are the ones above, and then the following extras
@@ -533,17 +567,13 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
-        fdirection, fdistance, flabel, flabel_pos = 0, 0, "", None
+        flabel, flabel_pos, fdirection, fdistance = "", None, None, None
         if len(feature) >= 3:
-            _fdir = feature[2]
-            fdirection = tools.as_float(_fdir, "direction")
+            fdirection, fdistance = self.feature_position(feature[2])
         if len(feature) >= 4:
-            _fdist = feature[3]
-            fdistance = tools.as_float(_fdist, "distance")
-        if len(feature) >= 5:
-            flabel = str(feature[4])
-        if len(feature) >= 6 and ftype != "private":  # see below; private overloads
-            flabel_pos = feature[5]
+            flabel = str(feature[3])
+        if len(feature) >= 5 and ftype != "private":  # see below; private overloads
+            flabel_pos = feature[4]
             if flabel_pos not in XX18_LABEL_POSITION:
                 feedback(
                     f"The label positions '{feature[5]}' is not available;",
@@ -552,7 +582,7 @@ class XX18GameObject(CoreGameObject):
                     True,
                 )
             kwargs["label_position"] = flabel_pos
-        print(f"&&& {feature[0]=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
+        # print(f"&&& {feature[0]=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
         # ---- feature to function
         match ftype:
             case "city":
@@ -608,7 +638,7 @@ class XX18GameObject(CoreGameObject):
                             True,
                         )
                     kwargs["label_position"] = flabel_pos
-                print(f"&&& private {flocation1=} {fdirection1=} {fdistance1=}")
+                # print(f"&&& private {flocation1=} {fdirection1=} {fdistance1=}")
                 self.private(
                     label=flabel,
                     location=feature[0],
@@ -633,6 +663,14 @@ class XX18GameObject(CoreGameObject):
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
+                    **kwargs,
+                )
+            case "block":
+                self.block(
+                    location=feature[0],
+                    label=flabel,
+                    position=fdirection,
+                    color=None,  # TODO => how to set
                     **kwargs,
                 )
             case _:
@@ -814,6 +852,89 @@ class XX18GameObject(CoreGameObject):
                 label_size=XX18_TEXT_MEDIUM,
             )
 
+    def block(
+        self,
+        location: str = None,
+        position: str = None,
+        stroke: object = None,
+        label: str = None,
+        **kwargs,
+    ):
+        """Draw thick line on hexside(s) at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            position (str): hex edge compass reference or references
+            stroke: the name of a color (defaults to self.barrier)
+            label (str): the text to be drawn above/below the line
+        """
+        from protograf.protos import Line
+
+        _locations = self.process_locations(location, "block")
+        if position is None:
+            if self.orientation == HexOrientationName.POINTY.value:
+                position = ["ne", "e", "se", "sw", "w", "nw"]
+            elif self.orientation == HexOrientationName.FLAT.value:
+                position = ["n", "ne", "se", "s", "sw", "nw"]
+        _positions = tools.split(position, separator=" ", clean=True)
+        edge_color = colrs.get_color(stroke) if stroke else self.barrier
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            for edge in _positions:
+                if self.orientation == HexOrientationName.POINTY.value:
+                    match _lower(edge):
+                        case "ne":
+                            start = geo.n
+                            end = geo.ne
+                        case "e":
+                            start = geo.ne
+                            end = geo.se
+                        case "se":
+                            start = geo.se
+                            end = geo.s
+                        case "sw":
+                            start = geo.s
+                            end = geo.sw
+                        case "w":
+                            start = geo.sw
+                            end = geo.nw
+                        case "nw":
+                            start = geo.nw
+                            end = geo.n
+                        case _:
+                            feedback(
+                                f'The block line position "{position}" is not a valid one.',
+                                True,
+                                True,
+                            )
+                elif self.orientation == HexOrientationName.FLAT.value:
+                    match _lower(edge):
+                        case "n":
+                            start = geo.nw
+                            end = geo.ne
+                        case "ne":
+                            start = geo.ne
+                            end = geo.e
+                        case "se":
+                            start = geo.e
+                            end = geo.se
+                        case "s":
+                            start = geo.se
+                            end = geo.sw
+                        case "sw":
+                            start = geo.sw
+                            end = geo.w
+                        case "nw":
+                            start = geo.w
+                            end = geo.nw
+                        case _:
+                            feedback(
+                                f'The block line position "{position}" is not a valid one.',
+                                True,
+                                True,
+                            )
+                Line(xy=start, xy1=end, stroke=edge_color, stroke_width=7, **kwargs)
+
     def tile_letter(
         self,
         location: str = None,
@@ -967,7 +1088,7 @@ class XX18GameObject(CoreGameObject):
             )
 
         if label:
-            print("TODO")
+            print("TODO - label for Private")
 
     def symbol(
         self,
