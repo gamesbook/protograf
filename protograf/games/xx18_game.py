@@ -3,7 +3,7 @@
 protograf 18XX games
 
 Credits:
-    * All symbols are sources from the  Noun Project (https://thenounproject.com)
+    * All symbols are sourced from the Noun Project (https://thenounproject.com)
       and are licensed under CC BY 3.0; see resources/xx18/symbols/CREDITS.md
 
 Notes:
@@ -18,35 +18,34 @@ The 18xx map "blueprint" feature covers:
   the railroad logo or a custom shape or text inset into it
 * depiction of revenue as circle with an amount
 * depiction of track, curved or straight; by itself or extending from a city
-* depiction of terminal spikes running off the board (short, medium and long)
-* depiction of blocked hex-sides (as lines)
-* depiction of private railways (in-hex; across hexes)
-* depiction of icons for various in-hex features; including mountains (two sizes),
-  hills, swamp, river, port, desert, mine, coal and oilrig
-* setting of a single piece of text
-* display of hex coordinates along the edges of the map
+* depiction of terminal spikes running off-board (short, medium and long)
+* depiction of blocked hex-sides as thick lines
+* depiction of private railways; either in-hex or across hexes
+* depiction of icons for various in-hex features; including mountains
+  (two sizes), hills, swamp, river, port, desert, mine, coal and oilrig
+* depiction of a river; as "wavy line"; running through a hex
 * depiction of a custom shape in a hex
-* depiction of a circle on a hex-side (at a perbii position)
-* depiction of a river running along a hex-side
+* display of a single piece of text
+* display of hex coordinates along the edges of the map
 * coloring ("fill") of a whole hex
-* setting of a shaded rectangular area (typically red and at the edge of the map)
-* creation of a small multi-line table to appear in a hex
+* setting of a shaded rectangular area (typically red and at the map edge)
+* creation of a small multi-line table to appear in an off-board hex
   (typically income per stage of the game)
-* depiction of a river (only approximate course) as "wavy line"
 
 The blueprint will also provide:
 * standard, named 18xx colors
 * ability to set the map fonts (of different sizes) to use
-* ability to put labels next to icons, towns or cities (above, below, left of, right of)
+* ability to put labels next to icons, towns or cities
+  (above, below, left of, right of)
 
 In-hex features, for example, cities, towns, icons, or lettering, will by default
 appear at the centre of a hex. These can be repositioned using a combination of
 direction (in degrees clockwise from east) and distance of the feature's center
 from the hex center (as a fraction of the hex radius).
 
-Positioning of features, such as lines or numbered circles, on hex edges will
-be done using standard compass directions; "ne" for northeast, "s" for south, etc.,
-and will be centred on that edge.
+Positioning of features, such as lines, spikes or numbered circles, on hex edges
+will be done uisng standard compass directions; "ne" for northeast, "s" for south,
+etc., and will be centred on that edge.
 
 Drawing will be done following the order in which features are provided.
 """
@@ -79,15 +78,28 @@ from protograf.utils.tools import _lower
 # local
 from .core_game import CoreGameObject
 
-# ---- constants
-XX18_HEX_HEIGHT = 4.399  # cm
-XX18_HEX_SIDE = XX18_HEX_HEIGHT / math.sqrt(3)  # cm
-XX18_HEX_DIAMETER = 2 * XX18_HEX_SIDE
+# ---- "variable" constants
+# TODO => enable overwrite by loading via JSON
+XX18_HEX_SIDE = 2.3864  # cm
 XX18_CITY_DIAMETER = 1.45  # cm
 XX18_TOWN_DIAMETER = 0.45  # cm
 XX18_PRIVATE_DIAMETER = 0.4  # cm
 XX18_REVENUE_DIAMETER = 0.8  # cm
-XX18_MTN_SIDE = 0.6  # cm; equilateral triangle
+XX18_TRACK_WIDTH_INNER = 0.4  # cm
+XX18_TRACK_WIDTH_OUTER = 0.5  # cm
+XX18_MOUNTAIN_SIDE = 0.6  # cm; equilateral triangle
+XX18_STROKE_WIDTH = 1
+XX18_TEXT_SMALL = 11
+XX18_TEXT_MEDIUM = 13
+XX18_TEXT_LARGE = 16
+XX18_TEXT_EXTRA = 20
+XX18_TEXT_FONT = "Times-Roman"
+XX18_TEXT_FONT_BOLD = "Times-Bold"
+XX18_RESOURCES = "resources/xx18/symbols/"
+
+# ---- fixed/derived constants
+XX18_HEX_HEIGHT = XX18_HEX_SIDE * math.sqrt(3)  # cm
+XX18_HEX_DIAMETER = 2 * XX18_HEX_SIDE
 XX18_SYMBOL_SET = [
     "coal",
     "hills",
@@ -109,16 +121,9 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "tile-letter",
     "fill",
     "block",
+    "spike",
 ]
 XX18_LABEL_POSITION = ["above", "below", "left", "right"]
-XX18_STROKE_WIDTH = 1
-XX18_TEXT_SMALL = 11
-XX18_TEXT_MEDIUM = 13
-XX18_TEXT_LARGE = 16
-XX18_TEXT_EXTRA = 20
-XX18_TEXT_FONT = "Times-Roman"
-XX18_TEXT_FONT_BOLD = "Times-Bold"
-XX18_RESOURCES = "resources/xx18/symbols/"
 
 
 class XX18GameObject(CoreGameObject):
@@ -128,7 +133,7 @@ class XX18GameObject(CoreGameObject):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- class props
         self.features = self._commons("features") or kwargs.get("features") or []
-        print(f"&&& {self.features=}")
+        # print(f"&&& {self.features=}")
         # ---- 18xx game
         self.cell_size = XX18_HEX_HEIGHT
         self.game_class = "XX18Game"
@@ -385,7 +390,7 @@ class XX18GameObject(CoreGameObject):
         # pointy; non-offset
         top_x = self.x if self.kwargs.get("x") else 0
         top_y = self.y if self.kwargs.get("y") else 0
-        colr = self.fills[0] if self.fills else "white"
+        hex_color = self.fill if self.fill else "white"
         x_offset = 0
         # x_offset = -0.5 * self.cell_size
         if self.name == "hexhex" and self.auto_size and self.hexes % 2 == 0:
@@ -395,7 +400,8 @@ class XX18GameObject(CoreGameObject):
             rows=self.rows,
             x=top_x + x_offset,
             y=top_y,
-            orientation=self.orientation,
+            # offset= odd/even TODO
+            orientation=self.orientation,  # default: pointy
             _draw_grid=False,
             pattern=self.pattern,
             user=f"{self.game_class}",
@@ -403,7 +409,7 @@ class XX18GameObject(CoreGameObject):
             height=self.cell_size,
             stroke=self.stroke,
             stroke_width=XX18_STROKE_WIDTH,
-            fill=colr,
+            fill=hex_color,
             # hex_shape=self.cell_shape,  # insert centre_image into hex?
         )
         # print(f'&&& XX18 BOARD {self.board_layout.cells.keys()=}')
@@ -504,7 +510,7 @@ class XX18GameObject(CoreGameObject):
             return direction, distance
         elif isinstance(position, str):
             # TODO - validate hexside position !
-            print("hexside: {position}")
+            # print(f"hexside: {position}")
             return position, None
         else:
             feedback(
@@ -671,6 +677,13 @@ class XX18GameObject(CoreGameObject):
                     label=flabel,
                     position=fdirection,
                     color=None,  # TODO => how to set
+                    **kwargs,
+                )
+            case "spike":
+                self.spike(
+                    location=feature[0],
+                    size=flabel,
+                    position=fdirection,
                     **kwargs,
                 )
             case _:
@@ -852,6 +865,87 @@ class XX18GameObject(CoreGameObject):
                 label_size=XX18_TEXT_MEDIUM,
             )
 
+    def spike(
+        self,
+        location: str = None,
+        position: str = None,
+        stroke: object = None,
+        size: str = None,
+        **kwargs,
+    ):
+        """Draw thin inset triangle(s) on hexside(s) at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            position (str): hex edge compass reference or references
+            stroke: the name of a color (defaults to white)
+            size (str): short, medium or long (defaults to medium)
+        """
+        from protograf.protos import Hexagon
+
+        if size:
+            if _lower(size) not in [
+                "short",
+                "medium",
+                "long",
+                "s",
+                "m",
+                "l",
+            ]:
+                feedback(
+                    f'"{size}" is an invalid size - choose short, medium or long.',
+                    True,
+                    True,
+                )
+        else:
+            size = "medium"
+
+        _locations = self.process_locations(location, "spike")
+        if position is None:
+            if self.orientation == HexOrientationName.POINTY.value:
+                position = ["ne", "e", "se", "sw", "w", "nw"]
+            elif self.orientation == HexOrientationName.FLAT.value:
+                position = ["n", "ne", "se", "s", "sw", "nw"]
+        _positions = tools.split(position, separator=" ", clean=True)
+        stroke = stroke if stroke else "white"
+        stroke_color = colrs.get_color(stroke)
+        height_shrink = XX18_TRACK_WIDTH_OUTER - XX18_TRACK_WIDTH_INNER
+        match _lower(size):
+            case "short" | "s":
+                height = XX18_HEX_DIAMETER * 0.1
+            case "medium" | "m":
+                height = XX18_HEX_DIAMETER * 0.25
+            case "long" | "l":
+                height = XX18_HEX_DIAMETER * 0.5
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            Hexagon(
+                cxy=geo.centre,
+                height=XX18_HEX_HEIGHT,
+                fill=None,
+                stroke="black",
+                stroke_width=0.1,
+                orientation=self.orientation,
+                spikes=_positions,
+                spikes_stroke="white",
+                spikes_fill="white",
+                spikes_width=XX18_TRACK_WIDTH_OUTER,
+                spikes_height=-height,
+            )
+            Hexagon(
+                cxy=geo.centre,
+                height=XX18_HEX_HEIGHT,
+                fill=None,
+                stroke="black",
+                stroke_width=0.1,
+                orientation=self.orientation,
+                spikes=_positions,
+                spikes_stroke="black",
+                spikes_fill="black",
+                spikes_width=XX18_TRACK_WIDTH_INNER,
+                spikes_height=-(height - height_shrink),
+            )
+
     def block(
         self,
         location: str = None,
@@ -1019,12 +1113,12 @@ class XX18GameObject(CoreGameObject):
             ccentre = self.feature_location(geo, direction, distance)
             label_position = kwargs.get("label_position", "below")
             kwargs = self.process_label(
-                label, label_position, XX18_MTN_SIDE / 2.0, "small"
+                label, label_position, XX18_MOUNTAIN_SIDE / 2.0, "small"
             )
             Triangle(
                 cx=ccentre.x,
                 cy=ccentre.y,
-                side=XX18_MTN_SIDE,
+                side=XX18_MOUNTAIN_SIDE,
                 stroke_width=XX18_STROKE_WIDTH,
                 fill="black",
                 **kwargs,

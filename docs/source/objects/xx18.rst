@@ -87,16 +87,16 @@ Below is a short summary of features available:
 * depiction of track, curved or straight; by itself or extending from a city
 * depiction of terminal spikes running off-board (short, medium and long)
 * depiction of blocked hex-sides as thick lines
-* depiction of private railwaysl either in-hex or across hexes
+* depiction of private railways; either in-hex or across hexes
 * depiction of icons for various in-hex features; including mountains
   (two sizes), hills, swamp, river, port, desert, mine, coal and oilrig
-* setting of a single piece of text
-* display of hex coordinates along the edges of the map
-* depiction of a custom shape in a hex
 * depiction of a river; as "wavy line"; running through a hex
+* depiction of a custom shape in a hex
+* display of a single piece of text
+* display of hex coordinates along the edges of the map
 * coloring ("fill") of a whole hex
 * setting of a shaded rectangular area (typically red and at the edge of the map)
-* creation of a small multi-line table to appear in a hex
+* creation of a small multi-line table to appear in an off-board hex
   (typically income per stage of the game)
 
 
