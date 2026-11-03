@@ -114,6 +114,9 @@ XX18_SYMBOL_SET = [
 XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "town",
     "city",
+    "cityx2",
+    "cityx3",
+    "cityx4",
     "mountain",
     "private",
     "revenue",
@@ -591,12 +594,17 @@ class XX18GameObject(CoreGameObject):
         # print(f"&&& {feature[0]=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
         # ---- feature to function
         match ftype:
-            case "city":
+            case "city" | "cityx2" | "cityx3" | "cityx4":
+                if "x" in ftype:
+                    _, count = ftype.split("x")
+                else:
+                    count = 1
                 self.city(
                     location=feature[0],
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
+                    count=count,
                     **kwargs,
                 )
             case "fill":
@@ -786,13 +794,13 @@ class XX18GameObject(CoreGameObject):
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             label_position = kwargs.get("label_position", "below")
-            kwargs = self.process_label(label, label_position, XX18_TOWN_DIAMETER / 2.0)
+            lwargs = self.process_label(label, label_position, XX18_TOWN_DIAMETER / 2.0)
             Circle(
                 cxy=ccentre,
                 radius=XX18_TOWN_DIAMETER / 2.0,
                 fill_stroke="black",
                 stroke_width=XX18_STROKE_WIDTH,
-                **kwargs,
+                **{**kwargs, **lwargs},
             )
 
     def city(
@@ -801,6 +809,7 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         direction: float = None,
         distance: float = None,
+        count: str | int = None,
         shape: str = None,
         **kwargs,
     ):
@@ -811,27 +820,88 @@ class XX18GameObject(CoreGameObject):
             label (str): the name of the city
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
+            count (str|int): number of circles in the city
             shape (Shape): the shape to be drawn inside the city
         """
-        from protograf.protos import Circle
+        from protograf.protos import Circle, Rectangle, Triangle
 
         _locations = self.process_locations(location, "city")
+        if count:
+            city_count = tools.as_int(count, "city count", maximum=6, minimum=1)
+        else:
+            city_count = 1
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             label_position = kwargs.get("label_position", "below")
-            kwargs = self.process_label(
+            if city_count > 1:
+                if label_position not in ["above", "below"]:
+                    label_position = "below"
+            lwargs = self.process_label(
                 label, label_position, XX18_CITY_DIAMETER / 2.0, "medium"
             )
-            Circle(
-                cxy=ccentre,
-                radius=XX18_CITY_DIAMETER / 2.0,
-                fill="white",
-                stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
-                centre_shape=shape,
-                **kwargs,
-            )
+            cwargs = {}
+            cwargs["radius"] = XX18_CITY_DIAMETER / 2.0
+            cwargs["fill"] = "white"
+            cwargs["stroke"] = "black"
+            cwargs["stroke_width"] = XX18_STROKE_WIDTH
+            cwargs["centre_shape"] = shape
+            match city_count:
+                case 1:
+                    Circle(
+                        cxy=ccentre,
+                        **{**kwargs, **lwargs, **cwargs},
+                    )
+                case 2:
+                    ccentre = geo
+                    cx1 = ccentre.centre.x - XX18_CITY_DIAMETER / 2.0
+                    cx2 = ccentre.centre.x + XX18_CITY_DIAMETER / 2.0
+                    Rectangle(
+                        height=XX18_CITY_DIAMETER,
+                        width=XX18_CITY_DIAMETER,
+                        cx=ccentre.centre.x,
+                        cy=ccentre.centre.y,
+                        fill="white",
+                        stroke="black",
+                        stroke_width=XX18_STROKE_WIDTH,
+                        **{**kwargs, **lwargs},
+                    )
+                    Circle(
+                        cx=cx1,
+                        cy=geo.centre.y,
+                        **{**kwargs, **cwargs},
+                    )
+                    Circle(
+                        cx=cx2,
+                        cy=geo.centre.y,
+                        **{**kwargs, **cwargs},
+                    )
+                case 3:
+                    ccentre = geo
+                    tri = Triangle(
+                        cx=geo.centre.x,
+                        cy=geo.centre.y,
+                        side=XX18_CITY_DIAMETER,
+                        fill="white",
+                        stroke="black",
+                    )
+                    csw = tri.geo.sw
+                    cse = tri.geo.se
+                    cn = tri.geo.n
+                    Circle(
+                        cxy=csw,
+                        **{**kwargs, **cwargs},
+                    )
+                    Circle(
+                        cxy=cse,
+                        **{**kwargs, **cwargs},
+                    )
+                    Circle(
+                        cxy=cn,
+                        **{**kwargs, **cwargs},
+                    )
+                    # TODO - Rectangles at each triangle edge of h=radius
+                    # label below cse-csw rectangle
 
     def revenue(
         self,
@@ -1112,7 +1182,7 @@ class XX18GameObject(CoreGameObject):
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             label_position = kwargs.get("label_position", "below")
-            kwargs = self.process_label(
+            lwargs = self.process_label(
                 label, label_position, XX18_MOUNTAIN_SIDE / 2.0, "small"
             )
             Triangle(
@@ -1121,7 +1191,7 @@ class XX18GameObject(CoreGameObject):
                 side=XX18_MOUNTAIN_SIDE,
                 stroke_width=XX18_STROKE_WIDTH,
                 fill="black",
-                **kwargs,
+                **{**kwargs, **lwargs},
             )
 
     def private(
