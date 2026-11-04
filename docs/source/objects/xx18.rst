@@ -80,7 +80,7 @@ Features
 
 Below is a short summary of features available:
 
-* depiction of towns as filled-in circles
+* depiction of towns as filled-in circles (including optional border)
 * depiction of cities (single, double) as open circles; may include
   the railroad logo or a custom shape or text inset into it
 * depiction of revenue as circle with an amount
@@ -88,8 +88,11 @@ Below is a short summary of features available:
 * depiction of terminal spikes running off-board (short, medium and long)
 * depiction of blocked hex-sides as thick lines
 * depiction of private railways; either in-hex or across hexes
-* depiction of icons for various in-hex features; including mountains
-  (two sizes), hills, swamp, river, port, desert, mine, coal and oilrig
+* depiction of icons for common in-hex features; including mountains
+  (two sizes), hills, and rivers
+* depiction of symbols for special features such coal, desert, factory,
+  fish, flag, forest, hills, lock, mine, noentry, oil, pennant, port,
+  swamp, train, tree, tunnel
 * depiction of a river; as "wavy line"; running through a hex
 * depiction of a custom shape in a hex
 * display of a single piece of text
@@ -127,7 +130,7 @@ XX18Game Properties
 -------------------
 `^ <xx18game-command_>`_
 
-The key properties that can be set for an XX18Game are:
+The key properties that can be set for an ``XX18Game()`` command are:
 
 * *cols*: this is the number of cells in the horizontal direction, for a
   regular layout; a default of ``8`` is used
@@ -139,30 +142,19 @@ The key properties that can be set for an XX18Game are:
   the mapbard ("flat") or pointing at it ("pointy"); the default of "pointy"
   matches that of *1830*
 * *fill*: the default color with which most of the hexagons will be filled;
-  by default this is white, but many maps use a light brown or green.
-
-Using the name of an existing game will also select the associated number of
-rows and columns for that game; for example, a **Shogi** board has 9 rows
-and 9 columns.  This can be changed by setting *cols* and/or *rows* values.
+  by default this is white, but many maps use a light brown or light green.
 
 .. IMPORTANT::
 
     Unlike many other shapes or objects in **protograf**, the *height* property
     is used to set the height of a cell on the board, and **not** the height
     of the board itself |dash| this being derived from the combination of
-    the number of rows and columns as well the cell *height*.  The reason for
-    this is to support both square and hexagonal cells with a single property.
-
-    In the examples used, if *height* is **not** provided to **protograf**,
-    then its value is determined by first sizing the board to occupy as much
-    of the page as possible and then calculating the cells' *height* based on
-    the number of rows and columns.  Boards with intersections occupy slightly
-    less space when using this automated process.
+    the number of rows and columns as well the cell *height*.
 
 Other useful properties that can be set for an XX18Game are:
 
 * *side*: sets the length of the side of a single hexagon; by default this is
-  1 inch (2.54 cm)
+  ~1 inch (2.3864 cm)
 * *label*: if ``True``, draw labels around the board's edges; use the
   normal styling options for a label; *label_font*, *label_size*,
   *label_stroke* etc.
@@ -178,7 +170,7 @@ Other useful properties that can be set for an XX18Game are:
 
     * *rows*: ``8``
     * *cols*: ``8``
-    * *side*: 1 inch (2.54 cm)
+    * *side*: ~1 inch (2.3864 cm)
 
 
 .. _xx18GameGrid:
@@ -187,14 +179,15 @@ XX18Game Board: Base Grid
 -------------------------
 `^ <xx18game-command_>`_
 
-Below are some examples of gridded boards.  There are further examples in
+Below are some examples of  18XX boards.  There are further examples in
 the section on the `XX18Game Command`_.
+
 
 Example 1. Default Board
 ~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <abstractGameGrid_>`_
 
-.. |ab1| image:: ../images/objects/abstracts_default.png
+.. |ab1| image:: ../images/objects/xx18_default.png
    :width: 330
 
 ===== ======
@@ -214,11 +207,11 @@ Example 1. Default Board
 ===== ======
 
 
-Example 2. Board Size and Position
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 2. Board Size, Color and Position
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <abstractGameGrid_>`_
 
-.. |ab2| image:: ../images/objects/abstracts_size_position.png
+.. |ab2| image:: ../images/objects/xx18_size_position.png
    :width: 330
 
 ===== ======
@@ -230,6 +223,7 @@ Example 2. Board Size and Position
             x=0, y=0,
             side=0.25,
             rows=3, cols=3,
+            fill="khaki"
         )
         XX18Game(board=agsp)
 
@@ -238,6 +232,7 @@ Example 2. Board Size and Position
             x=4, y=4,
             height=1.25,
             rows=3, cols=3,
+            fill="berylgreen"
         )
         XX18Game(board=ahsp)
 
@@ -246,6 +241,10 @@ Example 2. Board Size and Position
 
       Each of the two boards shown make use of custom *x* and *y* values to
       set their position on the page.
+
+      Each of the boards sets the default color of the cells to a light
+      brown and light green, respectively, via the *fill* property. It
+      is also possible to choose from the built-in 18XX colors.
 
       The board on the lower-right also has the *name* set to ``hexagons``
       in order to change its layout; more example of these types can be
@@ -262,7 +261,7 @@ Example 3. Styled Board
 ~~~~~~~~~~~~~~~~~~~~~~~
 `^ <abstractGameGrid_>`_
 
-.. |ab3| image:: ../images/objects/abstracts_styled.png
+.. |ab3| image:: ../images/objects/xx18_styled.png
    :width: 330
 
 ===== ======
@@ -271,10 +270,6 @@ Example 3. Styled Board
       .. code:: python
 
         ags = XX18Game(
-            name="grid",
-            fills=["gold"],
-            stroke="red",
-            stroke_width=2,
             label=True,
             label_stroke="blue"
         )
@@ -285,12 +280,6 @@ Example 3. Styled Board
 
       In this case, the board is further styled by setting:
 
-      - *fills* - a list one or more colors; in this case just a single one
-      - *stroke* - the color of the grid lines
-      - *stroke_width* - the thickness of the grid lines (in point units)
-      - *frame* - if ``True``, the frame will be drawn
-      - *frame_width* - the thickness of the frame lines (in point units)
-      - *frame_stroke* - the color of the frame
       - *label* - if ``True``, the labels will be drawn
       - *label_stroke* - the color of the labels
 
@@ -310,7 +299,7 @@ Example 4. Board with custom areas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <abstractGameGrid_>`_
 
-.. |ab4| image:: ../images/objects/abstracts_chess_custom_board.png
+.. |ab4| image:: ../images/objects/xx18_chess_custom_board.png
    :width: 330
 
 ===== ======
@@ -365,7 +354,7 @@ Example 5. Board with cell shape
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <abstractGameGrid_>`_
 
-.. |ab5| image:: ../images/objects/abstracts_hexagons_cell_shape.png
+.. |ab5| image:: ../images/objects/xx18_hexagons_cell_shape.png
    :width: 330
 
 ===== ======
@@ -410,7 +399,7 @@ Example 1. Rectangular Hexagonal Grid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <abstractGameHexagonal_>`_
 
-.. |ah1| image:: ../images/objects/abstracts_hexagons_default.png
+.. |ah1| image:: ../images/objects/xx18_hexagons_default.png
    :width: 330
 
 ===== ======
@@ -467,7 +456,7 @@ If a row on the board contains only hexagons, this can be shown with a
 single ``O`` (capital "oh").
 
 
-.. |ah4| image:: ../images/objects/abstracts_hexagons_pattern.png
+.. |ah4| image:: ../images/objects/xx18_hexagons_pattern.png
    :width: 330
 
 ===== ======
@@ -623,7 +612,7 @@ If a row on the board contains **no** pieces, this can be shown with a single
 ``.`` (dot or full stop).
 
 
-.. |sp1| image:: ../images/objects/abstracts_chess_positions.png
+.. |sp1| image:: ../images/objects/xx18_chess_positions.png
    :width: 330
 
 ===== ======
@@ -694,7 +683,7 @@ The various positions for a hexagonal cell, there are  n (north), s (south),
 ne (north-east), nw (north-west), sw (south-west), and se (south-east),
 as well as c (centre/center).
 
-.. |sp2| image:: ../images/objects/abstracts_grid_annotations.png
+.. |sp2| image:: ../images/objects/xx18_grid_annotations.png
    :width: 330
 
 ===== ======
@@ -762,7 +751,7 @@ Markers are supplied as a list of **protograf** shapes, whose position is
 set in the same way as :ref:`Annnotations Locations <xx18StateLocations>`.
 
 
-.. |sp3| image:: ../images/objects/abstracts_grid_chess_markers.png
+.. |sp3| image:: ../images/objects/xx18_grid_chess_markers.png
    :width: 330
 
 ===== ======
@@ -862,7 +851,7 @@ The two different styles of creating markers can be mixed together in the
 same list.
 
 
-.. |sp4| image:: ../images/objects/abstracts_hexagons_markers_shortcuts.png
+.. |sp4| image:: ../images/objects/xx18_hexagons_markers_shortcuts.png
    :width: 330
 
 ===== ======
@@ -910,7 +899,7 @@ same list.
 
 ===== ======
 
-.. |sp5| image:: ../images/objects/abstracts_grid_markers_shortcuts.png
+.. |sp5| image:: ../images/objects/xx18_grid_markers_shortcuts.png
    :width: 330
 
 ===== ======

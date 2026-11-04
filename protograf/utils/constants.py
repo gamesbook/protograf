@@ -312,9 +312,31 @@ COLORS_SVG = {
     "white": "#ffffff",
 }
 
-# 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
 # deprecated - see xx18_game module
 COLORS_18XX = {
+    "xtile_yellow": "#ffd200",
+    "xtile_green": "#00a651",
+    "xtile_brown": "#7a4b1b",
+    "xtile_gray": "#7f8c8d",
+    "xtile_yellow_mf": "#f1c40f",
+    "xtile_green_mf": "#27ae60",
+    "xtile_brown_mf": "#7e5109",
+    "xtile_gray_mf": "#95a5a6",
+    "xback": "#eaeaea",
+    "xplain": "#ffffff",
+    "xplain_off": "#f9f9f9",
+    "xyellow": "#f1e351",
+    "xgreen": "#4caf50",
+    "xbrown": "#8d6e63",
+    "xgray": "#b0bec5",
+    "xbarrier": "#757575",
+    "xoffboard": "#ef5350",
+    "xwater": "#4a7f9d",
+}
+
+# 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
+# deprecated - see xx18_game module
+COLORS_18XX_OLD = {
     "ground": "#fdd9b5",  # sandy tan
     "yellow": "#fdee00",  # aureolin
     "green": "#00a550",  # pigment green

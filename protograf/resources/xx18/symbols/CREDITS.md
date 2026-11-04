@@ -74,3 +74,73 @@ Mountains
 https://thenounproject.com/icon/mountains-154483/
 
 Mountains by Franco Mateo from https://thenounproject.com/browse/icons/term/mountains/
+
+Fish
+---------
+
+https://thenounproject.com/icon/fish-8476665/
+
+Fish by Cuan Studio from https://thenounproject.com/browse/icons/term/fish/
+
+Tunnel
+------
+
+https://thenounproject.com/icon/tunnel-7267743/
+
+Tunnel by Andi Nur Abdillah from https://thenounproject.com/browse/icons/term/tunnel/
+
+Tree
+----
+
+https://thenounproject.com/icon/tree-8388169/
+
+Tree by BnB Studio from https://thenounproject.com/browse/icons/term/tree/
+
+Forest
+------
+
+https://thenounproject.com/icon/tree-8481372/
+
+Tree by Arkinasi from https://thenounproject.com/browse/icons/term/tree/
+
+Flag
+----
+
+https://thenounproject.com/icon/flag-16860/
+
+Flag by Adam Heller from https://thenounproject.com/browse/icons/term/flag/
+
+Pennant
+-------
+
+https://thenounproject.com/icon/flag-8484522/
+
+Flag by Graphtend from https://thenounproject.com/browse/icons/term/flag/
+
+Lock
+----
+
+https://thenounproject.com/icon/lock-721996/
+
+Lock by Maxim Kulikov from https://thenounproject.com/browse/icons/term/lock/
+
+Factory
+-------
+
+https://thenounproject.com/icon/factory-780243/
+
+Factory by Gregor Cresnar from https://thenounproject.com/browse/icons/term/factory/
+
+Train
+-----
+
+https://thenounproject.com/icon/train-7412416/
+
+Train by Karsono from https://thenounproject.com/browse/icons/term/train/
+
+No Entry
+--------
+
+https://thenounproject.com/icon/no-entry-8295755/
+
+No Entry by lailistudio from https://thenounproject.com/browse/icons/term/no-entry/

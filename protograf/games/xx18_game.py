@@ -13,7 +13,7 @@ Summary of functions:
 
 The 18xx map "blueprint" feature covers:
 
-* depiction of towns as filled-in circles
+* depiction of towns as filled-in circles (may include a border)
 * depiction of cities (single, double) as open circles; may include
   the railroad logo or a custom shape or text inset into it
 * depiction of revenue as circle with an amount
@@ -21,8 +21,11 @@ The 18xx map "blueprint" feature covers:
 * depiction of terminal spikes running off-board (short, medium and long)
 * depiction of blocked hex-sides as thick lines
 * depiction of private railways; either in-hex or across hexes
-* depiction of icons for various in-hex features; including mountains
-  (two sizes), hills, swamp, river, port, desert, mine, coal and oilrig
+* depiction of icons for common in-hex features; including mountains
+  (two sizes), hills, and rivers
+* depiction of symbols for special features such coal, desert, factory,
+  fish, flag, forest, hills, lock, mine, noentry, oil, pennant, port,
+  swamp, train, tree, tunnel
 * depiction of a river; as "wavy line"; running through a hex
 * depiction of a custom shape in a hex
 * display of a single piece of text
@@ -110,6 +113,7 @@ from .core_game import CoreGameObject
 XX18_HEX_SIDE = 2.3864  # cm
 XX18_CITY_DIAMETER = 1.45  # cm
 XX18_TOWN_DIAMETER = 0.45  # cm
+XX18_TOWN_DIAMETER_BORDER = 0.55  # cm; outer-circle
 XX18_PRIVATE_DIAMETER = 0.4  # cm
 XX18_REVENUE_DIAMETER = 0.8  # cm
 XX18_TRACK_WIDTH_INNER = 0.4  # cm
@@ -149,17 +153,28 @@ XX18_HEX_HEIGHT = XX18_HEX_SIDE * math.sqrt(3)  # cm
 XX18_HEX_DIAMETER = 2 * XX18_HEX_SIDE
 XX18_SYMBOL_SET = [
     "coal",
-    "hills",
     "desert",
+    "factory",
+    "fish",
+    "flag",
+    "forest",
+    "hills",
+    "lock",
     "mine",
     "mountains",
+    "noentry",
     "oil",
+    "pennant",
     "port",
     "river",
     "swamp",
+    "train",
+    "tree",
+    "tunnel",
 ]
 XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "town",
+    "town_border",
     "city",
     "cityx1",
     "cityx2",
@@ -659,6 +674,15 @@ class XX18GameObject(CoreGameObject):
                     distance=fdistance,
                     **kwargs,
                 )
+            case "town_border":
+                self.town(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    border=True,
+                    **kwargs,
+                )
             case "track":
                 self.track(
                     location=feature[0],
@@ -917,6 +941,7 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         direction: float = None,
         distance: float = None,
+        border: bool = False,
         **kwargs,
     ):
         """Draw Town shape at hex location(s).
@@ -935,6 +960,13 @@ class XX18GameObject(CoreGameObject):
             ccentre = self.feature_location(geo, direction, distance)
             label_position = kwargs.get("label_position", "below")
             lwargs = self.process_label(label, label_position, XX18_TOWN_DIAMETER / 2.0)
+            if border:
+                Circle(
+                    cxy=ccentre,
+                    radius=XX18_TOWN_DIAMETER_BORDER / 2.0,
+                    fill_stroke="white",
+                    stroke_width=XX18_STROKE_WIDTH,
+                )
             Circle(
                 cxy=ccentre,
                 radius=XX18_TOWN_DIAMETER / 2.0,
@@ -1517,6 +1549,27 @@ class XX18GameObject(CoreGameObject):
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/river.svg")
             case "swamp":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/swamp.svg")
+            case "factry":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/factory.svg")
+            case "fish":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/fish.svg")
+            case "flag":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/flag.svg")
+            case "forest":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/forest.svg")
+            case "lock":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/lock.svg")
+            case "noentry":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/noentry.svg")
+            case "pennant":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/pennant.svg")
+            case "train":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/train.svg")
+            case "tree":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/tree.svg")
+            case "tunnel":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/tunnel.svg")
+
             case _:
                 feedback(
                     f"The symbol 'name' property cannot be '{name}';",
