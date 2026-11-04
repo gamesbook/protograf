@@ -113,6 +113,11 @@ from .core_game import CoreGameObject
 XX18_HEX_SIDE = 2.3864  # cm
 XX18_CITY_DIAMETER = 1.45  # cm
 XX18_TOWN_DIAMETER = 0.45  # cm
+XX18_TOWN_HEIGHT = 0.45  # cm
+XX18_TOWN_WIDTH = 0.7  # cm
+XX18_TOWN_WIDTH_OUTER = 0.8  # cm
+XX18_TOWN_HEIGHT = 0.4  # cm
+XX18_TOWN_HEIGHT_OUTER = 0.5  # cm
 XX18_TOWN_DIAMETER_BORDER = 0.55  # cm; outer-circle
 XX18_PRIVATE_DIAMETER = 0.4  # cm
 XX18_REVENUE_DIAMETER = 0.8  # cm
@@ -175,6 +180,7 @@ XX18_SYMBOL_SET = [
 XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "town",
     "town_border",
+    "town_block",
     "city",
     "cityx1",
     "cityx2",
@@ -683,6 +689,15 @@ class XX18GameObject(CoreGameObject):
                     border=True,
                     **kwargs,
                 )
+            case "town_block":
+                self.town(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    block=True,
+                    **kwargs,
+                )
             case "track":
                 self.track(
                     location=feature[0],
@@ -942,6 +957,7 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         border: bool = False,
+        block: bool = False,
         **kwargs,
     ):
         """Draw Town shape at hex location(s).
@@ -952,7 +968,7 @@ class XX18GameObject(CoreGameObject):
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
         """
-        from protograf.protos import Circle
+        from protograf.protos import Circle, Rectangle
 
         _locations = self.process_locations(location, "town")
         for _loc in _locations:
@@ -960,20 +976,43 @@ class XX18GameObject(CoreGameObject):
             ccentre = self.feature_location(geo, direction, distance)
             label_position = kwargs.get("label_position", "below")
             lwargs = self.process_label(label, label_position, XX18_TOWN_DIAMETER / 2.0)
-            if border:
-                Circle(
+            # ---- block
+            if block:
+                _rotation = 360 - direction if direction else 0.0
+                Rectangle(
                     cxy=ccentre,
-                    radius=XX18_TOWN_DIAMETER_BORDER / 2.0,
+                    height=XX18_TOWN_HEIGHT_OUTER,
+                    width=XX18_TOWN_WIDTH_OUTER,
                     fill_stroke="white",
                     stroke_width=XX18_STROKE_WIDTH,
+                    rotation=_rotation,
+                    **{**kwargs, **lwargs},
                 )
-            Circle(
-                cxy=ccentre,
-                radius=XX18_TOWN_DIAMETER / 2.0,
-                fill_stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
-                **{**kwargs, **lwargs},
-            )
+                Rectangle(
+                    cxy=ccentre,
+                    height=XX18_TOWN_HEIGHT,
+                    width=XX18_TOWN_WIDTH,
+                    fill_stroke="black",
+                    stroke_width=XX18_STROKE_WIDTH,
+                    rotation=_rotation,
+                    **{**kwargs, **lwargs},
+                )
+            # ---- circle
+            else:
+                if border:
+                    Circle(
+                        cxy=ccentre,
+                        radius=XX18_TOWN_DIAMETER_BORDER / 2.0,
+                        fill_stroke="white",
+                        stroke_width=XX18_STROKE_WIDTH,
+                    )
+                Circle(
+                    cxy=ccentre,
+                    radius=XX18_TOWN_DIAMETER / 2.0,
+                    fill_stroke="black",
+                    stroke_width=XX18_STROKE_WIDTH,
+                    **{**kwargs, **lwargs},
+                )
 
     def city(
         self,
