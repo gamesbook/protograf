@@ -43,11 +43,38 @@ appear at the centre of a hex. These can be repositioned using a combination of
 direction (in degrees clockwise from east) and distance of the feature's center
 from the hex center (as a fraction of the hex radius).
 
-Positioning of features, such as lines, spikes or numbered circles, on hex edges
-will be done uisng standard compass directions; "ne" for northeast, "s" for south,
-etc., and will be centred on that edge.
+Positioning of features, such as lines, spikes, bumps or numbered circles, on hex
+edges will be done using standard compass directions; "ne" for northeast,
+"s" for south, etc., and will be centred on that edge.
 
 Drawing will be done following the order in which features are provided.
+
+Standard, named 18xx colors
+===========================
+
+Tile Phase        Classic (Avalon Hill) HEX Code  Modern (Lookout/Mayfair) HEX Code
+----------------- ------------------------------- ---------------------------------
+Yellow (Phase 2)  #FFD200 (Bright Golden Yellow)  #F1C40F (Muted/Warm Yellow)
+Green (Phase 3)   #00A651 (Rich Kelly Green)      #27AE60 (Mid-tone Emerald)
+Brown (Phase 5)   #7A4B1B (Deep Chocolate Brown)  #7E5109 (Clay/Dark Ochre)
+Gray (Phase 7)    #7F8C8D (Medium Neutral Gray)   #95A5A6 (Light Slate Gray)
+----------------- ------------------------------- ---------------------------------
+
+Hex Type / Phase   HEX Code UI Design Purpose
+------------------ -------- ----------------------------------------------------
+Map Background     #EAEAEA  Neutral light gray to make active hexes pop.
+Plain Hex (Base)   #FFFFFF  Stark white or a pale off-white (#F9F9F9).
+Yellow Phase Hex   #F1E351  Warm digital yellow
+Green Phase Hex    #4CAF50  Vibrant emerald green for clear route tracking
+Brown Phase Hex    #8D6E63  Balanced medium brown
+Gray Phase Hex     #B0BEC5  Cool, light slate gray
+Barrier            #757575  Dark neutral gray for mountain edges or grid borders
+Off-Board Red Hex  #EF5350  Soft digital crimson for red-zone revenue endpoints
+
+Coastal Water      #5A8CAF  Often used near the coastline; water for artwork & land
+Avalon Hill Water  #4A7F9D  Slightly green-tinted teal-blue
+Modern 18xx Water  #A9CBE2  Very pale sky-blue. Desaturated, pastel light-blue
+
 """
 
 # lib
@@ -64,7 +91,7 @@ from protograf.shapes import (
     RectangularLocations,
 )
 from protograf.utils import tools, colrs, geoms
-from protograf.utils.constants import GRID_SHAPES_WITH_CENTRE, COLORS_18XX
+from protograf.utils.constants import GRID_SHAPES_WITH_CENTRE
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (  # named tuples; enums
     AbstractBoardType,
@@ -97,6 +124,26 @@ XX18_TEXT_FONT = "Times-Roman"
 XX18_TEXT_FONT_BOLD = "Times-Bold"
 XX18_RESOURCES = "resources/xx18/symbols/"
 
+# ---- color constants
+XX18_TILE_YELLOW = "#FFD200"
+XX18_TILE_GREEN = "#00A651"
+XX18_TILE_BROWN = "#7A4B1B"
+XX18_TILE_GRAY = "#7F8C8D"
+XX18_TILE_YELLOW_MF = "#F1C40F"
+XX18_TILE_GREEN_MF = "#27AE60"
+XX18_TILE_BROWN_MF = "#7E5109"
+XX18_TILE_GRAY_MF = "#95A5A6"
+XX18_HEX_BACK = "#EAEAEA"
+XX18_HEX_PLAIN = "#FFFFFF"
+XX18_HEX_PLAIN_OFF = "#F9f9f9"
+XX18_HEX_YELLOW = "#F1E351"
+XX18_HEX_GREEN = "#4CAF50"
+XX18_HEX_BROWN = "#8D6E63 "
+XX18_HEX_GRAY = "#B0BEC5"
+XX18_HEX_BARRIER = "#757575"
+XX18_HEX_OFFBOARD = "#EF5350"
+XX18_HEX_WATER = "#4A7F9D"
+
 # ---- fixed/derived constants
 XX18_HEX_HEIGHT = XX18_HEX_SIDE * math.sqrt(3)  # cm
 XX18_HEX_DIAMETER = 2 * XX18_HEX_SIDE
@@ -114,6 +161,7 @@ XX18_SYMBOL_SET = [
 XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "town",
     "city",
+    "cityx1",
     "cityx2",
     "cityx3",
     "cityx4",
@@ -125,6 +173,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "fill",
     "block",
     "spike",
+    "track",
 ]
 XX18_LABEL_POSITION = ["above", "below", "left", "right"]
 
@@ -169,37 +218,25 @@ class XX18GameObject(CoreGameObject):
         self.set_options_by_game(**kwargs)  # MUST be before call to validate!
         self._validate_choices()
         # ---- 18xx default colors
-        self.red = self._commons("red") or kwargs.get("red") or COLORS_18XX["red"]
-        self.ground = (
-            self._commons("ground") or kwargs.get("ground") or COLORS_18XX["ground"]
-        )
-        self.yellow = (
-            self._commons("yellow") or kwargs.get("yellow") or COLORS_18XX["yellow"]
-        )
-        self.green = (
-            self._commons("green") or kwargs.get("green") or COLORS_18XX["green"]
-        )
-        self.russet = (
-            self._commons("russet") or kwargs.get("russet") or COLORS_18XX["russet"]
-        )
-        self.grey = self._commons("grey") or kwargs.get("grey") or COLORS_18XX["grey"]
-        self.brown = (
-            self._commons("brown") or kwargs.get("brown") or COLORS_18XX["brown"]
-        )
-        self.blue = self._commons("blue") or kwargs.get("blue") or COLORS_18XX["blue"]
-        self.barrier = (
-            self._commons("barrier") or kwargs.get("barrier") or COLORS_18XX["barrier"]
-        )
-        self.white = (
-            self._commons("white") or kwargs.get("white") or COLORS_18XX["white"]
-        )
+        self.plain_hex = XX18_HEX_PLAIN
+        self.ground_hex = XX18_HEX_PLAIN_OFF
+        self.yellow_hex = XX18_HEX_YELLOW
+        self.green_hex = XX18_HEX_GREEN
+        self.brown_hex = XX18_HEX_BROWN
+        self.gray_hex = XX18_HEX_GRAY
+        self.grey_hex = XX18_HEX_GRAY
+        self.barrier_hex = XX18_HEX_BARRIER
+        self.offboard_hex = XX18_HEX_OFFBOARD
+        self.background = XX18_HEX_BACK
+        self.water_hex = XX18_HEX_WATER
         # self. = self._commons("") or kwargs.get("") or COLORS_18XX['']
         if kwargs.get("greys"):
-            self.yellow = "#D4D4D4"
-            self.green = "#B4B4B4"
-            self.grey = "#909090"
-            self.brown = "#636363"
-            self.red = "#494848"
+            self.yellow_hex = "#D4D4D4"
+            self.green_hex = "#B4B4B4"
+            self.grey_hex = "#909090"
+            self.gray_hex = "#909090"
+            self.brown_hex = "#636363"
+            self.offboard_hex = "#494848"
         # ---- setup
         self.setup_board()
         self.setup_pieces()  # none as yet
@@ -393,7 +430,7 @@ class XX18GameObject(CoreGameObject):
         # pointy; non-offset
         top_x = self.x if self.kwargs.get("x") else 0
         top_y = self.y if self.kwargs.get("y") else 0
-        hex_color = self.fill if self.fill else "white"
+        hex_color = self.fill if self.fill else self.plain_hex
         x_offset = 0
         # x_offset = -0.5 * self.cell_size
         if self.name == "hexhex" and self.auto_size and self.hexes % 2 == 0:
@@ -451,6 +488,8 @@ class XX18GameObject(CoreGameObject):
                         if self.even(col):
                             row_num += 1
                         cell_id = f"{col_alpha}{row_num}"
+                    else:
+                        cell_id = ""
                     cell_geo_label = cell_geo._replace(name=cell_id)
                     # print(f"&&& HEX {row=} {col=} name={cell_id}")
                     setattr(self, cell_id, cell_geo_label)
@@ -571,8 +610,7 @@ class XX18GameObject(CoreGameObject):
         ftype = feature[1]
         if ftype not in XX18_FEATURE_SET:
             feedback(
-                f"The feature '{ftype}' is not available;",
-                f" choose from: {XX18_FEATURE_SET}.",
+                f"The feature '{ftype}' is not available; choose from: \n{XX18_FEATURE_SET}.",
                 True,
                 True,
             )
@@ -594,7 +632,13 @@ class XX18GameObject(CoreGameObject):
         # print(f"&&& {feature[0]=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
         # ---- feature to function
         match ftype:
-            case "city" | "cityx2" | "cityx3" | "cityx4":
+            case "fill":
+                self.fill_hex(
+                    location=feature[0],
+                    color=flabel,
+                    **kwargs,
+                )
+            case "city" | "cityx1" | "cityx2" | "cityx3" | "cityx4":
                 if "x" in ftype:
                     _, count = ftype.split("x")
                 else:
@@ -607,18 +651,20 @@ class XX18GameObject(CoreGameObject):
                     count=count,
                     **kwargs,
                 )
-            case "fill":
-                self.fill_hex(
-                    location=feature[0],
-                    color=flabel,
-                    **kwargs,
-                )
             case "town":
                 self.town(
                     location=feature[0],
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
+                    **kwargs,
+                )
+            case "track":
+                self.track(
+                    location=feature[0],
+                    label=flabel,
+                    position=fdirection,
+                    color=None,  # TODO => how to set
                     **kwargs,
                 )
             case "mountain":
@@ -771,6 +817,100 @@ class XX18GameObject(CoreGameObject):
         kwargs["label_font"] = XX18_TEXT_FONT
         return kwargs
 
+    def track(
+        self,
+        location: str = None,
+        position: str = None,
+        stroke: object = None,
+        label: str = None,
+        **kwargs,
+    ):
+        """Draw track between hexsides at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            position (str): hex edge compass reference or references
+            stroke: the name of a color (defaults to self.barrier)
+            label (str): the text to be drawn above/below the line
+        """
+        from protograf.protos import Hexagon
+
+        _locations = self.process_locations(location, "track")
+        if position is None:
+            position = []
+        _positions = tools.split(position, separator=" ", clean=True)
+        paths = []
+        perbii = ""
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            for edges in _positions:
+                start, end = None, None
+                if "," in edges:
+                    start, end = tools.split(edges, separator=",", clean=True)
+                else:
+                    start, end = edges, ""
+                # ---- validate allowed track directions
+                if self.orientation == HexOrientationName.POINTY.value:
+                    allowed = ["ne", "e", "se", "sw", "w", "nw", ""]
+                    if start not in allowed or end not in allowed:
+                        feedback(
+                            f"The track start and end must be chosen from '{allowed}';",
+                            f" the option '{edges}' is not allowed.",
+                            True,
+                            True,
+                        )
+                elif self.orientation == HexOrientationName.FLAT.value:
+                    allowed = ["n", "ne", "se", "s", "sw", "nw", ""]
+                    if start not in allowed or end not in allowed:
+                        feedback(
+                            f"The track start and end must be chosen from '{allowed}';",
+                            f" the option '{edges}' is not allowed.",
+                            True,
+                            True,
+                        )
+                if start and end:
+                    paths.append(f"{start} {end}")
+                elif start:
+                    perbii = perbii + " " + start
+                if paths:
+                    Hexagon(  # underlying white
+                        cxy=geo.centre,
+                        height=XX18_HEX_HEIGHT,
+                        fill=None,
+                        stroke="black",
+                        stroke_width=0.1,
+                        orientation=self.orientation,
+                        paths_stroke="white",
+                        paths_stroke_width=XX18_TRACK_WIDTH_OUTER * self.units,
+                        paths=paths,
+                        perbii=perbii,
+                        perbii_stroke="white",
+                        perbii_stroke_width=XX18_TRACK_WIDTH_OUTER * self.units,
+                        **kwargs,
+                    )
+                    Hexagon(  # overlying black
+                        cxy=geo.centre,
+                        height=XX18_HEX_HEIGHT,
+                        fill=None,
+                        stroke="black",
+                        stroke_width=0.1,
+                        orientation=self.orientation,
+                        paths_stroke="black",
+                        paths_stroke_width=XX18_TRACK_WIDTH_INNER * self.units,
+                        paths=paths,
+                        perbii=perbii,
+                        perbii_stroke="black",
+                        perbii_stroke_width=XX18_TRACK_WIDTH_INNER * self.units,
+                        **kwargs,
+                    )
+                else:
+                    feedback(
+                        f"The track '{position}' for '{location}' cannot be drawn;",
+                        " please check the directions used.",
+                        False,
+                        alert=True,
+                    )
+
     def town(
         self,
         location: str = None,
@@ -823,9 +963,10 @@ class XX18GameObject(CoreGameObject):
             count (str|int): number of circles in the city
             shape (Shape): the shape to be drawn inside the city
         """
-        from protograf.protos import Circle, Rectangle, Triangle
+        from protograf.protos import Circle, Rectangle, Triangle, Polyshape
 
         _locations = self.process_locations(location, "city")
+        _radius = XX18_CITY_DIAMETER / 2.0
         if count:
             city_count = tools.as_int(count, "city count", maximum=6, minimum=1)
         else:
@@ -837,25 +978,25 @@ class XX18GameObject(CoreGameObject):
             if city_count > 1:
                 if label_position not in ["above", "below"]:
                     label_position = "below"
-            lwargs = self.process_label(
-                label, label_position, XX18_CITY_DIAMETER / 2.0, "medium"
-            )
+            lwargs = self.process_label(label, label_position, _radius, "medium")
             cwargs = {}
-            cwargs["radius"] = XX18_CITY_DIAMETER / 2.0
+            cwargs["radius"] = _radius
             cwargs["fill"] = "white"
             cwargs["stroke"] = "black"
             cwargs["stroke_width"] = XX18_STROKE_WIDTH
             cwargs["centre_shape"] = shape
             match city_count:
+                # ---- city 1
                 case 1:
                     Circle(
                         cxy=ccentre,
                         **{**kwargs, **lwargs, **cwargs},
                     )
+                # ---- city 1
                 case 2:
                     ccentre = geo
-                    cx1 = ccentre.centre.x - XX18_CITY_DIAMETER / 2.0
-                    cx2 = ccentre.centre.x + XX18_CITY_DIAMETER / 2.0
+                    cw = ccentre.centre.x - _radius
+                    ce = ccentre.centre.x + _radius
                     Rectangle(
                         height=XX18_CITY_DIAMETER,
                         width=XX18_CITY_DIAMETER,
@@ -867,29 +1008,56 @@ class XX18GameObject(CoreGameObject):
                         **{**kwargs, **lwargs},
                     )
                     Circle(
-                        cx=cx1,
+                        cx=cw,
                         cy=geo.centre.y,
                         **{**kwargs, **cwargs},
                     )
                     Circle(
-                        cx=cx2,
+                        cx=ce,
                         cy=geo.centre.y,
                         **{**kwargs, **cwargs},
                     )
+                # ---- city 3
                 case 3:
                     ccentre = geo
+                    rwargs = {}
+                    rwargs["fill"] = "white"
+                    rwargs["stroke"] = "black"
+                    rwargs["stroke_width"] = XX18_STROKE_WIDTH
+                    # fill background
                     tri = Triangle(
                         cx=geo.centre.x,
                         cy=geo.centre.y,
                         side=XX18_CITY_DIAMETER,
-                        fill="white",
-                        stroke="black",
+                        **{**kwargs, **rwargs},
                     )
                     csw = tri.geo.sw
                     cse = tri.geo.se
                     cn = tri.geo.n
+                    Polyshape(
+                        x=cn.x,
+                        y=cn.y,
+                        snail=f"a30 {_radius} r90 {XX18_CITY_DIAMETER} r90 {_radius} r90 {XX18_CITY_DIAMETER}",
+                        **{**kwargs, **rwargs},
+                    )
+                    Polyshape(
+                        x=cn.x,
+                        y=cn.y,
+                        snail=f"a150 {_radius} l90 {XX18_CITY_DIAMETER} l90 {_radius} l90 {XX18_CITY_DIAMETER}",
+                        **{**kwargs, **rwargs},
+                    )
+                    # label below csw-cse rectangle
+                    Rectangle(
+                        height=_radius,
+                        width=XX18_CITY_DIAMETER,
+                        x=csw.x,
+                        y=csw.y,
+                        # title=label,
+                        **{**kwargs, **lwargs, **rwargs},
+                    )
+                    # draw city circles
                     Circle(
-                        cxy=csw,
+                        cxy=cn,
                         **{**kwargs, **cwargs},
                     )
                     Circle(
@@ -897,11 +1065,65 @@ class XX18GameObject(CoreGameObject):
                         **{**kwargs, **cwargs},
                     )
                     Circle(
-                        cxy=cn,
+                        cxy=csw,
                         **{**kwargs, **cwargs},
                     )
-                    # TODO - Rectangles at each triangle edge of h=radius
-                    # label below cse-csw rectangle
+                # ---- city 4
+                case 4:
+                    ccentre = geo
+                    cx1 = ccentre.centre.x - _radius
+                    cy1 = ccentre.centre.y - _radius
+                    cx2 = ccentre.centre.x + _radius
+                    cy2 = ccentre.centre.y - _radius
+                    cx3 = ccentre.centre.x + _radius
+                    cy3 = ccentre.centre.y + _radius
+                    cx4 = ccentre.centre.x - _radius
+                    cy4 = ccentre.centre.y + _radius
+                    rwargs = {}
+                    rwargs["fill"] = "white"
+                    rwargs["stroke"] = "black"
+                    rwargs["stroke_width"] = XX18_STROKE_WIDTH
+                    Rectangle(
+                        height=2 * XX18_CITY_DIAMETER,
+                        width=XX18_CITY_DIAMETER,
+                        cx=ccentre.centre.x,
+                        cy=ccentre.centre.y,
+                        **{**kwargs, **rwargs, **lwargs},
+                    )
+                    Rectangle(
+                        height=XX18_CITY_DIAMETER,
+                        width=2 * XX18_CITY_DIAMETER,
+                        cx=ccentre.centre.x,
+                        cy=ccentre.centre.y,
+                        **{**kwargs, **rwargs},
+                    )
+                    Circle(
+                        cx=cx1,
+                        cy=cy1,
+                        **{**kwargs, **cwargs},
+                    )
+                    Circle(
+                        cx=cx2,
+                        cy=cy2,
+                        **{**kwargs, **cwargs},
+                    )
+                    Circle(
+                        cx=cx3,
+                        cy=cy3,
+                        **{**kwargs, **cwargs},
+                    )
+                    Circle(
+                        cx=cx4,
+                        cy=cy4,
+                        **{**kwargs, **cwargs},
+                    )
+                case _:
+                    feedback(
+                        f"Unable to draw a City of size '{city_count}';",
+                        " choose from sizes 1, 2, 3 or 4",
+                        True,
+                        True,
+                    )
 
     def revenue(
         self,
@@ -1041,10 +1263,11 @@ class XX18GameObject(CoreGameObject):
             elif self.orientation == HexOrientationName.FLAT.value:
                 position = ["n", "ne", "se", "s", "sw", "nw"]
         _positions = tools.split(position, separator=" ", clean=True)
-        edge_color = colrs.get_color(stroke) if stroke else self.barrier
+        edge_color = colrs.get_color(stroke) if stroke else self.barrier_hex
         for _loc in _locations:
             geo = self.cells.get(_loc)
             for edge in _positions:
+                start, end = None, None
                 if self.orientation == HexOrientationName.POINTY.value:
                     match _lower(edge):
                         case "ne":
@@ -1097,7 +1320,8 @@ class XX18GameObject(CoreGameObject):
                                 True,
                                 True,
                             )
-                Line(xy=start, xy1=end, stroke=edge_color, stroke_width=7, **kwargs)
+                if start and end:
+                    Line(xy=start, xy1=end, stroke=edge_color, stroke_width=7, **kwargs)
 
     def tile_letter(
         self,

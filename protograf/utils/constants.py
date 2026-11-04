@@ -9,6 +9,7 @@ Notes:
 
 # lib
 from collections import namedtuple
+from functools import lru_cache
 import math
 
 # third-party
@@ -31,6 +32,13 @@ ThePaper = namedtuple(
     ],
 )
 
+
+@lru_cache(maxsize=1024)
+def color_list():
+    COLOR_NAMES = getColorList()
+    return COLOR_NAMES
+
+
 YES = True
 NO = False
 SIN_60 = math.sin(math.radians(60))
@@ -40,7 +48,7 @@ HEX_HD = math.sqrt(3) / 2.0
 PHI = 1.61803398875  # an irrational number; decimal places continue...
 
 BGG_IMAGES = "cf.geekdo-images.com"
-COLOR_NAMES = getColorList()
+COLOR_NAMES = color_list()
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 
 RGB_DEBUG_COLOR = "#B0C4DE"
@@ -63,6 +71,15 @@ DEFAULT_MARGIN_SIZE = 18  # pt (1/4")
 DEFAULT_PAGE_SIZE = "A4"
 MAXIMUM_PAGE_WIDTH = 10000  # pt ~126" / 3.2m
 MAXIMUM_PAGE_HEIGHT = 10000  # pt ~126" / 3.2m
+
+
+CSS_COLOR_NAMES = {
+    "berylgreen": "#D9E3BE",
+    "geraldine": "#E98A84",
+    "chelseacucumber": "#80B26B",
+    "glacier": "#62BCDE",  # 18xx hex blue
+    "lochmara": "#0D81C0",  # 18xx river blue
+}
 
 RGB_COLOR_SINGLES = {
     "b": "#0000FF",
@@ -296,6 +313,7 @@ COLORS_SVG = {
 }
 
 # 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
+# deprecated - see xx18_game module
 COLORS_18XX = {
     "ground": "#fdd9b5",  # sandy tan
     "yellow": "#fdee00",  # aureolin

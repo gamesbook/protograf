@@ -187,6 +187,10 @@ class BaseCanvas:
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.cxy = self.defaults.get("cxy", None)
+        self.ptl = self.defaults.get("ptl", None)  # top-left Point
+        self.ptr = self.defaults.get("ptr", None)  # top-right Point
+        self.pbl = self.defaults.get("pbl", None)  # bottom-left Point
+        self.pbr = self.defaults.get("pbr", None)  # bottom-right Point
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -974,6 +978,10 @@ class BaseShape:
             kwargs.get("cy", __cy if __cy is not None else base.cy)
         )  # centre (for some shapes)
         # print(f"{self.xy=} {self.x=} {self.y=} {self.cx=} {self.cy=}")
+        self.ptl = kwargs.get("ptl", base.ptl)  # top-left Point
+        self.ptr = kwargs.get("ptr", base.ptr)  # top-right Point
+        self.pbl = kwargs.get("pbl", base.pbl)  # bottom-left Point
+        self.pbr = kwargs.get("pbr", base.pbr)  # bottom-right Point
         # ---- to be calculated ...
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
