@@ -14,10 +14,11 @@ Summary of functions:
 The 18xx map "blueprint" feature covers:
 
 * depiction of towns as filled-in circles (may include a border)
-* depiction of cities (single, double) as open circles; may include
+* depiction of cities (different sizes) as open circles; may include
   the railroad logo or a custom shape or text inset into it
 * depiction of revenue as circle with an amount
-* depiction of track, curved or straight; by itself or extending from a city
+* depiction of track, curved or straight
+* depiction of track extending from a city
 * depiction of terminal spikes running off-board (short, medium and long)
 * depiction of blocked hex-sides as thick lines
 * depiction of highlighted hex as a yellow band inside and along all hex edges
@@ -128,6 +129,7 @@ XX18_TRACK_WIDTH_INNER = 0.4  # cm
 XX18_TRACK_WIDTH_OUTER = 0.5  # cm
 XX18_MOUNTAIN_SIDE = 0.6  # cm; equilateral triangle
 XX18_STROKE_WIDTH = 1
+XX18_STROKE_WIDTH_HIGHLIGHT = 8
 XX18_TEXT_SMALL = 11
 XX18_TEXT_MEDIUM = 13
 XX18_TEXT_LARGE = 16
@@ -194,6 +196,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "tile_letter",
     "tile-letter",
     "fill",
+    "highlight",
     "block",
     "spike",
     "track",
@@ -658,6 +661,12 @@ class XX18GameObject(CoreGameObject):
         match ftype:
             case "fill":
                 self.fill_hex(
+                    location=feature[0],
+                    color=flabel,
+                    **kwargs,
+                )
+            case "highlight":
+                self.highlight(
                     location=feature[0],
                     color=flabel,
                     **kwargs,
@@ -1601,16 +1610,49 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Hexagon
 
         _locations = self.process_locations(location, "fill")
-        the_color = colrs.get_color(color)
+        if color:
+            the_color = colrs.get_color(color)
+            for _loc in _locations:
+                geo = self.cells.get(_loc)
+                ccentre = geo.centre
+                Hexagon(
+                    cxy=ccentre,
+                    height=XX18_HEX_HEIGHT,
+                    fill=the_color,
+                    stroke="black",
+                    stroke_width=XX18_STROKE_WIDTH,
+                    orientation=self.orientation,
+                )
+        else:
+            feedback("No color has been set for the hexagon fill!", alert=True)
+
+    def highlight(
+        self,
+        location: str = None,
+        color: object = None,
+        **kwargs,
+    ):
+        """Draw an inner outline hexagon in color at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            color (color): a color reference (default to 18XX yellow)
+        """
+        from protograf.protos import Hexagon
+
+        _locations = self.process_locations(location, "highlight")
+        _color = color if color else XX18_HEX_YELLOW
+        the_color = colrs.get_color(_color)
+        _height = XX18_HEX_HEIGHT - XX18_STROKE_WIDTH_HIGHLIGHT / self.units
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = geo.centre
             Hexagon(
                 cxy=ccentre,
-                height=XX18_HEX_HEIGHT,
-                fill=the_color,
-                stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
+                height=_height,
+                fill=None,
+                stroke=the_color,
+                stroke_width=XX18_STROKE_WIDTH_HIGHLIGHT,
                 orientation=self.orientation,
             )
 

@@ -73,6 +73,7 @@ MAXIMUM_PAGE_WIDTH = 10000  # pt ~126" / 3.2m
 MAXIMUM_PAGE_HEIGHT = 10000  # pt ~126" / 3.2m
 
 
+# ---- CSS colors
 CSS_COLOR_NAMES = {
     "berylgreen": "#D9E3BE",
     "geraldine": "#E98A84",
@@ -81,6 +82,7 @@ CSS_COLOR_NAMES = {
     "lochmara": "#0D81C0",  # 18xx river blue
 }
 
+# ---- RGB single letter colors
 RGB_COLOR_SINGLES = {
     "b": "#0000FF",
     "c": "#00FFFF",
@@ -103,6 +105,8 @@ RGB_COLOR_SINGLES = {
     "y": "#FFFF00",
     "x": "#000000",
 }
+
+# ---- CMYK single letter colors
 # converted from RGB via https://colordesigner.io/convert/hextocmyk
 CMYK_COLOR_SINGLES = {
     "b": "100, 100, 0, 0",
@@ -162,6 +166,7 @@ SHAPES_FOR_TRACK = [
     "SquareShape",
 ]
 
+# ---- SVG colors
 COLORS_SVG = {
     "black": "#000000",
     "navy": "#000080",
@@ -312,16 +317,18 @@ COLORS_SVG = {
     "white": "#ffffff",
 }
 
-# deprecated - see xx18_game module
+# ---- 18XX colors
 COLORS_18XX = {
     "xtile_yellow": "#ffd200",
     "xtile_green": "#00a651",
     "xtile_brown": "#7a4b1b",
     "xtile_gray": "#7f8c8d",
+    "xtile_grey": "#7f8c8d",
     "xtile_yellow_mf": "#f1c40f",
     "xtile_green_mf": "#27ae60",
     "xtile_brown_mf": "#7e5109",
     "xtile_gray_mf": "#95a5a6",
+    "xtile_grey_mf": "#95a5a6",
     "xback": "#eaeaea",
     "xplain": "#ffffff",
     "xplain_off": "#f9f9f9",
@@ -329,6 +336,7 @@ COLORS_18XX = {
     "xgreen": "#4caf50",
     "xbrown": "#8d6e63",
     "xgray": "#b0bec5",
+    "xgrey": "#b0bec5",
     "xbarrier": "#757575",
     "xoffboard": "#ef5350",
     "xwater": "#4a7f9d",
