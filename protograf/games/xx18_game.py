@@ -40,7 +40,7 @@ The 18xx map "blueprint" feature covers:
 The blueprint will also provide:
 
 * standard, named 18xx colors
-* ability to set the map fonts (of different sizes) to use
+* ability to set the map font names & sizes; or colors to use
 * ability to put labels next to icons, symbols, towns or cities
   (above, below, left-of, right-of)
 
@@ -635,9 +635,10 @@ class XX18GameObject(CoreGameObject):
         # ---- feature property values
         kwargs = {}
         ftype = feature[1]
-        if ftype not in XX18_FEATURE_SET:
+        if ftype not in XX18_FEATURE_SET and not isinstance(BaseShape):
             feedback(
-                f"The feature '{ftype}' is not available; choose from: \n{XX18_FEATURE_SET}.",
+                f"The feature '{ftype}' is not available; "
+                f"choose from: \n{XX18_FEATURE_SET} or supply a shape.",
                 True,
                 True,
             )
@@ -658,7 +659,12 @@ class XX18GameObject(CoreGameObject):
             kwargs["label_position"] = flabel_pos
         # print(f"&&& {feature[0]=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
         # ---- feature to function
-        match ftype:
+        feature_type = ftype
+        if ftype in XX18_SYMBOL_SET:
+            ftype = "SYMBOL"
+        if isinstance(ftype, BaseShape):
+            ftype = "SHAPE"
+        match feature_type:
             case "fill":
                 self.fill_hex(
                     location=feature[0],
@@ -791,7 +797,7 @@ class XX18GameObject(CoreGameObject):
                     position=fdirection,
                     **kwargs,
                 )
-            case _:
+            case "SYMBOL":
                 self.symbol(
                     location=feature[0],
                     label=flabel,
@@ -799,6 +805,22 @@ class XX18GameObject(CoreGameObject):
                     distance=fdistance,
                     name=ftype,
                     **kwargs,
+                )
+            case "SHAPE":
+                self.figure(
+                    location=feature[0],
+                    label=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    thing=ftype,
+                    **kwargs,
+                )
+            case _:
+                feedback(
+                    f"The feature '{ftype}' is not available; "
+                    f"choose from: \n{XX18_FEATURE_SET} or supply a shape.",
+                    True,
+                    True,
                 )
 
     def feature_location(
@@ -1826,3 +1848,29 @@ class XX18GameObject(CoreGameObject):
             offset = 0.5
             lwargs = self.process_label(label, label_position, offset, "small")
             Image(_file, cxy=ccentre, **{**kwargs, **lwargs})
+
+    def figure(
+        self,
+        location: str = None,
+        label: str = None,
+        direction: float = None,
+        distance: float = None,
+        thing: object = None,
+        **kwargs,
+    ):
+        """Draw a symbol/shape at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            label (str): the label for the symbol
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
+            name (str): the name the symbol
+        """
+        _locations = self.process_locations(location, f"figure")
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            thing.cx = ccentre.x
+            thing.cy = ccentre.y
+            thing.draw()
