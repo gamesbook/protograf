@@ -99,6 +99,7 @@ from protograf.utils.messaging import feedback
 from protograf.utils.structures import (  # named tuples; enums
     AbstractBoardType,
     Corner,
+    HexOrientation,
     HexOrientationName,
     Point,
     ShapeGeometry,
@@ -114,10 +115,10 @@ XX18_HEX_SIDE = 2.3864  # cm
 XX18_CITY_DIAMETER = 1.45  # cm
 XX18_TOWN_DIAMETER = 0.45  # cm
 XX18_TOWN_HEIGHT = 0.45  # cm
-XX18_TOWN_WIDTH = 0.7  # cm
-XX18_TOWN_WIDTH_OUTER = 0.8  # cm
-XX18_TOWN_HEIGHT = 0.4  # cm
-XX18_TOWN_HEIGHT_OUTER = 0.5  # cm
+XX18_TOWN_HEIGHT = 0.7  # cm
+XX18_TOWN_HEIGHT_OUTER = 0.8  # cm
+XX18_TOWN_WIDTH = 0.4  # cm
+XX18_TOWN_WIDTH_OUTER = 0.5  # cm
 XX18_TOWN_DIAMETER_BORDER = 0.55  # cm; outer-circle
 XX18_PRIVATE_DIAMETER = 0.4  # cm
 XX18_REVENUE_DIAMETER = 0.8  # cm
@@ -180,7 +181,6 @@ XX18_SYMBOL_SET = [
 XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "town",
     "town_border",
-    "town_block",
     "city",
     "cityx1",
     "cityx2",
@@ -195,6 +195,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "block",
     "spike",
     "track",
+    "track_town",
 ]
 XX18_LABEL_POSITION = ["above", "below", "left", "right"]
 
@@ -689,21 +690,21 @@ class XX18GameObject(CoreGameObject):
                     border=True,
                     **kwargs,
                 )
-            case "town_block":
-                self.town(
-                    location=feature[0],
-                    label=flabel,
-                    direction=fdirection,
-                    distance=fdistance,
-                    block=True,
-                    **kwargs,
-                )
             case "track":
                 self.track(
                     location=feature[0],
                     label=flabel,
                     position=fdirection,
                     color=None,  # TODO => how to set
+                    **kwargs,
+                )
+            case "track_town":
+                self.track(
+                    location=feature[0],
+                    label=flabel,
+                    position=fdirection,
+                    color=None,  # TODO => how to set
+                    town="middle",  # ALL POSITIONS NOT OPERATIONAL
                     **kwargs,
                 )
             case "mountain":
@@ -844,17 +845,166 @@ class XX18GameObject(CoreGameObject):
         kwargs["heading"] = heading
         kwargs["heading_size"] = font_size
         kwargs["heading_font"] = XX18_TEXT_FONT
+        kwargs["heading_stroke"] = "black"
 
         kwargs["title"] = title
         kwargs["title_size"] = font_size
         kwargs["title_font"] = XX18_TEXT_FONT
+        kwargs["title_stroke"] = "black"
 
         kwargs["label"] = _label
         kwargs["label_mx"] = label_mx
         kwargs["label_align"] = label_align
         kwargs["label_size"] = font_size
         kwargs["label_font"] = XX18_TEXT_FONT
+        kwargs["label_stroke"] = "black"
         return kwargs
+
+    def process_track_town_position(
+        self, hexagon: object, path_pair: list, offset: str = "middle"
+    ) -> tuple:
+        """Determine where on a hexagon path a shape should be located.
+
+        Args:
+            hexagon (Hexagon): a pre-drawn Hexagon shape
+            path_pair (list): list of two strings (start and end compass directions)
+            offset: where on the path to draw the shape
+
+        Returns:
+            tuple: direction (float), distance (float), rotation (float)
+        """
+        direction, distance, rotation = 0, 0, 0
+        if hexagon.ORIENTATION == HexOrientation.FLAT:
+            match path_pair:
+                # 120 degrees / short arc
+                case ["n", "ne"] | ["ne", "n"]:
+                    direction = 60
+                    distance = 0.4
+                    rotation = 60
+                case ["se", "ne"] | ["ne", "se"]:
+                    direction = 60
+                    distance = 0.4
+                    rotation = 60
+                case ["se", "s"] | ["s", "se"]:
+                    direction = 60
+                    distance = 0.4
+                    rotation = 60
+                case ["sw", "s"] | ["s", "sw"]:
+                    direction = 60
+                    distance = 0.4
+                    rotation = 60
+                case ["sw", "nw"] | ["nw", "sw"]:
+                    direction = 60
+                    distance = 0.4
+                    rotation = 60
+                case ["n", "nw"] | ["nw", "n"]:
+                    direction = 60
+                    distance = 0.4
+                    rotation = 60
+                # 60 degrees / long arc
+                case ["n", "se"] | ["se", "n"]:
+                    direction = 60
+                    distance = 0.5
+                    rotation = 60
+                case ["ne", "s"] | ["s", "ne"]:
+                    direction = 60
+                    distance = 0.5
+                    rotation = 60
+                case ["se", "sw"] | ["sw", "se"]:
+                    direction = 60
+                    distance = 0.5
+                    rotation = 60
+                case ["s", "nw"] | ["nw", "s"]:
+                    direction = 60
+                    distance = 0.5
+                    rotation = 60
+                case ["sw", "n"] | ["n", "sw"]:
+                    direction = 60
+                    distance = 0.5
+                    rotation = 60
+                case ["nw", "ne"] | ["ne", "nw"]:
+                    direction = 60
+                    distance = 0.5
+                    rotation = 60
+                # 90 degrees
+                case ["nw", "se"] | ["se", "nw"]:
+                    direction = 0
+                    distance = 0
+                    rotation = 90
+                case ["ne", "sw"] | ["sw", "ne"]:
+                    direction = 0
+                    distance = 0
+                    rotation = 90
+                case ["n", "s"] | ["s", "n"]:
+                    direction = 0
+                    distance = 0
+                    rotation = 90
+        elif hexagon.ORIENTATION == HexOrientation.POINTY:
+            match path_pair:
+                # 120 degrees / short arc
+                case ["e", "ne"] | ["ne", "e"]:
+                    direction = 330
+                    distance = 0.5
+                    rotation = 120
+                case ["e", "se"] | ["se", "e"]:
+                    direction = 30
+                    distance = 0.5
+                    rotation = 60
+                case ["sw", "se"] | ["se", "sw"]:
+                    direction = 90
+                    distance = 0.5
+                    rotation = 0
+                case ["w", "sw"] | ["sw", "w"]:
+                    direction = 150
+                    distance = 0.5
+                    rotation = 300
+                case ["w", "nw"] | ["nw", "w"]:
+                    direction = 210
+                    distance = 0.5
+                    rotation = 240
+                case ["nw", "ne"] | ["ne", "nw"]:
+                    direction = 270
+                    distance = 0.5
+                    rotation = 180
+                # 60 degrees / long arc
+                case ["ne", "se"] | ["se", "ne"]:
+                    direction = 0
+                    distance = 0.23
+                    rotation = 90
+                case ["e", "sw"] | ["sw", "e"]:
+                    direction = 60
+                    distance = 0.23
+                    rotation = 30
+                case ["w", "se"] | ["se", "w"]:
+                    direction = 120
+                    distance = 0.23
+                    rotation = -30
+                case ["nw", "sw"] | ["sw", "nw"]:
+                    direction = 180
+                    distance = 0.23
+                    rotation = 270
+                case ["ne", "w"] | ["w", "ne"]:
+                    direction = 240
+                    distance = 0.23
+                    rotation = 210
+                case ["e", "nw"] | ["nw", "e"]:
+                    direction = 300
+                    distance = 0.23
+                    rotation = 150
+                # 90 degrees
+                case ["ne", "sw"] | ["sw", "ne"]:
+                    direction = 0
+                    distance = 0
+                    rotation = 60
+                case ["e", "w"] | ["w", "e"]:
+                    direction = 0
+                    distance = 0
+                    rotation = 0
+                case ["nw", "se"] | ["se", "nw"]:
+                    direction = 0
+                    distance = 0
+                    rotation = 300
+        return direction, distance, rotation
 
     def track(
         self,
@@ -862,6 +1012,7 @@ class XX18GameObject(CoreGameObject):
         position: str = None,
         stroke: object = None,
         label: str = None,
+        town: str = None,
         **kwargs,
     ):
         """Draw track between hexsides at hex location(s).
@@ -871,13 +1022,14 @@ class XX18GameObject(CoreGameObject):
             position (str): hex edge compass reference or references
             stroke: the name of a color (defaults to self.barrier)
             label (str): the text to be drawn above/below the line
+            town (str): position of a town "block" on the track; middle, start or end
         """
-        from protograf.protos import Hexagon
+        from protograf.protos import Hexagon, Rectangle
 
         _locations = self.process_locations(location, "track")
         if position is None:
             position = []
-        _positions = tools.split(position, separator=" ", clean=True)
+        _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         paths = []
         perbii = ""
         for _loc in _locations:
@@ -912,7 +1064,7 @@ class XX18GameObject(CoreGameObject):
                 elif start:
                     perbii = perbii + " " + start
                 if paths:
-                    Hexagon(  # underlying white
+                    hxw = Hexagon(  # underlying white
                         cxy=geo.centre,
                         height=XX18_HEX_HEIGHT,
                         fill=None,
@@ -927,6 +1079,25 @@ class XX18GameObject(CoreGameObject):
                         perbii_stroke_width=XX18_TRACK_WIDTH_OUTER * self.units,
                         **kwargs,
                     )
+                    # ---- town-on-track
+                    if town:
+                        direction, distance, rotation = (
+                            self.process_track_town_position(hxw, [start, end])
+                        )
+                        ccentre = self.feature_location(geo, direction, distance)
+                        label_position = kwargs.get("label_position", "above")
+                        lwargs = self.process_label(
+                            label, label_position, XX18_TOWN_DIAMETER / 2.0
+                        )
+                        Rectangle(
+                            cxy=ccentre,
+                            height=XX18_TOWN_HEIGHT_OUTER,
+                            width=XX18_TOWN_WIDTH_OUTER,
+                            fill_stroke="white",
+                            stroke_width=XX18_STROKE_WIDTH,
+                            rotation=rotation,
+                            **{**kwargs, **lwargs},
+                        )
                     Hexagon(  # overlying black
                         cxy=geo.centre,
                         height=XX18_HEX_HEIGHT,
@@ -942,6 +1113,16 @@ class XX18GameObject(CoreGameObject):
                         perbii_stroke_width=XX18_TRACK_WIDTH_INNER * self.units,
                         **kwargs,
                     )
+                    if town:
+                        Rectangle(
+                            cxy=ccentre,  # as set for white above
+                            height=XX18_TOWN_HEIGHT,
+                            width=XX18_TOWN_WIDTH,
+                            fill_stroke="black",
+                            stroke_width=XX18_STROKE_WIDTH,
+                            rotation=rotation,  # as set for white above
+                            **kwargs,
+                        )
                 else:
                     feedback(
                         f"The track '{position}' for '{location}' cannot be drawn;",
@@ -957,7 +1138,6 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         border: bool = False,
-        block: bool = False,
         **kwargs,
     ):
         """Draw Town shape at hex location(s).
@@ -968,7 +1148,7 @@ class XX18GameObject(CoreGameObject):
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
         """
-        from protograf.protos import Circle, Rectangle
+        from protograf.protos import Circle
 
         _locations = self.process_locations(location, "town")
         for _loc in _locations:
@@ -976,43 +1156,21 @@ class XX18GameObject(CoreGameObject):
             ccentre = self.feature_location(geo, direction, distance)
             label_position = kwargs.get("label_position", "below")
             lwargs = self.process_label(label, label_position, XX18_TOWN_DIAMETER / 2.0)
-            # ---- block
-            if block:
-                _rotation = 360 - direction if direction else 0.0
-                Rectangle(
-                    cxy=ccentre,
-                    height=XX18_TOWN_HEIGHT_OUTER,
-                    width=XX18_TOWN_WIDTH_OUTER,
-                    fill_stroke="white",
-                    stroke_width=XX18_STROKE_WIDTH,
-                    rotation=_rotation,
-                    **{**kwargs, **lwargs},
-                )
-                Rectangle(
-                    cxy=ccentre,
-                    height=XX18_TOWN_HEIGHT,
-                    width=XX18_TOWN_WIDTH,
-                    fill_stroke="black",
-                    stroke_width=XX18_STROKE_WIDTH,
-                    rotation=_rotation,
-                    **{**kwargs, **lwargs},
-                )
             # ---- circle
-            else:
-                if border:
-                    Circle(
-                        cxy=ccentre,
-                        radius=XX18_TOWN_DIAMETER_BORDER / 2.0,
-                        fill_stroke="white",
-                        stroke_width=XX18_STROKE_WIDTH,
-                    )
+            if border:
                 Circle(
                     cxy=ccentre,
-                    radius=XX18_TOWN_DIAMETER / 2.0,
-                    fill_stroke="black",
+                    radius=XX18_TOWN_DIAMETER_BORDER / 2.0,
+                    fill_stroke="white",
                     stroke_width=XX18_STROKE_WIDTH,
-                    **{**kwargs, **lwargs},
                 )
+            Circle(
+                cxy=ccentre,
+                radius=XX18_TOWN_DIAMETER / 2.0,
+                fill_stroke="black",
+                stroke_width=XX18_STROKE_WIDTH,
+                **{**kwargs, **lwargs},
+            )
 
     def city(
         self,

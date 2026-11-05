@@ -22,6 +22,7 @@ from protograf.utils.structures import (
     DirectionGroup,
     HexGeometry,
     HexOrientation,
+    HexPathCurve,
     Link,
     Perbis,
     Point,
@@ -58,6 +59,7 @@ class HexShape(BaseShape):
         self.grid = None
         self.is_cards = False
         self.bleed_radius = kwargs.get("bleed_radius", 0.0)
+        self.path_curve = None  # instance of HexPathCurve if Path set
         # ---- check construction type
         self.use_diameter = self.is_kwarg("diameter")
         self.use_height = self.is_kwarg("height")
@@ -1017,30 +1019,42 @@ class HexShape(BaseShape):
                 match dir_pair:
                     # 120 degrees / short arc
                     case ["n", "ne"] | ["ne", "n"]:
+                        self.path_curve = HexPathCurve.TIGHT
                         arc(vertices[4], perbii_dict["n"].point, 120.0)  # p5
                     case ["se", "ne"] | ["ne", "se"]:
                         arc(vertices[3], perbii_dict["ne"].point, 120.0)  # p4
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["se", "s"] | ["s", "se"]:
                         arc(vertices[2], perbii_dict["se"].point, 120.0)  # p3
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["sw", "s"] | ["s", "sw"]:
                         arc(vertices[1], perbii_dict["s"].point, 120.0)  # p2
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["sw", "nw"] | ["nw", "sw"]:
                         arc(vertices[0], perbii_dict["sw"].point, 120.0)  # p1
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["n", "nw"] | ["nw", "n"]:
                         arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p0
+                        self.path_curve = HexPathCurve.TIGHT
                     # 60 degrees / long arc
                     case ["n", "se"] | ["se", "n"]:
                         arc(pt_b, perbii_dict["n"].point, 60.0)  # p5
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["ne", "s"] | ["s", "ne"]:
                         arc(pt_c, perbii_dict["ne"].point, 60.0)  # p4
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["se", "sw"] | ["sw", "se"]:
                         arc(pt_d, perbii_dict["se"].point, 60.0)  # p3
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["s", "nw"] | ["nw", "s"]:
                         arc(pt_e, perbii_dict["s"].point, 60.0)  # p2
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["sw", "n"] | ["n", "sw"]:
                         arc(pt_f, perbii_dict["sw"].point, 60.0)  # p1
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["nw", "ne"] | ["ne", "nw"]:
                         arc(pt_a, perbii_dict["nw"].point, 60.0)  # p0
+                        self.path_curve = HexPathCurve.GENTLE
                     # 90 degrees
                     case ["nw", "se"] | ["se", "nw"]:
                         klargs = draw_line(
@@ -1050,6 +1064,7 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
+                        self.path_curve = HexPathCurve.FLAT
                     case ["ne", "sw"] | ["sw", "ne"]:
                         klargs = draw_line(
                             cnv,
@@ -1058,6 +1073,7 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
+                        self.path_curve = HexPathCurve.FLAT
                     case ["n", "s"] | ["s", "n"]:
                         klargs = draw_line(
                             cnv,
@@ -1066,34 +1082,47 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
+                        self.path_curve = HexPathCurve.FLAT
             elif self.ORIENTATION == HexOrientation.POINTY:
                 match dir_pair:
                     # 120 degrees / short arc
                     case ["e", "ne"] | ["ne", "e"]:
                         arc(vertices[4], perbii_dict["ne"].point, 120.0)  # p5
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["e", "se"] | ["se", "e"]:
                         arc(vertices[3], perbii_dict["e"].point, 120.0)  # p4
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["sw", "se"] | ["se", "sw"]:
                         arc(vertices[2], perbii_dict["se"].point, 120.0)  # p3
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["w", "sw"] | ["sw", "w"]:
                         arc(vertices[1], perbii_dict["sw"].point, 120.0)  # p2
+                        self.path_curve = HexPathCurve.TIGHT
                     case ["w", "nw"] | ["nw", "w"]:
                         arc(vertices[0], perbii_dict["w"].point, 120.0)  # p1
-                    case ["nw", "ne"] | ["nw", "ne"]:
+                        self.path_curve = HexPathCurve.TIGHT
+                    case ["nw", "ne"] | ["ne", "nw"]:
                         arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p0
+                        self.path_curve = HexPathCurve.TIGHT
                     # 60 degrees / long arc
                     case ["ne", "se"] | ["se", "ne"]:
                         arc(pt_b, perbii_dict["ne"].point, 60.0)  # p5
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["e", "sw"] | ["sw", "e"]:
                         arc(pt_c, perbii_dict["e"].point, 60.0)  # p4
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["w", "se"] | ["se", "w"]:
                         arc(pt_d, perbii_dict["se"].point, 60.0)  # p3
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["nw", "sw"] | ["sw", "nw"]:
                         arc(pt_e, perbii_dict["sw"].point, 60.0)  # p2
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["ne", "w"] | ["w", "ne"]:
                         arc(pt_f, perbii_dict["w"].point, 60.0)  # p1
+                        self.path_curve = HexPathCurve.GENTLE
                     case ["e", "nw"] | ["nw", "e"]:
                         arc(pt_a, perbii_dict["nw"].point, 60.0)  # p0
+                        self.path_curve = HexPathCurve.GENTLE
                     # 90 degrees
                     case ["ne", "sw"] | ["sw", "ne"]:
                         klargs = draw_line(
@@ -1103,6 +1132,7 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
+                        self.path_curve = HexPathCurve.FLAT
                     case ["e", "w"] | ["w", "e"]:
                         klargs = draw_line(
                             cnv,
@@ -1111,6 +1141,7 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
+                        self.path_curve = HexPathCurve.FLAT
                     case ["nw", "se"] | ["se", "nw"]:
                         klargs = draw_line(
                             cnv,
@@ -1119,6 +1150,7 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
+                        self.path_curve = HexPathCurve.FLAT
 
             else:
                 feedback(
