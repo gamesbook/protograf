@@ -20,6 +20,7 @@ The 18xx map "blueprint" feature covers:
 * depiction of track, curved or straight; by itself or extending from a city
 * depiction of terminal spikes running off-board (short, medium and long)
 * depiction of blocked hex-sides as thick lines
+* depiction of highlighted hex as a yellow band inside and along all hex edges
 * depiction of private railways; either in-hex or across hexes
 * depiction of icons for common in-hex features; including mountains
   (two sizes), hills, and rivers
@@ -31,23 +32,24 @@ The 18xx map "blueprint" feature covers:
 * display of a single piece of text
 * display of hex coordinates along the edges of the map
 * coloring ("fill") of a whole hex
-* setting of a shaded rectangular area (typically red and at the map edge)
+* setting of a off-board, colored, rectangular area (typically red and at the map edge)
 * creation of a small multi-line table to appear in an off-board hex
   (typically income per stage of the game)
 
 The blueprint will also provide:
+
 * standard, named 18xx colors
 * ability to set the map fonts (of different sizes) to use
-* ability to put labels next to icons, towns or cities
-  (above, below, left of, right of)
+* ability to put labels next to icons, symbols, towns or cities
+  (above, below, left-of, right-of)
 
-In-hex features, for example, cities, towns, icons, or lettering, will by default
-appear at the centre of a hex. These can be repositioned using a combination of
-direction (in degrees clockwise from east) and distance of the feature's center
-from the hex center (as a fraction of the hex radius).
+In-hex features, for example, cities, towns, icons, symbols or lettering will,
+by default, appear at the centre of a hex. These can be repositioned using a
+combination of direction (in degrees clockwise from east) and distance (as a
+fraction of the hex radius).
 
-Positioning of features, such as lines, spikes, bumps or numbered circles, on hex
-edges will be done using standard compass directions; "ne" for northeast,
+Positioning of features, such as lines, spikes, bumps or numbered circles, on
+hex edges will be done using standard compass directions; "ne" for northeast,
 "s" for south, etc., and will be centred on that edge.
 
 Drawing will be done following the order in which features are provided.
@@ -878,63 +880,63 @@ class XX18GameObject(CoreGameObject):
             match path_pair:
                 # 120 degrees / short arc
                 case ["n", "ne"] | ["ne", "n"]:
-                    direction = 60
-                    distance = 0.4
-                    rotation = 60
+                    direction = 300
+                    distance = 0.5
+                    rotation = 150
                 case ["se", "ne"] | ["ne", "se"]:
-                    direction = 60
-                    distance = 0.4
-                    rotation = 60
+                    direction = 0
+                    distance = 0.5
+                    rotation = 90
                 case ["se", "s"] | ["s", "se"]:
                     direction = 60
-                    distance = 0.4
-                    rotation = 60
+                    distance = 0.5
+                    rotation = 30
                 case ["sw", "s"] | ["s", "sw"]:
-                    direction = 60
-                    distance = 0.4
-                    rotation = 60
+                    direction = 120
+                    distance = 0.5
+                    rotation = 330
                 case ["sw", "nw"] | ["nw", "sw"]:
-                    direction = 60
-                    distance = 0.4
-                    rotation = 60
+                    direction = 180
+                    distance = 0.5
+                    rotation = 270
                 case ["n", "nw"] | ["nw", "n"]:
-                    direction = 60
-                    distance = 0.4
-                    rotation = 60
+                    direction = 240
+                    distance = 0.5
+                    rotation = 210
                 # 60 degrees / long arc
                 case ["n", "se"] | ["se", "n"]:
-                    direction = 60
-                    distance = 0.5
-                    rotation = 60
+                    direction = 330
+                    distance = 0.24
+                    rotation = 300
                 case ["ne", "s"] | ["s", "ne"]:
-                    direction = 60
-                    distance = 0.5
+                    direction = 30
+                    distance = 0.24
                     rotation = 60
                 case ["se", "sw"] | ["sw", "se"]:
-                    direction = 60
-                    distance = 0.5
-                    rotation = 60
+                    direction = 90
+                    distance = 0.24
+                    rotation = 0
                 case ["s", "nw"] | ["nw", "s"]:
-                    direction = 60
-                    distance = 0.5
-                    rotation = 60
+                    direction = 150
+                    distance = 0.24
+                    rotation = 300
                 case ["sw", "n"] | ["n", "sw"]:
-                    direction = 60
-                    distance = 0.5
+                    direction = 210
+                    distance = 0.24
                     rotation = 60
                 case ["nw", "ne"] | ["ne", "nw"]:
-                    direction = 60
-                    distance = 0.5
-                    rotation = 60
+                    direction = 270
+                    distance = 0.24
+                    rotation = 0
                 # 90 degrees
                 case ["nw", "se"] | ["se", "nw"]:
                     direction = 0
                     distance = 0
-                    rotation = 90
+                    rotation = 330
                 case ["ne", "sw"] | ["sw", "ne"]:
                     direction = 0
                     distance = 0
-                    rotation = 90
+                    rotation = 30
                 case ["n", "s"] | ["s", "n"]:
                     direction = 0
                     distance = 0
