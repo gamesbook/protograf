@@ -157,6 +157,8 @@ XX18_HEX_GRAY = "#B0BEC5"
 XX18_HEX_BARRIER = "#757575"
 XX18_HEX_OFFBOARD = "#EF5350"
 XX18_HEX_WATER = "#4A7F9D"
+XX18_HEX_RIVER = "#01A0D6"
+XX18_HEX_SEA = "#C1E6FD"
 
 # ---- fixed/derived constants
 XX18_HEX_HEIGHT = XX18_HEX_SIDE * math.sqrt(3)  # cm
@@ -201,6 +203,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "spike",
     "track",
     "track_town",
+    "river_line",
 ]
 XX18_LABEL_POSITION = ["above", "below", "left", "right"]
 
@@ -256,6 +259,7 @@ class XX18GameObject(CoreGameObject):
         self.offboard_hex = XX18_HEX_OFFBOARD
         self.background = XX18_HEX_BACK
         self.water_hex = XX18_HEX_WATER
+        self.sea_hex = XX18_HEX_SEA
         # self. = self._commons("") or kwargs.get("") or COLORS_18XX['']
         if kwargs.get("greys"):
             self.yellow_hex = "#D4D4D4"
@@ -445,6 +449,15 @@ class XX18GameObject(CoreGameObject):
                 Text(row_value, x=x, y=y, **lkeys)
                 row_num += 1
 
+    def set_locale_label(self, row: int, col: int, label: str):
+        """Set a locale label attribute for the board's locales."""
+        for key, locale in enumerate(self.board_layout.locales):
+            if locale.col == col and locale.row == row:
+                self.board_layout.locales[key] = self.board_layout.locales[
+                    key
+                ]._replace(label=label)
+                break
+
     def setup_board(self):
         """Create board_layout for the required grid"""
         from protograf.protos import Layout, rectangle, Hexagons
@@ -520,6 +533,7 @@ class XX18GameObject(CoreGameObject):
                     cell_geo_label = cell_geo._replace(name=cell_id)
                     # print(f"&&& HEX {row=} {col=} name={cell_id}")
                     setattr(self, cell_id, cell_geo_label)
+                    self.set_locale_label(row - 1, col - 1, cell_id)
                     self.cells[cell_id] = cell_geo
                 except Exception as err:
                     feedback(
@@ -635,7 +649,7 @@ class XX18GameObject(CoreGameObject):
         # ---- feature property values
         kwargs = {}
         ftype = feature[1]
-        if ftype not in XX18_FEATURE_SET and not isinstance(BaseShape):
+        if ftype not in XX18_FEATURE_SET and not isinstance(ftype, BaseShape):
             feedback(
                 f"The feature '{ftype}' is not available; "
                 f"choose from: \n{XX18_FEATURE_SET} or supply a shape.",
@@ -661,9 +675,9 @@ class XX18GameObject(CoreGameObject):
         # ---- feature to function
         feature_type = ftype
         if ftype in XX18_SYMBOL_SET:
-            ftype = "SYMBOL"
+            feature_type = "SYMBOL"
         if isinstance(ftype, BaseShape):
-            ftype = "SHAPE"
+            feature_type = "SHAPE"
         match feature_type:
             case "fill":
                 self.fill_hex(
@@ -722,6 +736,15 @@ class XX18GameObject(CoreGameObject):
                     position=fdirection,
                     color=None,  # TODO => how to set
                     town="middle",  # ALL POSITIONS NOT OPERATIONAL
+                    **kwargs,
+                )
+            case "river_line":
+                self.river_line(
+                    location=feature[0],
+                    label=flabel,
+                    position=fdirection,
+                    color=None,  # TODO => how to set
+                    breadth="medium",  # all thicknesses: medium/m; narrow/n; wide/w
                     **kwargs,
                 )
             case "mountain":
@@ -1163,6 +1186,53 @@ class XX18GameObject(CoreGameObject):
                         False,
                         alert=True,
                     )
+
+    def river_line(
+        self,
+        location: str = None,
+        position: str = None,
+        stroke: object = None,
+        label: str = None,
+        breadth: str = None,
+        **kwargs,
+    ):
+        """Draw river path along/between hexsides starting at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            position (str): hex compass reference(s) for the path
+            stroke: the name of a color (defaults to self.river)
+            label (str): the text to be drawn above/below the line
+            breadth (str): thickness of the river line; medium/m; narrow/n; wide/w
+        """
+        from protograf.protos.proto_gridline import GridLine
+
+        _locations = self.process_locations(location, "river_line")
+        if position is None:
+            position = []
+        _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
+        edges = ", ".join(_positions[1:])
+        point = _positions[0]
+        match breadth:
+            case "narrow" | "n":
+                _river_width = 2
+            case "medium" | "m":
+                _river_width = 4
+            case "wide" | "w":
+                _river_width = 6
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            GridLine(
+                self.board_layout,
+                start=_loc,
+                point=point,
+                edges=edges,
+                stroke=XX18_HEX_RIVER,
+                stroke_width=_river_width,
+                stroke_ends="rounded",
+                wave_style="wave",
+                wave_height=0.15,
+            )
 
     def town(
         self,
@@ -1871,6 +1941,4 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            thing.cx = ccentre.x
-            thing.cy = ccentre.y
-            thing.draw()
+            thing.draw(off_x=ccentre.x, off_y=ccentre.y)

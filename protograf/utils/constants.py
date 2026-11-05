@@ -78,6 +78,8 @@ CSS_COLOR_NAMES = {
     "berylgreen": "#D9E3BE",
     "geraldine": "#E98A84",
     "chelseacucumber": "#80B26B",
+    "sail": "#C1E6FD",  # 18xx sea blue
+    "cerulean": "#01A0D6",  # 18xx river blue
     "glacier": "#62BCDE",  # 18xx hex blue
     "lochmara": "#0D81C0",  # 18xx river blue
 }
