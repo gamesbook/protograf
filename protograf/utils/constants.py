@@ -81,7 +81,22 @@ CSS_COLOR_NAMES = {
     "sail": "#C1E6FD",  # 18xx sea blue
     "cerulean": "#01A0D6",  # 18xx river blue
     "glacier": "#62BCDE",  # 18xx hex blue
-    "lochmara": "#0D81C0",  # 18xx river blue
+    "lochmara": "#0D81C0",  # 18xx lake blue
+    "fountainblue": "#64B1BB",
+    "electricviolet": "#8243F8",
+    "camarone": "#11582A",
+    "lynch": "#627890",
+    "blackpearl": "#021128",
+    "internationalorange": "#FF5202",
+    "spindle": "#ADCBF4",
+    "governorbay": "#1444D5",
+    # Catan!
+    "catandesert": "#E6AD3A",
+    "catanwheat": "#FFCF1A",
+    "catanpasture": "#8CC53B",
+    "catanhill": "F17B1D",
+    "catanmountain": "C7B2A7",
+    "catanforest": "0C4F16",
 }
 
 # ---- RGB single letter colors
