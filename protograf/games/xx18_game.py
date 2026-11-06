@@ -237,15 +237,25 @@ class XX18GameObject(CoreGameObject):
         elif self.orientation == "flat":
             self.orientation = HexOrientationName.FLAT.value
         else:
-            raise ValueError(
-                f'Invalid orientation "{self.orientation}" for {self.game_class}'
+            feedback(
+                f'Invalid orientation "{self.orientation}" for XX18Game;'
+                ' choose from "flat" or "pointy".',
+                True,
+                True,
+            )
+        # ---- offset
+        if self._no not in ["odd", "even"]:
+            feedback(
+                f'Invalid hex_offset "{self.hex_offset}" for XX18Game;'
+                ' choose from "odd" or "even".',
+                True,
+                True,
             )
         # ---- add in defaults
         if not self.rows:
             self.rows = 8
         if not self.cols:
             self.cols = 8
-        self.set_options_by_game(**kwargs)  # MUST be before call to validate!
         self._validate_choices()
         # ---- 18xx default colors
         self.plain_hex = XX18_HEX_PLAIN
@@ -276,178 +286,133 @@ class XX18GameObject(CoreGameObject):
         """Generate feedback if incorrect game name used."""
         pass
 
-    def set_options_by_game(self, **kwargs):
-        """Set properties according to preset, known, game."""
-        pass
-
     def _validate_choices(self) -> bool:
         """Check and reset user choices for valid selections."""
         return True
 
     def draw_labels(self):
+        """Draw row and column labels at the board edges."""
+        from protograf.protos import Text
+
+        if not self.label:
+            return
+
+        # ---- label settings
+        end_col, end_row = self.cols + 1, self.rows + 1
+        _label_col = self._p2v(self.label_size) * 0.5  # user-units
+        _label_row = self._p2v(self.label_size) * 0.75  # user-units
+        lbl_offset = self.label_offset if self.label_offset else None
+        if lbl_offset:
+            _label_col, _label_col = lbl_offset, lbl_offset
+        else:
+            _label_col = self._p2v(self.label_size) * 0.5  # user-units
+            _label_row = self._p2v(self.label_size) * 0.75  # user-units
+        lbl_offset_col = self.label_offset_col if self.label_offset_col else _label_col
+        lbl_offset_row = self.label_offset_row if self.label_offset_row else _label_row
+        lkeys = {}
+        lkeys["font_name"] = self.label_font
+        lkeys["font_size"] = self.label_size
+        lkeys["stroke"] = self.label_stroke
+
+        # ---- POINTY grid
+        if self.orientation == HexOrientationName.POINTY.value:
+            # ---- * column labels
+            for col_no in range(1, end_col):
+                col_value = str(col_no)
+                cell = self.board_layout.cells[(col_no, 1)]
+                # Text(col_value, x=x, y=y, **lkeys)
+            # ---- * row labels
+            for row_no in range(1, end_row):
+                row_value = tools.alpha_column(row_no, lower=False)
+                cell = self.board_layout.cells[(1, row_no)]
+                # Text(row_value, x=x, y=y, **lkeys)
+
+        # ---- FLAT grid
+        elif self.orientation == HexOrientationName.FlAT.value:
+            # ---- * column labels
+            for col_no in range(1, end_col):
+                col_value = tools.alpha_column(col_no, lower=False)
+                cell = self.board_layout.cells[(col_no, 1)]
+                # Text(col_value, x=x, y=y, **lkeys)
+            # ---- * row labels
+            for row_no in range(1, end_row):
+                row_value = str(row_no)
+                cell = self.board_layout.cells[(1, row_no)]
+                # Text(row_value, x=x, y=y, **lkeys)
+
+    def draw_labels_OLD(self):
         """Draw labels around the board."""
         from protograf.protos import Text
 
         def hex_col_label():
             x, y = 0, 0
             ajc = adjacent_cell
-            match self.label_start:
-                case Corner.BOTTOM_RIGHT:
-                    tr = geoms.fraction_along_line(ajc.ne, ajc.n, 0.5)
-                    bl = geoms.fraction_along_line(ajc.s, ajc.sw, 0.5)
-                    distance = self.label_size / self.units * 1.0
-                    lbc = geoms.point_beyond_line(tr, bl, distance)
-                    x, y = lbc.x, lbc.y
-                case Corner.BOTTOM_LEFT:
-                    tl = geoms.fraction_along_line(ajc.nw, ajc.n, 0.5)
-                    br = geoms.fraction_along_line(ajc.s, ajc.se, 0.5)
-                    distance = self.label_size / self.units * 1.0
-                    lbc = geoms.point_beyond_line(tl, br, distance)
-                    x, y = lbc.x, lbc.y
-                case Corner.TOP_RIGHT:
-                    x = ajc.nw.x + (ajc.n.x - ajc.nw.x) * (1.0 / 3.0)
-                    y = ajc.n.y  # + shift * lbl_offset_col
-                case Corner.TOP_LEFT:
-                    x = ajc.ne.x - (ajc.ne.x - ajc.n.x) * (1.0 / 3.0)
-                    y = ajc.n.y  # + shift * lbl_offset_col
-                case _:
-                    raise NotImplementedError(
-                        "Cannot process label_start of {self.label_start}"
-                    )
+            # top-left start
+            x = ajc.ne.x - (ajc.ne.x - ajc.n.x) * (1.0 / 3.0)
+            y = ajc.n.y  # + shift * lbl_offset_col
             return x, y
 
-        # ---- label ranges
-        if self.label:
-            match self.label_start:
-                case Corner.TOP_RIGHT:  # eg. Shogi
-                    start_col, start_row = self.cols, 1
-                    delta_row, delta_col = 1, -1
-                    end_col, end_row = 0, self.rows + 1
-                case Corner.TOP_LEFT:  # eg. Hex
-                    start_col, start_row = 1, 1
-                    delta_row, delta_col = 1, 1
-                    end_col, end_row = self.cols + 1, self.rows + 1
-                case Corner.BOTTOM_RIGHT:  # eg. ???
-                    start_col, start_row = self.cols, self.rows
-                    delta_row, delta_col = -1, -1
-                    end_col, end_row = 0, 0
-                case Corner.BOTTOM_LEFT:  # eg. Chess (default)
-                    start_col, start_row = 1, self.rows
-                    delta_row, delta_col = -1, 1
-                    end_col, end_row = self.cols + 1, 0
+        if not self.label:
+            return
 
-            # ---- label settings
+        # ---- label settings
+        start_col, start_row = 1, 1
+        delta_row, delta_col = 1, 1
+        end_col, end_row = self.cols + 1, self.rows + 1
+        _label_col = self._p2v(self.label_size) * 0.5  # user-units
+        _label_row = self._p2v(self.label_size) * 0.75  # user-units
+        lbl_offset = self.label_offset if self.label_offset else None
+        if lbl_offset:
+            _label_col, _label_col = lbl_offset, lbl_offset
+        else:
             _label_col = self._p2v(self.label_size) * 0.5  # user-units
             _label_row = self._p2v(self.label_size) * 0.75  # user-units
-            lbl_intersect = 0  # user-units
-            lbl_offset = self.label_offset if self.label_offset else None
-            if lbl_offset:
-                _label_col, _label_col = lbl_offset, lbl_offset
-            else:
-                _label_col = self._p2v(self.label_size) * 0.5  # user-units
-                _label_row = self._p2v(self.label_size) * 0.75  # user-units
-                if self.intersections:
-                    lbl_intersect = 0.5 * self.cell_size  # user-units
-            lbl_offset_col = (
-                self.label_offset_col if self.label_offset_col else _label_col
-            )
-            lbl_offset_row = (
-                self.label_offset_row if self.label_offset_row else _label_row
-            )
-            lkeys = {}
-            lkeys["font_name"] = self.label_font
-            lkeys["font_size"] = self.label_size
-            lkeys["stroke"] = self.label_stroke
+        lbl_offset_col = self.label_offset_col if self.label_offset_col else _label_col
+        lbl_offset_row = self.label_offset_row if self.label_offset_row else _label_row
+        lkeys = {}
+        lkeys["font_name"] = self.label_font
+        lkeys["font_size"] = self.label_size
+        lkeys["stroke"] = self.label_stroke
 
-            # ---- column label settings
-            if self.label_start in [Corner.TOP_RIGHT, Corner.TOP_LEFT]:
-                label_row = 1
-                shift = -1
-            elif self.label_start in [Corner.BOTTOM_RIGHT, Corner.BOTTOM_LEFT]:
-                label_row = self.rows
-                shift = 1
-            else:
-                raise NotImplementedError(
-                    "Cannot process label_start of {self.label_start}"
-                )
+        # ---- POINTY grid
+        if self.orientation == HexOrientationName.POINTY.value:
+            # ---- * column labels
+            label_row = 1
+            shift = -1
+            non_blank_col_no = 1  # do NOT label blank diagonals
 
-            # ---- hex column labels
-            if self.board_type == AbstractBoardType.HEXAGONAL:
-                non_blank_col_no = 1  # do NOT label blank diagonals
-                for _, dcells in self.hexgrid_diagonals.items():
-                    # print(f'&&& {dcells=} {non_blank_col_no=}')
-                    for value in dcells:
-                        col_no, row_no = value[0], value[1]
-                        col_value = tools.as_excel(non_blank_col_no, False)
-                        adjacent_cell = self.board_layout.cells[(col_no, row_no)]
-                        if not adjacent_cell.blank:
-                            x, y = hex_col_label()
-                            Text(col_value, x=x, y=y, **lkeys)
-                            # print(f'&&& {col_value=} {col_no=} {row_no=}')
-                            non_blank_col_no += 1
-                            break  # label done; next diagonal, please!
-            else:
-                raise NotImplementedError(
-                    "No labels can be drawn for this type of board!"
-                )
-            # print('&&& col label', ltype, col_value, x, y)
+            for _, dcells in self.hexgrid_diagonals.items():
+                # print(f'&&& {dcells=} {non_blank_col_no=}')
+                for value in dcells:
+                    col_no, row_no = value[0], value[1]
+                    col_value = tools.as_excel(non_blank_col_no, False)
+                    x, y = hex_col_label()
+                    Text(col_value, x=x, y=y, **lkeys)
+                    # print(f'&&& {col_value=} {col_no=} {row_no=}')
+                    non_blank_col_no += 1
+                    break  # label done; next diagonal, please!
 
-            # ---- row labels
-            if self.label_start in [Corner.TOP_LEFT, Corner.BOTTOM_LEFT]:
-                label_col = 1
-                shift = -1
-                col_shift = 1
-            elif self.label_start in [Corner.BOTTOM_RIGHT, Corner.TOP_RIGHT]:
-                label_col = self.cols
-                shift = 1
-                col_shift = -1
-            else:
-                raise NotImplementedError(
-                    "Cannot process label_start of {self.label_start}"
-                )
-
+            # ---- * row labels
+            label_col = 1
+            shift = -1
+            col_shift = 1
             row_num = 1
+
             for row_no in range(start_row, end_row, delta_row):
-                if self.label_type in ["AA", "NA"]:
-                    row_value = tools.alpha_column(row_num, lower=False)
-                else:
-                    row_value = str(row_num)
+                row_value = tools.alpha_column(row_num, lower=False)
                 col_no = label_col  # label col can be at start or end
                 # print(f"{row_no=} {col_no=}") ; breakpoint()
-                # skip blank columns at start of a hexagonal grid row
-                if self.board_type == AbstractBoardType.HEXAGONAL:
-                    active_cells = self.cells_non_blank[row_no - 1]
-                    while True:
-                        col_exists = any(
-                            len(tup) > 1 and tup[0] == col_no for tup in active_cells
-                        )
-                        if col_exists:
-                            break
-                        col_no += col_shift
-                        if col_no < 1 or col_no > self.cols:
-                            col_no = label_col  # give up and use default ...
-                            break
                 # get cell geo to use for label position
                 adjacent_cell = self.board_layout.cells[(col_no, row_no)]
-                if self.board_type == AbstractBoardType.GRID:
-                    if self.label_start in [Corner.TOP_LEFT, Corner.BOTTOM_LEFT]:
-                        x = adjacent_cell.w.x + shift * lbl_offset_row + lbl_intersect
-                        y = adjacent_cell.w.y + (self.label_size * 0.5) / globals.units
-                    else:
-                        x = adjacent_cell.e.x + shift * lbl_offset_row - lbl_intersect
-                        y = adjacent_cell.e.y + (self.label_size * 0.5) / globals.units
-                elif self.board_type == AbstractBoardType.HEXAGONAL:
-                    if self.label_start in [Corner.TOP_LEFT, Corner.BOTTOM_LEFT]:
-                        x = adjacent_cell.w.x + shift * lbl_offset_row
-                        y = adjacent_cell.w.y + (self.label_size * 0.5) / globals.units
-                    else:
-                        x = adjacent_cell.e.x + shift * lbl_offset_row
-                        y = adjacent_cell.e.y + (self.label_size * 0.5) / globals.units
-                elif self.board_type == AbstractBoardType.TRIANGULAR:
-                    raise NotImplementedError("No labels for Triangle grids!")
+                x = adjacent_cell.w.x + shift * lbl_offset_row
+                y = adjacent_cell.w.y + (self.label_size * 0.5) / globals.units
                 # print('&&& row label', ltype, row_value, x, y)
                 Text(row_value, x=x, y=y, **lkeys)
                 row_num += 1
+
+        # ---- FLAT grid
+        elif self.orientation == HexOrientationName.FlAT.value:
+            pass
 
     def set_locale_label(self, row: int, col: int, label: str):
         """Set a locale label attribute for the board's locales."""
@@ -463,24 +428,18 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Layout, rectangle, Hexagons
 
         # ---- game-based defaults
-        board_start = "NW"
-        board_direction = "east"
         # Point(top_x, top_x) is the top-left point of the VirtualLocations (grid points)
-
-        # pointy; non-offset
         top_x = self.x if self.kwargs.get("x") else 0
         top_y = self.y if self.kwargs.get("y") else 0
         hex_color = self.fill if self.fill else self.plain_hex
         x_offset = 0
         # x_offset = -0.5 * self.cell_size
-        if self.name == "hexhex" and self.auto_size and self.hexes % 2 == 0:
-            x_offset = -self.cell_size * 0.5
         self.board_layout = Hexagons(
             cols=self.cols,
             rows=self.rows,
             x=top_x + x_offset,
             y=top_y,
-            # offset= odd/even TODO
+            hex_offset=self.hex_offset,
             orientation=self.orientation,  # default: pointy
             _draw_grid=False,
             pattern=self.pattern,

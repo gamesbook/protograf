@@ -48,6 +48,7 @@ class HexShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        # breakpoint()
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- class vars
         self.x_d = None
