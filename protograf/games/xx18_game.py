@@ -433,12 +433,20 @@ class XX18GameObject(CoreGameObject):
                     cell = self.board_layout.cells[(1, row_no)]
                     # first label
                     x = cell.w.x
-                    y = cell.w.y + font_offset
+                    y = (
+                        cell.w.y + font_offset
+                        if self.hex_offset == "even"
+                        else cell.nw.y + font_offset
+                    )
                     x = x - lbl_offset_row
                     Text(str(row_value), x=x, y=y, **lkeys)
                     # second label
                     x = cell.w.x
-                    y = cell.sw.y + font_offset
+                    y = (
+                        cell.sw.y + font_offset
+                        if self.hex_offset == "even"
+                        else cell.w.y + font_offset
+                    )
                     x = x - lbl_offset_row
                     Text(str(row_value + 1), x=x, y=y, **lkeys)
                 if GridEdge.RIGHT.value in self.label_locations:
@@ -448,7 +456,7 @@ class XX18GameObject(CoreGameObject):
                     y = (
                         cell.ne.y + font_offset
                         if self.hex_offset == "even"
-                        else cell.e.y
+                        else cell.e.y + font_offset
                     )
                     x = x + lbl_offset_row
                     Text(str(row_value), x=x, y=y, **lkeys)
@@ -457,7 +465,7 @@ class XX18GameObject(CoreGameObject):
                     y = (
                         cell.e.y + font_offset
                         if self.hex_offset == "even"
-                        else cell.se.y
+                        else cell.se.y + font_offset
                     )
                     x = x + lbl_offset_row
                     Text(str(row_value + 1), x=x, y=y, **lkeys)
