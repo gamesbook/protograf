@@ -91,13 +91,13 @@ class FontStyleType(Enum):
     BOLDITALIC = 4
 
 
-class GridEdge(Enum):
-    """Constants for each side of a grid"""
+class RelativeLocation(Enum):
+    """Constants for each side of a object"""
 
-    TOP = 1
+    ABOVE = 1
     RIGHT = 2
     LEFT = 3
-    BOTTOM = 4
+    BELOW = 4
 
 
 class HexOrientation(Enum):

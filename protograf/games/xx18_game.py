@@ -21,21 +21,21 @@ The 18xx map "blueprint" feature covers:
 * depiction of track extending from a city
 * depiction of terminal spikes running off-board (short, medium and long)
 * depiction of blocked hex-sides as thick lines
-* depiction of highlighted hex as a yellow band inside and along all hex edges
+* depiction of highlighted hex as a yellow band inside of all hex edges
 * depiction of private railways; either in-hex or across hexes
 * depiction of icons for common in-hex features; including mountains
   (two sizes), hills, and rivers
-* depiction of symbols for special features such coal, desert, factory,
+* depiction of symbols for special features such as: coal, desert, factory,
   fish, flag, forest, hills, lock, mine, noentry, oil, pennant, port,
   swamp, train, tree, tunnel
 * depiction of a river; as "wavy line"; running through a hex
 * depiction of a custom shape in a hex
 * display of a single piece of text
-* display of hex coordinates along the edges of the map
+* display of hex coordinates along the edges of the map (above, below,
+  left-of, and right-of)
 * coloring ("fill") of a whole hex
-* setting of a off-board, colored, rectangular area (typically red and at the map edge)
-* creation of a small multi-line table to appear in an off-board hex
-  (typically income per stage of the game)
+* creation of a small, multi-line, colored table to appear in an off-board
+  hexagon or area (typically income per stage of the game)
 
 The blueprint will also provide:
 
@@ -54,6 +54,13 @@ hex edges will be done using standard compass directions; "ne" for northeast,
 "s" for south, etc., and will be centred on that edge.
 
 Drawing will be done following the order in which features are provided.
+
+Setting of an off-board, colored, rectangular, or polyshape area - typically
+red and extending from the edge of the board hexagons - is not handled
+directly by XX18 game.  There is too much variabilty in how such areas are
+drawn.  What is possible is to use the cell references to set the vertices
+of such shapes relative to the board.
+
 
 Standard, named 18xx colors
 ===========================
@@ -98,7 +105,7 @@ from protograf.utils import tools, colrs, geoms
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (  # named tuples; enums
     AbstractBoardType,
-    GridEdge,
+    RelativeLocation,
     HexOrientation,
     HexOrientationName,
     Point,
@@ -202,7 +209,6 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "track_town",
     "river_line",
 ]
-XX18_LABEL_POSITION = ["above", "below", "left", "right"]
 
 
 class XX18GameObject(CoreGameObject):
@@ -248,20 +254,20 @@ class XX18GameObject(CoreGameObject):
         if not _label_locations:
             _label_locations = ""  # avoid invalid, non-string
         if not _label_locations and self.label is True:
-            _label_locations = "TL"  # set default
+            _label_locations = "AL"  # set default
         try:
-            if "T" in _label_locations or "t" in _label_locations:
-                self.label_locations.append(GridEdge.TOP.value)
+            if "A" in _label_locations or "a" in _label_locations:
+                self.label_locations.append(RelativeLocation.ABOVE.value)
             if "L" in _label_locations or "l" in _label_locations:
-                self.label_locations.append(GridEdge.LEFT.value)
+                self.label_locations.append(RelativeLocation.LEFT.value)
             if "B" in _label_locations or "b" in _label_locations:
-                self.label_locations.append(GridEdge.BOTTOM.value)
+                self.label_locations.append(RelativeLocation.BELOW.value)
             if "R" in _label_locations or "r" in _label_locations:
-                self.label_locations.append(GridEdge.RIGHT.value)
+                self.label_locations.append(RelativeLocation.RIGHT.value)
         except (TypeError, ValueError):
             feedback(
                 f'Invalid label_locations "{_label_locations}" for XX18Game;'
-                " this should be a string with any or all of T, L, B, or R.",
+                " this should be a string with any or all of A, L, B, or R.",
                 True,
                 True,
             )
@@ -310,7 +316,6 @@ class XX18GameObject(CoreGameObject):
 
     def game_name_error(self):
         """Generate feedback if incorrect game name used."""
-        pass
 
     def _validate_choices(self) -> bool:
         """Check and reset user choices for valid selections."""
@@ -347,7 +352,7 @@ class XX18GameObject(CoreGameObject):
             # ---- * column labels
             for col_no in range(1, end_col):
                 col_value = 2 * col_no - 1
-                if GridEdge.TOP.value in self.label_locations:
+                if RelativeLocation.ABOVE.value in self.label_locations:
                     cell = self.board_layout.cells[(col_no, 1)]
                     # first label
                     x = cell.n.x if self.hex_offset == "even" else cell.nw.x
@@ -357,7 +362,7 @@ class XX18GameObject(CoreGameObject):
                     x = cell.ne.x if self.hex_offset == "even" else cell.n.x
                     y = cell.n.y - lbl_offset_col
                     Text(str(col_value + 1), x=x, y=y, **lkeys)
-                if GridEdge.BOTTOM.value in self.label_locations:
+                if RelativeLocation.BELOW.value in self.label_locations:
                     cell = self.board_layout.cells[(col_no, self.rows)]
                     # first label
                     x = cell.s.x if self.hex_offset == "even" else cell.sw.x
@@ -370,7 +375,7 @@ class XX18GameObject(CoreGameObject):
             # ---- * row labels
             for row_no in range(1, end_row):
                 row_value = tools.alpha_column(row_no, lower=False)
-                if GridEdge.LEFT.value in self.label_locations:
+                if RelativeLocation.LEFT.value in self.label_locations:
                     cell = self.board_layout.cells[(1, row_no)]
                     if self.even(row_no) and self.hex_offset == "even":
                         x = cell.w.x - lbl_offset_row - self.cell_size / 2.0
@@ -380,7 +385,7 @@ class XX18GameObject(CoreGameObject):
                         x = cell.w.x - lbl_offset_row
                     y = cell.w.y
                     Text(row_value, x=x, y=y, **lkeys)
-                if GridEdge.RIGHT.value in self.label_locations:
+                if RelativeLocation.RIGHT.value in self.label_locations:
                     cell = self.board_layout.cells[(self.cols, row_no)]
                     if self.odd(row_no) and self.hex_offset == "even":
                         x = cell.e.x + lbl_offset_row + self.cell_size / 2.0
@@ -396,7 +401,7 @@ class XX18GameObject(CoreGameObject):
             # ---- * column labels
             for col_no in range(1, end_col):
                 col_value = tools.alpha_column(col_no, lower=False)
-                if GridEdge.TOP.value in self.label_locations:
+                if RelativeLocation.ABOVE.value in self.label_locations:
                     cell = self.board_layout.cells[(col_no, 1)]
                     x = cell.n.x
                     if self.even(col_no) and self.hex_offset == "even":
@@ -406,7 +411,7 @@ class XX18GameObject(CoreGameObject):
                     else:
                         y = cell.n.y - lbl_offset_col
                     Text(col_value, x=x, y=y, **lkeys)
-                if GridEdge.BOTTOM.value in self.label_locations:
+                if RelativeLocation.BELOW.value in self.label_locations:
                     cell = self.board_layout.cells[(col_no, self.rows)]
                     x = cell.n.x
                     if self.odd(col_no) and self.hex_offset == "even":
@@ -429,7 +434,7 @@ class XX18GameObject(CoreGameObject):
             # ---- * row labels
             for row_no in range(1, end_row):
                 row_value = 2 * row_no - 1
-                if GridEdge.LEFT.value in self.label_locations:
+                if RelativeLocation.LEFT.value in self.label_locations:
                     cell = self.board_layout.cells[(1, row_no)]
                     # first label
                     x = cell.w.x
@@ -449,7 +454,7 @@ class XX18GameObject(CoreGameObject):
                     )
                     x = x - lbl_offset_row
                     Text(str(row_value + 1), x=x, y=y, **lkeys)
-                if GridEdge.RIGHT.value in self.label_locations:
+                if RelativeLocation.RIGHT.value in self.label_locations:
                     cell = self.board_layout.cells[(self.cols, row_no)]
                     # first label
                     x = cell.e.x
@@ -625,16 +630,22 @@ class XX18GameObject(CoreGameObject):
             location (str): grid reference or references for one or more cells
 
         Notes:
-            * The feature (tuple) should contain in this order:
-                  cellID (str): the alphanumeric grid coordinate of the hex
-                  position (tuple | str): either a tuple of
-                      direction (float): optional, degrees
-                      distance (float): optional, fraction
-                    or a string of:
-                      hex-side directions
-                    or None
-                  label (str): a label for the feature or symbol (default "")
-                  label_position (str): the position for label (above, below, L, R)
+            * The feature (tuple) can contain in this order:
+                  * cellID (str): the alphanumeric grid coordinate of the hex
+                  * position (tuple | str):
+                      either a tuple of
+                        direction (float): optional, degrees
+                        distance (float): optional, fraction
+                      or a string of:
+                        hex-side directions
+                      or None
+                  * label (str): a label for the feature or symbol (default "")
+                  * label_location (str): the position for label
+                    (above, below, left, right)
+                  * shapes (BaseShape): a list of one or more shape to be drawn
+                    inside the feature; usually inside a city or, if multiple items
+                    in the list, one shape per city circle in a compound city -
+                    this could be to add color, or text or an Image e.g. a logo
 
             * For a private railroad, which has a start and end hex, the
               start settings are the ones above, and then the following extras
@@ -660,7 +671,8 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
-        self.process_locations(feature[0])  # sanity check
+        fhexagon = feature[0]
+        self.process_locations(fhexagon)  # sanity check
         # ---- feature property values
         kwargs = {}
         ftype = feature[1]
@@ -671,22 +683,32 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
-        flabel, flabel_pos, fdirection, fdistance = "", None, None, None
+        flabel, flabel_loc, fdirection, fdistance, fshapes = "", None, None, None, []
         if len(feature) >= 3:
             fdirection, fdistance = self.feature_position(feature[2])
         if len(feature) >= 4:
             flabel = str(feature[3])
         if len(feature) >= 5 and ftype != "private":  # see below; private overloads
-            flabel_pos = feature[4]
-            if flabel_pos not in XX18_LABEL_POSITION:
+            flabel_loc = self.relative_location(feature[4])
+            kwargs["label_location"] = flabel_loc
+        if len(feature) >= 6 and ftype != "private":  # see below; private overloads
+            fshapes = feature[5]
+            if not isinstance(fshapes, (tuple, list)):
                 feedback(
-                    f"The label positions '{feature[5]}' is not available;",
-                    f" choose from: {XX18_LABEL_POSITION}.",
+                    f"The setting '{fshapes}' for {fhexagon} must be a list.",
                     True,
                     True,
                 )
-            kwargs["label_position"] = flabel_pos
-        # print(f"&&& {feature[0]=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
+            for fshape in fshapes:
+                if fshape is not None and not isinstance(fshape, BaseShape):
+                    feedback(
+                        f"The item '{fshape}' in the list for {fhexagon} is not a "
+                        "protograf shape.",
+                        True,
+                        True,
+                    )
+
+        # print(f"&&& {fhexagon=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
         # ---- feature to function
         feature_type = ftype
         if ftype in XX18_SYMBOL_SET:
@@ -696,13 +718,13 @@ class XX18GameObject(CoreGameObject):
         match feature_type:
             case "fill":
                 self.fill_hex(
-                    location=feature[0],
+                    location=fhexagon,
                     color=flabel,
                     **kwargs,
                 )
             case "highlight":
                 self.highlight(
-                    location=feature[0],
+                    location=fhexagon,
                     color=flabel,
                     **kwargs,
                 )
@@ -712,16 +734,17 @@ class XX18GameObject(CoreGameObject):
                 else:
                     count = 1
                 self.city(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
                     count=count,
+                    shapes=fshapes,
                     **kwargs,
                 )
             case "town":
                 self.town(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
@@ -729,7 +752,7 @@ class XX18GameObject(CoreGameObject):
                 )
             case "town_border":
                 self.town(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
@@ -738,33 +761,30 @@ class XX18GameObject(CoreGameObject):
                 )
             case "track":
                 self.track(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     position=fdirection,
-                    color=None,  # TODO => how to set
                     **kwargs,
                 )
             case "track_town":
                 self.track(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     position=fdirection,
-                    color=None,  # TODO => how to set
                     town="middle",  # ALL POSITIONS NOT OPERATIONAL
                     **kwargs,
                 )
             case "river_line":
                 self.river_line(
-                    location=feature[0],
-                    label=flabel,
+                    location=fhexagon,
                     position=fdirection,
-                    color=None,  # TODO => how to set
+                    stroke=None,  # TODO => how to set
                     breadth="medium",  # all thicknesses: medium/m; narrow/n; wide/w
                     **kwargs,
                 )
             case "mountain":
                 self.mountain(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
@@ -775,7 +795,7 @@ class XX18GameObject(CoreGameObject):
                 if len(feature) >= 6:
                     flocation1 = str(feature[5])
                     if flocation1 in ["", None]:
-                        flocation1 = feature[0]
+                        flocation1 = fhexagon
                 if len(feature) >= 7:
                     _fdir1 = feature[6]
                     fdirection1 = tools.as_float(_fdir1, "direction")
@@ -784,19 +804,12 @@ class XX18GameObject(CoreGameObject):
                     fdistance1 = tools.as_float(_fdist1, "distance")
 
                 if len(feature) >= 9:
-                    flabel_pos = feature[8]
-                    if flabel_pos not in XX18_LABEL_POSITION:
-                        feedback(
-                            f"The label position '{feature[8]}' is not available;",
-                            f" choose from: {XX18_LABEL_POSITION}.",
-                            True,
-                            True,
-                        )
-                    kwargs["label_position"] = flabel_pos
+                    flabel_loc = self.relative_location(feature[8])
+                    kwargs["label_location"] = flabel_loc
                 # print(f"&&& private {flocation1=} {fdirection1=} {fdistance1=}")
                 self.private(
                     label=flabel,
-                    location=feature[0],
+                    location=fhexagon,
                     direction=fdirection,
                     distance=fdistance,
                     location1=flocation1,
@@ -806,7 +819,7 @@ class XX18GameObject(CoreGameObject):
                 )
             case "revenue":
                 self.revenue(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
@@ -814,7 +827,7 @@ class XX18GameObject(CoreGameObject):
                 )
             case "tile_letter" | "tile-letter" | "tileletter":
                 self.tile_letter(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
@@ -822,22 +835,21 @@ class XX18GameObject(CoreGameObject):
                 )
             case "block":
                 self.block(
-                    location=feature[0],
-                    label=flabel,
+                    location=fhexagon,
                     position=fdirection,
-                    color=None,  # TODO => how to set
+                    stroke=None,  # TODO => how to set
                     **kwargs,
                 )
             case "spike":
                 self.spike(
-                    location=feature[0],
+                    location=fhexagon,
                     size=flabel,
                     position=fdirection,
                     **kwargs,
                 )
             case "SYMBOL":
                 self.symbol(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
@@ -846,7 +858,7 @@ class XX18GameObject(CoreGameObject):
                 )
             case "SHAPE":
                 self.figure(
-                    location=feature[0],
+                    location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
@@ -872,10 +884,38 @@ class XX18GameObject(CoreGameObject):
             fcentre = geo.centre
         return fcentre
 
+    def relative_location(self, location: str = None) -> int:
+        """Convert a string into a RelativeLocation value."""
+        if not location:
+            return None
+        if not isinstance(location, str):
+            feedback(
+                "The location must be a string;",
+                f" the option '{location}' is not allowed.",
+                True,
+                True,
+            )
+        match _lower(location):
+            case "a" | "above":
+                return RelativeLocation.ABOVE.value
+            case "b" | "below":
+                return RelativeLocation.BELOW.value
+            case "l" | "left":
+                return RelativeLocation.LEFT.value
+            case "r" | "right":
+                return RelativeLocation.RIGHT.value
+            case _:
+                feedback(
+                    "The location must be one of A, B, L, R;",
+                    f" the option '{location}' is not allowed.",
+                    True,
+                    True,
+                )
+
     def process_label(
         self,
         label: str,
-        position: str = "below",
+        location: RelativeLocation = RelativeLocation.BELOW.value,
         base_shift: float = 0.0,
         text_size: str = "medium",
     ) -> dict:
@@ -897,16 +937,16 @@ class XX18GameObject(CoreGameObject):
                 )
         if label:
             shift = base_shift + self.label_size / self.units / 3.0
-            match position:
-                case "above":
+            match location:
+                case RelativeLocation.ABOVE.value:
                     heading = label
-                case "below":
+                case RelativeLocation.BELOW.value:
                     title = label
-                case "left":
+                case RelativeLocation.LEFT.value:
                     _label = label
                     label_mx = -shift
                     label_align = "right"
-                case "right":
+                case RelativeLocation.RIGHT.value:
                     _label = label
                     label_mx = shift
                     label_align = "left"
@@ -939,7 +979,7 @@ class XX18GameObject(CoreGameObject):
         Args:
             hexagon (Hexagon): a pre-drawn Hexagon shape
             path_pair (list): list of two strings (start and end compass directions)
-            offset: where on the path to draw the shape
+            offset: where on the path to draw the shape [TO BE DONE]
 
         Returns:
             tuple: direction (float), distance (float), rotation (float)
@@ -1081,7 +1121,6 @@ class XX18GameObject(CoreGameObject):
         self,
         location: str = None,
         position: str = None,
-        stroke: object = None,
         label: str = None,
         town: str = None,
         **kwargs,
@@ -1156,9 +1195,10 @@ class XX18GameObject(CoreGameObject):
                             self.process_track_town_position(hxw, [start, end])
                         )
                         ccentre = self.feature_location(geo, direction, distance)
-                        label_position = kwargs.get("label_position", "above")
+                        _label_loc = kwargs.get("label_location", "above")
+                        label_location = self.relative_location(_label_loc)
                         lwargs = self.process_label(
-                            label, label_position, XX18_TOWN_DIAMETER / 2.0
+                            label, label_location, XX18_TOWN_DIAMETER / 2.0
                         )
                         Rectangle(
                             cxy=ccentre,
@@ -1206,8 +1246,7 @@ class XX18GameObject(CoreGameObject):
         self,
         location: str = None,
         position: str = None,
-        stroke: object = None,
-        label: str = None,
+        stroke: str = None,
         breadth: str = None,
         **kwargs,
     ):
@@ -1217,7 +1256,6 @@ class XX18GameObject(CoreGameObject):
             location (str): grid reference or references for one or more cells
             position (str): hex compass reference(s) for the path
             stroke: the name of a color (defaults to self.river)
-            label (str): the text to be drawn above/below the line
             breadth (str): thickness of the river line; medium/m; narrow/n; wide/w
         """
         from protograf.protos.proto_gridline import GridLine
@@ -1225,6 +1263,7 @@ class XX18GameObject(CoreGameObject):
         _locations = self.process_locations(location, "river_line")
         if position is None:
             position = []
+        river_stroke = stroke or XX18_HEX_RIVER
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         edges = ", ".join(_positions[1:])
         point = _positions[0]
@@ -1241,7 +1280,7 @@ class XX18GameObject(CoreGameObject):
                 start=_loc,
                 point=point,
                 edges=edges,
-                stroke=XX18_HEX_RIVER,
+                stroke=river_stroke,
                 stroke_width=_river_width,
                 stroke_ends="rounded",
                 wave_style="wave",
@@ -1261,7 +1300,7 @@ class XX18GameObject(CoreGameObject):
 
         Args:
             location (str): grid reference or references for one or more cells
-            label (str): the name of the Town
+            label (str): the name of the town
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
         """
@@ -1271,8 +1310,8 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            label_position = kwargs.get("label_position", "below")
-            lwargs = self.process_label(label, label_position, XX18_TOWN_DIAMETER / 2.0)
+            label_location = kwargs.get("label_location", "below")
+            lwargs = self.process_label(label, label_location, XX18_TOWN_DIAMETER / 2.0)
             # ---- circle
             if border:
                 Circle(
@@ -1296,7 +1335,7 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         count: str | int = None,
-        shape: str = None,
+        shapes: list = None,  # list of BaseShape
         **kwargs,
     ):
         """Draw City shape at hex location(s).
@@ -1307,7 +1346,7 @@ class XX18GameObject(CoreGameObject):
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
             count (str|int): number of circles in the city
-            shape (Shape): the shape to be drawn inside the city
+            shapes (list): a list of shapes to be drawn inside the city circle(s)
         """
         from protograf.protos import Circle, Rectangle, Triangle, Polyshape
 
@@ -1320,20 +1359,24 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            label_position = kwargs.get("label_position", "below")
+            label_location = kwargs.get("label_location", "below")
             if city_count > 1:
-                if label_position not in ["above", "below"]:
-                    label_position = "below"
-            lwargs = self.process_label(label, label_position, _radius, "medium")
+                if label_location not in ["above", "below"]:
+                    label_location = "below"
+            lwargs = self.process_label(label, label_location, _radius, "medium")
             cwargs = {}
             cwargs["radius"] = _radius
             cwargs["fill"] = "white"
             cwargs["stroke"] = "black"
             cwargs["stroke_width"] = XX18_STROKE_WIDTH
-            cwargs["centre_shape"] = shape
+            cwargs["centre_shape"] = shapes
             match city_count:
                 # ---- city 1
                 case 1:
+                    if shapes and len(shapes) > 0:
+                        cwargs["centre_shape"] = shapes[0]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cxy=ccentre,
                         **{**kwargs, **lwargs, **cwargs},
@@ -1353,11 +1396,17 @@ class XX18GameObject(CoreGameObject):
                         stroke_width=XX18_STROKE_WIDTH,
                         **{**kwargs, **lwargs},
                     )
+                    if shapes and len(shapes) > 0:
+                        cwargs["centre_shape"] = shapes[0]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cx=cw,
                         cy=geo.centre.y,
                         **{**kwargs, **cwargs},
                     )
+                    if shapes and len(shapes) > 1:
+                        cwargs["centre_shape"] = shapes[1]
                     Circle(
                         cx=ce,
                         cy=geo.centre.y,
@@ -1402,14 +1451,26 @@ class XX18GameObject(CoreGameObject):
                         **{**kwargs, **lwargs, **rwargs},
                     )
                     # draw city circles
+                    if shapes and len(shapes) > 0:
+                        cwargs["centre_shape"] = shapes[0]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cxy=cn,
                         **{**kwargs, **cwargs},
                     )
+                    if shapes and len(shapes) > 1:
+                        cwargs["centre_shape"] = shapes[1]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cxy=cse,
                         **{**kwargs, **cwargs},
                     )
+                    if shapes and len(shapes) > 2:
+                        cwargs["centre_shape"] = shapes[2]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cxy=csw,
                         **{**kwargs, **cwargs},
@@ -1443,21 +1504,37 @@ class XX18GameObject(CoreGameObject):
                         cy=ccentre.centre.y,
                         **{**kwargs, **rwargs},
                     )
+                    if shapes and len(shapes) > 0:
+                        cwargs["centre_shape"] = shapes[0]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cx=cx1,
                         cy=cy1,
                         **{**kwargs, **cwargs},
                     )
+                    if shapes and len(shapes) > 1:
+                        cwargs["centre_shape"] = shapes[1]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cx=cx2,
                         cy=cy2,
                         **{**kwargs, **cwargs},
                     )
+                    if shapes and len(shapes) > 2:
+                        cwargs["centre_shape"] = shapes[2]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cx=cx3,
                         cy=cy3,
                         **{**kwargs, **cwargs},
                     )
+                    if shapes and len(shapes) > 3:
+                        cwargs["centre_shape"] = shapes[3]
+                    else:
+                        cwargs["centre_shape"] = None
                     Circle(
                         cx=cx4,
                         cy=cy4,
@@ -1546,7 +1623,7 @@ class XX18GameObject(CoreGameObject):
                 position = ["n", "ne", "se", "s", "sw", "nw"]
         _positions = tools.split(position, separator=" ", clean=True)
         stroke = stroke if stroke else "white"
-        stroke_color = colrs.get_color(stroke)
+        # stroke_color = colrs.get_color(stroke)
         height_shrink = XX18_TRACK_WIDTH_OUTER - XX18_TRACK_WIDTH_INNER
         match _lower(size):
             case "short" | "s":
@@ -1589,7 +1666,6 @@ class XX18GameObject(CoreGameObject):
         location: str = None,
         position: str = None,
         stroke: object = None,
-        label: str = None,
         **kwargs,
     ):
         """Draw thick line on hexside(s) at hex location(s).
@@ -1598,7 +1674,6 @@ class XX18GameObject(CoreGameObject):
             location (str): grid reference or references for one or more cells
             position (str): hex edge compass reference or references
             stroke: the name of a color (defaults to self.barrier)
-            label (str): the text to be drawn above/below the line
         """
         from protograf.protos import Line
 
@@ -1687,7 +1762,7 @@ class XX18GameObject(CoreGameObject):
         """
         from protograf.protos import Text
 
-        _locations = self.process_locations(location, "revenue")
+        _locations = self.process_locations(location, "tile_letter")
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
@@ -1715,7 +1790,7 @@ class XX18GameObject(CoreGameObject):
         """
         from protograf.protos import Hexagon
 
-        _locations = self.process_locations(location, "fill")
+        _locations = self.process_locations(location, "fill_hex")
         if color:
             the_color = colrs.get_color(color)
             for _loc in _locations:
@@ -1780,13 +1855,13 @@ class XX18GameObject(CoreGameObject):
         """
         from protograf.protos import Triangle
 
-        _locations = self.process_locations(location, "revenue")
+        _locations = self.process_locations(location, "mountain")
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            label_position = kwargs.get("label_position", "below")
+            label_location = kwargs.get("label_location", "below")
             lwargs = self.process_label(
-                label, label_position, XX18_MOUNTAIN_SIDE / 2.0, "small"
+                label, label_location, XX18_MOUNTAIN_SIDE / 2.0, "small"
             )
             Triangle(
                 cx=ccentre.x,
@@ -1928,15 +2003,14 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            label_position = kwargs.get("label_position", "below")
+            label_location = kwargs.get("label_location", "below")
             offset = 0.5
-            lwargs = self.process_label(label, label_position, offset, "small")
+            lwargs = self.process_label(label, label_location, offset, "small")
             Image(_file, cxy=ccentre, **{**kwargs, **lwargs})
 
     def figure(
         self,
         location: str = None,
-        label: str = None,
         direction: float = None,
         distance: float = None,
         thing: object = None,
@@ -1951,7 +2025,7 @@ class XX18GameObject(CoreGameObject):
             distance (float): distance from hex centre
             name (str): the name the symbol
         """
-        _locations = self.process_locations(location, f"figure")
+        _locations = self.process_locations(location, "figure")
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
