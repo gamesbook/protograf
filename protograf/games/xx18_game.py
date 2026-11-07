@@ -98,6 +98,7 @@ from protograf.utils import tools, colrs, geoms
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (  # named tuples; enums
     AbstractBoardType,
+    GridEdge,
     HexOrientation,
     HexOrientationName,
     Point,
@@ -239,6 +240,31 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
+        # ---- labels
+        self.label_locations = []
+        _label_locations = (
+            self._commons("label_locations") or kwargs.get("label_locations") or ""
+        )
+        if not _label_locations:
+            _label_locations = ""  # avoid invalid, non-string
+        if not _label_locations and self.label is True:
+            _label_locations = "TL"  # set default
+        try:
+            if "T" in _label_locations or "t" in _label_locations:
+                self.label_locations.append(GridEdge.TOP.value)
+            if "L" in _label_locations or "l" in _label_locations:
+                self.label_locations.append(GridEdge.LEFT.value)
+            if "B" in _label_locations or "b" in _label_locations:
+                self.label_locations.append(GridEdge.BOTTOM.value)
+            if "R" in _label_locations or "r" in _label_locations:
+                self.label_locations.append(GridEdge.RIGHT.value)
+        except (TypeError, ValueError):
+            feedback(
+                f'Invalid label_locations "{_label_locations}" for XX18Game;'
+                " this should be a string with any or all of T, L, B, or R.",
+                True,
+                True,
+            )
         # ---- offset
         if self.hex_offset not in ["odd", "even"]:
             feedback(
@@ -320,57 +346,121 @@ class XX18GameObject(CoreGameObject):
         if self.orientation == HexOrientationName.POINTY.value:
             # ---- * column labels
             for col_no in range(1, end_col):
-                cell = self.board_layout.cells[(col_no, 1)]
                 col_value = 2 * col_no - 1
-                # first label
-                x = cell.n.x if self.hex_offset == "even" else cell.nw.x
-                y = cell.n.y - lbl_offset_col
-                Text(str(col_value), x=x, y=y, **lkeys)
-                # second label
-                x = cell.ne.x if self.hex_offset == "even" else cell.n.x
-                y = cell.n.y - lbl_offset_col
-                Text(str(col_value + 1), x=x, y=y, **lkeys)
+                if GridEdge.TOP.value in self.label_locations:
+                    cell = self.board_layout.cells[(col_no, 1)]
+                    # first label
+                    x = cell.n.x if self.hex_offset == "even" else cell.nw.x
+                    y = cell.n.y - lbl_offset_col
+                    Text(str(col_value), x=x, y=y, **lkeys)
+                    # second label
+                    x = cell.ne.x if self.hex_offset == "even" else cell.n.x
+                    y = cell.n.y - lbl_offset_col
+                    Text(str(col_value + 1), x=x, y=y, **lkeys)
+                if GridEdge.BOTTOM.value in self.label_locations:
+                    cell = self.board_layout.cells[(col_no, self.rows)]
+                    # first label
+                    x = cell.s.x if self.hex_offset == "even" else cell.sw.x
+                    y = cell.s.y + lbl_offset_col + font_offset
+                    Text(str(col_value), x=x, y=y, **lkeys)
+                    # second label
+                    x = cell.se.x if self.hex_offset == "even" else cell.s.x
+                    y = cell.s.y + lbl_offset_col + font_offset
+                    Text(str(col_value + 1), x=x, y=y, **lkeys)
             # ---- * row labels
             for row_no in range(1, end_row):
                 row_value = tools.alpha_column(row_no, lower=False)
-                cell = self.board_layout.cells[(1, row_no)]
-                if self.even(row_no) and self.hex_offset == "even":
-                    x = cell.w.x - lbl_offset_row - self.cell_size / 2.0
-                elif self.odd(row_no) and self.hex_offset == "odd":
-                    x = cell.w.x - lbl_offset_row - self.cell_size / 2.0
-                else:
-                    x = cell.w.x - lbl_offset_row
-                y = cell.w.y
-                Text(row_value, x=x, y=y, **lkeys)
+                if GridEdge.LEFT.value in self.label_locations:
+                    cell = self.board_layout.cells[(1, row_no)]
+                    if self.even(row_no) and self.hex_offset == "even":
+                        x = cell.w.x - lbl_offset_row - self.cell_size / 2.0
+                    elif self.odd(row_no) and self.hex_offset == "odd":
+                        x = cell.w.x - lbl_offset_row - self.cell_size / 2.0
+                    else:
+                        x = cell.w.x - lbl_offset_row
+                    y = cell.w.y
+                    Text(row_value, x=x, y=y, **lkeys)
+                if GridEdge.RIGHT.value in self.label_locations:
+                    cell = self.board_layout.cells[(self.cols, row_no)]
+                    if self.odd(row_no) and self.hex_offset == "even":
+                        x = cell.e.x + lbl_offset_row + self.cell_size / 2.0
+                    elif self.even(row_no) and self.hex_offset == "odd":
+                        x = cell.e.x + lbl_offset_row + self.cell_size / 2.0
+                    else:
+                        x = cell.e.x + lbl_offset_row
+                    y = cell.e.y
+                    Text(row_value, x=x, y=y, **lkeys)
 
         # ---- FLAT grid
         elif self.orientation == HexOrientationName.FLAT.value:
             # ---- * column labels
             for col_no in range(1, end_col):
                 col_value = tools.alpha_column(col_no, lower=False)
-                cell = self.board_layout.cells[(col_no, 1)]
-                x = cell.n.x
-                if self.even(col_no) and self.hex_offset == "even":
-                    y = cell.n.y - lbl_offset_col - self.cell_size / 2.0
-                elif self.odd(col_no) and self.hex_offset == "odd":
-                    y = cell.n.y - lbl_offset_col - self.cell_size / 2.0
-                else:
-                    y = cell.n.y - lbl_offset_col
-                Text(col_value, x=x, y=y, **lkeys)
+                if GridEdge.TOP.value in self.label_locations:
+                    cell = self.board_layout.cells[(col_no, 1)]
+                    x = cell.n.x
+                    if self.even(col_no) and self.hex_offset == "even":
+                        y = cell.n.y - lbl_offset_col - self.cell_size / 2.0
+                    elif self.odd(col_no) and self.hex_offset == "odd":
+                        y = cell.n.y - lbl_offset_col - self.cell_size / 2.0
+                    else:
+                        y = cell.n.y - lbl_offset_col
+                    Text(col_value, x=x, y=y, **lkeys)
+                if GridEdge.BOTTOM.value in self.label_locations:
+                    cell = self.board_layout.cells[(col_no, self.rows)]
+                    x = cell.n.x
+                    if self.odd(col_no) and self.hex_offset == "even":
+                        y = (
+                            cell.s.y
+                            + lbl_offset_col
+                            + self.cell_size / 2.0
+                            + font_offset
+                        )
+                    elif self.even(col_no) and self.hex_offset == "odd":
+                        y = (
+                            cell.s.y
+                            + lbl_offset_col
+                            + self.cell_size / 2.0
+                            + font_offset
+                        )
+                    else:
+                        y = cell.s.y + lbl_offset_col + font_offset
+                    Text(col_value, x=x, y=y, **lkeys)
             # ---- * row labels
             for row_no in range(1, end_row):
                 row_value = 2 * row_no - 1
-                cell = self.board_layout.cells[(1, row_no)]
-                # first label
-                x = cell.w.x
-                y = cell.w.y + font_offset
-                x = x - lbl_offset_row
-                Text(str(row_value), x=x, y=y, **lkeys)
-                # second label
-                x = cell.w.x
-                y = cell.sw.y + font_offset
-                x = x - lbl_offset_row
-                Text(str(row_value + 1), x=x, y=y, **lkeys)
+                if GridEdge.LEFT.value in self.label_locations:
+                    cell = self.board_layout.cells[(1, row_no)]
+                    # first label
+                    x = cell.w.x
+                    y = cell.w.y + font_offset
+                    x = x - lbl_offset_row
+                    Text(str(row_value), x=x, y=y, **lkeys)
+                    # second label
+                    x = cell.w.x
+                    y = cell.sw.y + font_offset
+                    x = x - lbl_offset_row
+                    Text(str(row_value + 1), x=x, y=y, **lkeys)
+                if GridEdge.RIGHT.value in self.label_locations:
+                    cell = self.board_layout.cells[(self.cols, row_no)]
+                    # first label
+                    x = cell.e.x
+                    y = (
+                        cell.ne.y + font_offset
+                        if self.hex_offset == "even"
+                        else cell.e.y
+                    )
+                    x = x + lbl_offset_row
+                    Text(str(row_value), x=x, y=y, **lkeys)
+                    # second label
+                    x = cell.e.x
+                    y = (
+                        cell.e.y + font_offset
+                        if self.hex_offset == "even"
+                        else cell.se.y
+                    )
+                    x = x + lbl_offset_row
+                    Text(str(row_value + 1), x=x, y=y, **lkeys)
 
     def set_locale_label(self, row: int, col: int, label: str):
         """Set a locale label attribute for the board's locales."""
