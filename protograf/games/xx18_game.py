@@ -57,10 +57,10 @@ Drawing will be done following the order in which features are provided.
 
 Setting of an off-board, colored, rectangular, or polyshape area - typically
 red and extending from the edge of the board hexagons - is not handled
-directly by XX18 game.  There is too much variabilty in how such areas are
-drawn.  What is possible is to use the cell references to set the vertices
-of such shapes relative to the board.
-
+directly by XX18Game.  There is too much variation in how such areas are
+drawn to use a common formulae.  What is possible is to use the cell grid
+references and hexagon geometry to set the vertices of such shapes relative
+to the board.
 
 Standard, named 18xx colors
 ===========================
@@ -75,8 +75,8 @@ Gray (Phase 7)    #7F8C8D (Medium Neutral Gray)   #95A5A6 (Light Slate Gray)
 
 Hex Type / Phase   HEX Code UI Design Purpose
 ------------------ -------- ----------------------------------------------------
-Map Background     #EAEAEA  Neutral light gray to make active hexes pop.
-Plain Hex (Base)   #FFFFFF  Stark white or a pale off-white (#F9F9F9).
+Map Background     #EAEAEA  Neutral light gray to offset active hexes
+Plain Hex (Base)   #FFFFFF  Stark white or a pale off-white (#F9F9F9)
 Yellow Phase Hex   #F1E351  Warm digital yellow
 Green Phase Hex    #4CAF50  Vibrant emerald green for clear route tracking
 Brown Phase Hex    #8D6E63  Balanced medium brown
@@ -223,6 +223,7 @@ class XX18GameObject(CoreGameObject):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- class props
         self.features = self._commons("features") or kwargs.get("features") or []
+        self.debug = self._commons("debug") or kwargs.get("debug") or False
         # print(f"&&& {self.features=}")
         # ---- 18xx game
         self.cell_size = XX18_HEX_HEIGHT
@@ -325,6 +326,33 @@ class XX18GameObject(CoreGameObject):
     def _validate_choices(self) -> bool:
         """Check and reset user choices for valid selections."""
         return True
+
+    def draw_debug_labels(self):
+        """Draw Hexagon labels overlays"""
+        from protograf.protos import Text
+
+        def get_label(row, col):
+            for key, locale in enumerate(self.board_layout.locales):
+                if locale.col == col and locale.row == row:
+                    return self.board_layout.locales[key].label
+
+        if not self.debug:
+            return
+
+        lkeys = {}
+        LSIZE = XX18_HEX_SIDE * self.units * 0.75
+        lkeys["font_name"] = "Helvetica"
+        lkeys["font_size"] = LSIZE
+        lkeys["stroke"] = self.debug_color
+        lkeys["stroke_transparency"] = 50
+        lkeys["align"] = "centre"
+
+        end_col, end_row = self.cols + 1, self.rows + 1
+        for col_no in range(1, end_col):
+            for row_no in range(1, end_row):
+                cell = self.board_layout.cells[(col_no, row_no)]
+                label = get_label(row_no - 1, col_no - 1)
+                Text(label, x=cell.c.x, y=cell.c.y + LSIZE / self.units / 2.5, **lkeys)
 
     def draw_labels(self):
         """Draw row and column labels at the board edges."""
@@ -497,7 +525,7 @@ class XX18GameObject(CoreGameObject):
         # Point(top_x, top_x) is the top-left point of the VirtualLocations (grid points)
         top_x = self.x if self.kwargs.get("x") else 0
         top_y = self.y if self.kwargs.get("y") else 0
-        hex_color = self.fill if self.fill else self.plain_hex
+        hex_color = self.fill if (self.fill or self.fill is None) else self.plain_hex
         x_offset = 0
         # x_offset = -0.5 * self.cell_size
         self.board_layout = Hexagons(
@@ -515,6 +543,7 @@ class XX18GameObject(CoreGameObject):
             stroke=self.stroke,
             stroke_width=XX18_STROKE_WIDTH,
             fill=hex_color,
+            debug=self.debug,
             # hex_shape=self.cell_shape,  # insert centre_image into hex?
         )
         # print(f'&&& XX18 BOARD {self.board_layout.cells.keys()=}')
@@ -1157,6 +1186,7 @@ class XX18GameObject(CoreGameObject):
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         paths = []
         perbii = ""
+
         for _loc in _locations:
             geo = self.cells.get(_loc)
             for edges in _positions:
@@ -1188,7 +1218,7 @@ class XX18GameObject(CoreGameObject):
                     paths.append(f"{start} {end}")
                 elif start:
                     perbii = perbii + " " + start
-                if paths:
+                if paths or perbii:
                     hxw = Hexagon(  # underlying white
                         cxy=geo.centre,
                         height=XX18_HEX_HEIGHT,

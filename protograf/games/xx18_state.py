@@ -72,3 +72,5 @@ class XX18StateObject(CoreStateObject):
         # ---- draw the features on the board
         if self.board.features:
             self.draw_features()
+        if self.board.kwargs.get("debug", False):
+            self.board.draw_debug_labels()

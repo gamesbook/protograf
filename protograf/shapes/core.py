@@ -3934,6 +3934,7 @@ class TextShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # feedback(f'*** Text init {self.kwargs=}')
         self.height_used = None
         if self.kwargs.get("cx") and self.kwargs.get("cy"):
             self.x = self.kwargs.get("cx")
@@ -4285,8 +4286,14 @@ class TextShape(BaseShape):
             keys["rotation"] = self.rotation
             if self.use_abs_c:
                 keys["absolute"] = True
-                # feedback(f"\n*** Text PLAIN {_text=} {x_t=} {y_t=} {keys=}")
-            self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
+            # feedback(f"\n*** Text PLAIN {_text=} {x_t=} {y_t=} {keys=}")
+            self.draw_multi_string(
+                cnv,
+                x_t,
+                y_t,
+                _text,
+                **{**kwargs, **keys},
+            )  # use morph to rotate
             # TODO - calculate self.height_used
 
 
