@@ -356,6 +356,7 @@ COLORS_18XX = {
     "xgrey": "#b0bec5",
     "xbarrier": "#757575",
     "xoffboard": "#ef5350",
+    "xred": "#ef5350",
     "xwater": "#4a7f9d",
 }
 

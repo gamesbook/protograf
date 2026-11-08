@@ -35,7 +35,7 @@ The 18xx map "blueprint" feature covers:
   left-of, and right-of)
 * coloring ("fill") of a whole hex
 * creation of a small, multi-line, colored table to appear in an off-board
-  hexagon or area (typically income per stage of the game)
+  hexagon or area (showing revenue per phase of the game)
 
 The blueprint will also provide:
 
@@ -132,6 +132,7 @@ XX18_REVENUE_DIAMETER = 0.8  # cm
 XX18_TRACK_WIDTH_INNER = 0.4  # cm
 XX18_TRACK_WIDTH_OUTER = 0.5  # cm
 XX18_MOUNTAIN_SIDE = 0.6  # cm; equilateral triangle
+XX18_PHASE_REVENUE_BOX = 0.7  # cm
 XX18_STROKE_WIDTH = 1
 XX18_STROKE_WIDTH_HIGHLIGHT = 8
 XX18_TEXT_SMALL = 11
@@ -147,17 +148,20 @@ XX18_TILE_YELLOW = "#FFD200"
 XX18_TILE_GREEN = "#00A651"
 XX18_TILE_BROWN = "#7A4B1B"
 XX18_TILE_GRAY = "#7F8C8D"
+XX18_TILE_GREY = "#7F8C8D"
 XX18_TILE_YELLOW_MF = "#F1C40F"
 XX18_TILE_GREEN_MF = "#27AE60"
 XX18_TILE_BROWN_MF = "#7E5109"
 XX18_TILE_GRAY_MF = "#95A5A6"
+XX18_TILE_GREY_MF = "#95A5A6"
 XX18_HEX_BACK = "#EAEAEA"
 XX18_HEX_PLAIN = "#FFFFFF"
 XX18_HEX_PLAIN_OFF = "#F9f9f9"
 XX18_HEX_YELLOW = "#F1E351"
 XX18_HEX_GREEN = "#4CAF50"
-XX18_HEX_BROWN = "#8D6E63 "
+XX18_HEX_BROWN = "#8D6E63"
 XX18_HEX_GRAY = "#B0BEC5"
+XX18_HEX_GREY = "#B0BEC5"
 XX18_HEX_BARRIER = "#757575"
 XX18_HEX_OFFBOARD = "#EF5350"
 XX18_HEX_WATER = "#4A7F9D"
@@ -199,6 +203,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "mountain",
     "private",
     "revenue",
+    "phase_revenue",
     "tile_letter",
     "tile-letter",
     "fill",
@@ -825,6 +830,14 @@ class XX18GameObject(CoreGameObject):
                     distance=fdistance,
                     **kwargs,
                 )
+            case "phase_revenue":
+                self.phase_revenue(
+                    location=fhexagon,
+                    income=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    **kwargs,
+                )
             case "tile_letter" | "tile-letter" | "tileletter":
                 self.tile_letter(
                     location=fhexagon,
@@ -925,15 +938,17 @@ class XX18GameObject(CoreGameObject):
         heading, title, _label = "", "", ""
         label_align = "centre"
         match text_size:
-            case "small":
+            case "small" | "s":
                 font_size = XX18_TEXT_SMALL
-            case "medium":
+            case "medium" | "m":
                 font_size = XX18_TEXT_MEDIUM
-            case "large":
+            case "large" | "l":
                 font_size = XX18_TEXT_LARGE
+            case "extra" | "e" | "x":
+                font_size = XX18_TEXT_EXTRA
             case _:
                 raise ValueError(
-                    f'Text size "{text_size}" is not available for label processing'
+                    f'Text size "{text_size}" is not available for label processing.',
                 )
         if label:
             shift = base_shift + self.label_size / self.units / 3.0
@@ -1598,8 +1613,9 @@ class XX18GameObject(CoreGameObject):
         """
         from protograf.protos import Hexagon
 
+        _locations = self.process_locations(location, "spike")
         if size:
-            if _lower(size) not in [
+            if not isinstance(size, str) or _lower(size) not in [
                 "short",
                 "medium",
                 "long",
@@ -1608,14 +1624,14 @@ class XX18GameObject(CoreGameObject):
                 "l",
             ]:
                 feedback(
-                    f'"{size}" is an invalid size - choose short, medium or long.',
+                    f'"{size}" is an invalid size for {_locations};'
+                    " - use short, medium or long.",
                     True,
                     True,
                 )
         else:
             size = "medium"
 
-        _locations = self.process_locations(location, "spike")
         if position is None:
             if self.orientation == HexOrientationName.POINTY.value:
                 position = ["ne", "e", "se", "sw", "w", "nw"]
@@ -1871,6 +1887,122 @@ class XX18GameObject(CoreGameObject):
                 fill="black",
                 **{**kwargs, **lwargs},
             )
+
+    def phase_revenue(
+        self,
+        location: str = None,
+        income: str = None,
+        direction: float = None,
+        distance: float = None,
+        colors: list = None,
+        orientation: str = "v",  # None,
+        **kwargs,
+    ):
+        """Draw a Phase Revenue table at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            income (str): the phase revenue incomes (two to four values)
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
+            colors (list): the colors to use for the different incomes
+            orientation (str):
+                the table layout; either vertical (v) or horizontal (h)
+        """
+        from protograf.protos import Rectangle
+
+        _locations = self.process_locations(location, "phase_revenue")
+        if colors:
+            _colors = colors
+            colors_default = True
+        else:
+            _colors = [XX18_HEX_YELLOW, XX18_HEX_GREEN, XX18_HEX_BROWN, XX18_HEX_GREY]
+            colors_default = True
+        orientation = orientation if orientation else "horizontal"
+        if not isinstance(orientation, str) or _lower(orientation) not in [
+            "v",
+            "vertical",
+            "h",
+            "horizontal",
+        ]:
+            feedback(
+                f'The phase_revenue orientation "{orientation}" is invalid for {_locations};'
+                " - use vertical (v) or horizontal (h).",
+                True,
+                True,
+            )
+        table_orientation = "V" if _lower(orientation) in ["v", "vertical"] else "H"
+        incomes = tools.split(income, separator=" ", clean=True, no_blanks=True)
+        if not incomes or len(incomes) < 2:
+            feedback(
+                f'The phase_revenue income "{income}" is invalid for {_locations};'
+                " - at least two, space-separated values are required.",
+                True,
+                True,
+            )
+        if len(incomes) > len(_colors):
+            feedback(
+                f"Each phase_revenue income for {_locations} must have a matching color",
+                True,
+                True,
+            )
+        if len(incomes) == 2 and colors_default:
+            _colors = [XX18_HEX_YELLOW, XX18_HEX_BROWN]
+        box_width = XX18_PHASE_REVENUE_BOX
+        box_height = XX18_PHASE_REVENUE_BOX * 0.8
+        if table_orientation == "H":
+            offset = box_width * len(incomes) / 2.0
+        else:
+            offset = box_height * len(incomes) / 2.0
+
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            x1 = (
+                ccentre.x - offset
+                if table_orientation == "H"
+                else ccentre.x - XX18_PHASE_REVENUE_BOX / 2.0
+            )
+            y1 = (
+                ccentre.y - offset
+                if table_orientation == "V"
+                else ccentre.y - XX18_PHASE_REVENUE_BOX / 2.0
+            )
+            x, y = x1, y1
+            for key, inc in enumerate(incomes):
+                Rectangle(
+                    x=x,
+                    y=y,
+                    height=box_height,
+                    width=box_width,
+                    fill_stroke=_colors[key],
+                    label=inc,
+                    label_font=XX18_TEXT_FONT,
+                    label_stroke="black",
+                    **kwargs,
+                )
+                x = x + box_width if table_orientation == "H" else x
+                y = y + box_height if table_orientation == "V" else y
+            if table_orientation == "H":
+                Rectangle(
+                    x=x1,
+                    y=y1,
+                    height=box_height,
+                    width=box_width * len(incomes),
+                    fill=None,
+                    stroke="black",
+                    stroke_width=XX18_STROKE_WIDTH,
+                )
+            else:
+                Rectangle(
+                    x=x1,
+                    y=y1,
+                    height=box_height * len(incomes),
+                    width=box_width,
+                    fill=None,
+                    stroke="black",
+                    stroke_width=XX18_STROKE_WIDTH,
+                )
 
     def private(
         self,
