@@ -723,8 +723,7 @@ class XX18GameObject(CoreGameObject):
         if len(feature) >= 4:
             flabel = str(feature[3])
         if len(feature) >= 5 and ftype != "private":  # see below; private overloads
-            flabel_loc = self.relative_location(feature[4])
-            kwargs["label_location"] = flabel_loc
+            kwargs["label_location"] = feature[4]
         if len(feature) >= 6 and ftype != "private":  # see below; private overloads
             fshapes = feature[5]
             if not isinstance(fshapes, (tuple, list)):
@@ -826,20 +825,14 @@ class XX18GameObject(CoreGameObject):
                 )
             case "private":
                 flocation1, fdirection1, fdistance1 = "", 0, 0
-                if len(feature) >= 6:
-                    flocation1 = str(feature[5])
+                if len(feature) >= 5:
+                    flocation1 = str(feature[4])
                     if flocation1 in ["", None]:
                         flocation1 = fhexagon
+                if len(feature) >= 6:
+                    fdirection1, fdistance1 = self.feature_position(feature[5])
                 if len(feature) >= 7:
-                    _fdir1 = feature[6]
-                    fdirection1 = tools.as_float(_fdir1, "direction")
-                if len(feature) >= 8:
-                    _fdist1 = feature[7]
-                    fdistance1 = tools.as_float(_fdist1, "distance")
-
-                if len(feature) >= 9:
-                    flabel_loc = self.relative_location(feature[8])
-                    kwargs["label_location"] = flabel_loc
+                    kwargs["label_location"] = feature[6]
                 # print(f"&&& private {flocation1=} {fdirection1=} {fdistance1=}")
                 self.private(
                     label=flabel,
@@ -1241,9 +1234,9 @@ class XX18GameObject(CoreGameObject):
                         )
                         ccentre = self.feature_location(geo, direction, distance)
                         _label_loc = kwargs.get("label_location", "above")
-                        label_location = self.relative_location(_label_loc)
+                        relative_location = self.relative_location(_label_loc)
                         lwargs = self.process_label(
-                            label, label_location, XX18_TOWN_DIAMETER / 2.0
+                            label, relative_location, XX18_TOWN_DIAMETER / 2.0
                         )
                         Rectangle(
                             cxy=ccentre,
@@ -1356,7 +1349,10 @@ class XX18GameObject(CoreGameObject):
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             label_location = kwargs.get("label_location", "below")
-            lwargs = self.process_label(label, label_location, XX18_TOWN_DIAMETER / 2.0)
+            relative_location = self.relative_location(label_location)
+            lwargs = self.process_label(
+                label, relative_location, XX18_TOWN_DIAMETER / 2.0
+            )
             # ---- circle
             if border:
                 Circle(
@@ -1408,7 +1404,8 @@ class XX18GameObject(CoreGameObject):
             if city_count > 1:
                 if label_location not in ["above", "below"]:
                     label_location = "below"
-            lwargs = self.process_label(label, label_location, _radius, "medium")
+            relative_location = self.relative_location(label_location)
+            lwargs = self.process_label(label, relative_location, _radius, "medium")
             cwargs = {}
             cwargs["radius"] = _radius
             cwargs["fill"] = "white"
@@ -1906,8 +1903,9 @@ class XX18GameObject(CoreGameObject):
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             label_location = kwargs.get("label_location", "below")
+            relative_location = self.relative_location(label_location)
             lwargs = self.process_label(
-                label, label_location, XX18_MOUNTAIN_SIDE / 2.0, "small"
+                label, relative_location, XX18_MOUNTAIN_SIDE / 2.0, "small"
             )
             Triangle(
                 cx=ccentre.x,
@@ -2052,47 +2050,111 @@ class XX18GameObject(CoreGameObject):
             location (str): grid reference or references for start cell
             direction (float): degrees clockwise from East in start cell
             distance (float): distance from hex centre in start cell
-            location1 (str): grid reference or references for start cell
+            location1 (str): grid reference or references for end cell
             direction1 (float): degrees clockwise from East in end cell
             distance1 (float): distance from hex centre in end cell
         """
-        from protograf.protos import Circle, Line
+        from protograf.protos import Circle, Line, Text
 
-        _locations = self.process_locations(location, "private-start")
-        _locations1 = self.process_locations(location1, "private-end")
-        if _locations and _locations1:
-            _loc = _locations[0]
-            _loc1 = _locations1[0]
-            geo = self.cells.get(_loc)
-            geo1 = self.cells.get(_loc1)
-            ccentre = self.feature_location(geo, direction, distance)
-            ccentre1 = self.feature_location(geo1, direction1, distance1)
+        _locations_s = self.process_locations(location, "private-start")
+        _locations_e = self.process_locations(location1, "private-end")
+        if _locations_s and _locations_e:
+            _loc_s = _locations_s[0]
+            _loc_e = _locations_e[0]
+            geo = self.cells.get(_loc_s)
+            geo1 = self.cells.get(_loc_e)
+            ccentre_s = self.feature_location(geo, direction, distance)  # start
+            ccentre_e = self.feature_location(geo1, direction1, distance1)  # end
+            # ---- private label settings
+            # above: heading for upper-circle; above: title for lower-circle;
+            # left: above line; right: below line;
+            pce_heading, pce_title, pcs_heading, pcs_title = "", "", "", ""
+            lheading, ltitle, labove = "", "", False
+            if label:
+                lwargs = {}
+                lwargs["font_name"] = XX18_TEXT_FONT
+                lwargs["font_size"] = XX18_TEXT_SMALL
+                kwargs["stroke"] = "black"
+                lwargs["heading_font"] = XX18_TEXT_FONT
+                lwargs["heading_size"] = XX18_TEXT_SMALL
+                kwargs["heading_stroke"] = "black"
+                lwargs["title_font"] = XX18_TEXT_FONT
+                lwargs["title_size"] = XX18_TEXT_SMALL
+                kwargs["title_stroke"] = "black"
+
+                label_location = kwargs.get("label_location", "below")
+                relative_location = self.relative_location(label_location)
+
+                match relative_location:
+                    case RelativeLocation.ABOVE.value:
+                        lheading = label
+                        labove = True
+                    case RelativeLocation.BELOW.value:
+                        ltitle = label
+                    case RelativeLocation.LEFT.value:
+                        if ccentre_s.x <= ccentre_e.x:
+                            if ccentre_s.y < ccentre_e.y:
+                                pcs_heading = label
+                            else:
+                                pcs_title = label
+                        else:
+                            if ccentre_s.y > ccentre_e.y:
+                                pce_heading = label
+                            if ccentre_s.y < ccentre_e.y:
+                                pce_title = label
+                    case RelativeLocation.RIGHT.value:
+                        if ccentre_s.x >= ccentre_e.x:
+                            if ccentre_s.y < ccentre_e.y:
+                                pcs_heading = label
+                            else:
+                                pcs_title = label
+                        else:
+                            if ccentre_e.y < ccentre_s.y:
+                                pce_heading = label
+                            else:
+                                pce_title = label
+
+            # ---- private features; circles with title or heading
             pcs = Circle(
-                cxy=ccentre,
+                cxy=ccentre_s,
                 radius=XX18_PRIVATE_DIAMETER / 2.0,
                 fill=None,
                 stroke="black",
                 stroke_width=XX18_STROKE_WIDTH,
-                # label=label if label else "",
-                # label_size=XX18_TEXT_SMALL,
+                title=pcs_title,
+                heading=pcs_heading,
+                **lwargs,
             )
             pce = Circle(
-                cxy=ccentre1,
+                cxy=ccentre_e,
                 radius=XX18_PRIVATE_DIAMETER / 2.0,
                 fill=None,
                 stroke="black",
                 stroke_width=XX18_STROKE_WIDTH,
-                # label=label if label else "",
-                # label_size=XX18_TEXT_SMALL,
+                title=pce_title,
+                heading=pce_heading,
+                **lwargs,
             )
             Line(
                 links=[pcs, pce],
-                stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
+                **lwargs,
             )
-
-        if label:
-            print("TODO - label for Private")
+            # ---- label - title or heading - for private line
+            # breakpoint()
+            if label and (ltitle or lheading):
+                lcntr = geoms.fraction_along_line(ccentre_e, ccentre_s, 0.5)
+                if ccentre_e.y != ccentre_s.y:
+                    if lheading:
+                        Text(lheading, x=lcntr.x, y=lcntr.y, align="right", **lwargs)
+                    if ltitle:
+                        Text(ltitle, x=lcntr.x, y=lcntr.y, align="left", **lwargs)
+                else:
+                    llabel = lheading or ltitle
+                    if labove:
+                        delta_y = -XX18_TEXT_SMALL / self.units / 2.0
+                    else:
+                        delta_y = XX18_TEXT_SMALL / self.units
+                    Text(llabel, x=lcntr.x, y=lcntr.y + delta_y, **lwargs)  # centre
 
     def symbol(
         self,
@@ -2167,7 +2229,8 @@ class XX18GameObject(CoreGameObject):
             ccentre = self.feature_location(geo, direction, distance)
             label_location = kwargs.get("label_location", "below")
             offset = 0.5
-            lwargs = self.process_label(label, label_location, offset, "small")
+            relative_location = self.relative_location(label_location)
+            lwargs = self.process_label(label, relative_location, offset, "small")
             Image(_file, cxy=ccentre, **{**kwargs, **lwargs})
 
     def figure(

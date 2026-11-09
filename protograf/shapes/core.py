@@ -1888,7 +1888,22 @@ class LineShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Line in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        return ShapeGeometry(
+            # centre
+            # centre=cntr_u,
+            # center=cntr_u,
+            # c=cntr_u,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
