@@ -2063,8 +2063,8 @@ class XX18GameObject(CoreGameObject):
             _loc_e = _locations_e[0]
             geo = self.cells.get(_loc_s)
             geo1 = self.cells.get(_loc_e)
-            ccentre_s = self.feature_location(geo, direction, distance)  # start
-            ccentre_e = self.feature_location(geo1, direction1, distance1)  # end
+            c_s = self.feature_location(geo, direction, distance)  # start
+            c_e = self.feature_location(geo1, direction1, distance1)  # end
             # ---- private label settings
             # above: heading for upper-circle; above: title for lower-circle;
             # left: above line; right: below line;
@@ -2092,31 +2092,31 @@ class XX18GameObject(CoreGameObject):
                     case RelativeLocation.BELOW.value:
                         ltitle = label
                     case RelativeLocation.LEFT.value:
-                        if ccentre_s.x <= ccentre_e.x:
-                            if ccentre_s.y < ccentre_e.y:
+                        if c_s.x <= c_e.x:
+                            if c_s.y < c_e.y:
                                 pcs_heading = label
                             else:
                                 pcs_title = label
                         else:
-                            if ccentre_s.y > ccentre_e.y:
+                            if c_s.y > c_e.y:
                                 pce_heading = label
-                            if ccentre_s.y < ccentre_e.y:
+                            else:
                                 pce_title = label
                     case RelativeLocation.RIGHT.value:
-                        if ccentre_s.x >= ccentre_e.x:
-                            if ccentre_s.y < ccentre_e.y:
+                        if c_s.x >= c_e.x:
+                            if c_s.y < c_e.y:
                                 pcs_heading = label
                             else:
                                 pcs_title = label
                         else:
-                            if ccentre_e.y < ccentre_s.y:
+                            if c_e.y < c_s.y:
                                 pce_heading = label
                             else:
                                 pce_title = label
 
             # ---- private features; circles with title or heading
             pcs = Circle(
-                cxy=ccentre_s,
+                cxy=c_s,
                 radius=XX18_PRIVATE_DIAMETER / 2.0,
                 fill=None,
                 stroke="black",
@@ -2126,7 +2126,7 @@ class XX18GameObject(CoreGameObject):
                 **lwargs,
             )
             pce = Circle(
-                cxy=ccentre_e,
+                cxy=c_e,
                 radius=XX18_PRIVATE_DIAMETER / 2.0,
                 fill=None,
                 stroke="black",
@@ -2142,14 +2142,28 @@ class XX18GameObject(CoreGameObject):
             # ---- label - title or heading - for private line
             # breakpoint()
             if label and (ltitle or lheading):
-                lcntr = geoms.fraction_along_line(ccentre_e, ccentre_s, 0.5)
-                if ccentre_e.y != ccentre_s.y:
-                    if lheading:
-                        Text(lheading, x=lcntr.x, y=lcntr.y, align="right", **lwargs)
-                    if ltitle:
-                        Text(ltitle, x=lcntr.x, y=lcntr.y, align="left", **lwargs)
+                lcntr = geoms.fraction_along_line(c_e, c_s, 0.5)
+                llabel = lheading or ltitle
+                if c_e.y != c_s.y:
+                    # align text in/out from line centre
+                    if labove:
+                        delta_y = -XX18_TEXT_SMALL / self.units / 2.0
+                    else:
+                        delta_y = XX18_TEXT_SMALL / self.units
+
+                    if c_e.x > c_s.x and c_e.y < c_s.y:
+                        talign = "left"
+                    if c_e.x < c_s.x and c_e.y > c_s.y:
+                        talign = "left"
+
+                    if c_e.x > c_s.x and c_e.y > c_s.y:
+                        talign = "right"
+                    if c_e.x < c_s.x and c_e.y < c_s.y:
+                        talign = "right"
+
+                    Text(llabel, x=lcntr.x, y=lcntr.y + delta_y, align=talign, **lwargs)
                 else:
-                    llabel = lheading or ltitle
+                    # centre text over/above the line
                     if labove:
                         delta_y = -XX18_TEXT_SMALL / self.units / 2.0
                     else:
