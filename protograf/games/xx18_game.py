@@ -1404,6 +1404,8 @@ class XX18GameObject(CoreGameObject):
             if city_count > 1:
                 if label_location not in ["above", "below"]:
                     label_location = "below"
+            if city_count == 3:
+                label_location = "below"
             relative_location = self.relative_location(label_location)
             lwargs = self.process_label(label, relative_location, _radius, "medium")
             cwargs = {}
