@@ -571,16 +571,29 @@ class XX18GameObject(CoreGameObject):
                     cell_geo = self.board_layout.cells[(col, row)]
                     if self.orientation == HexOrientationName.POINTY.value:
                         row_alpha = tools.as_excel(row, False)
-                        if self.odd(row):
-                            col_num = col * 2 - 1
+                        if self.hex_offset == "even":
+                            if self.odd(row):
+                                col_num = col * 2 - 1
+                            else:
+                                col_num = col * 2
                         else:
-                            col_num = col * 2
+                            if self.odd(row):
+                                col_num = col * 2
+                            else:
+                                col_num = col * 2 - 1
                         cell_id = f"{row_alpha}{col_num}"
                     elif self.orientation == HexOrientationName.FLAT.value:
                         col_alpha = tools.as_excel(col, False)
-                        row_num = row * 2 - 1
-                        if self.even(col):
-                            row_num += 1
+                        if self.hex_offset == "even":
+                            if self.even(col):
+                                row_num = row * 2
+                            else:
+                                row_num = row * 2 - 1
+                        else:
+                            if self.even(col):
+                                row_num = row * 2 - 1
+                            else:
+                                row_num = row * 2
                         cell_id = f"{col_alpha}{row_num}"
                     else:
                         cell_id = ""
