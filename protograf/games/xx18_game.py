@@ -1293,6 +1293,28 @@ class XX18GameObject(CoreGameObject):
                         alert=True,
                     )
 
+    def track_point(
+        self,
+        location: str = None,
+        position: str = None,
+        direction: float = None,
+        distance: float = None,
+        height: float = None,
+        **kwargs,
+    ):
+        """Draw track between hexside and a point at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            position (str): hex edge compass reference for start point
+            direction (float): degrees clockwise from East to end point
+            distance (float): distance from hex centre to end point
+            height (float): height of the curve above the baseline joining its points
+        """
+        from protograf.protos import Hexagon, Line
+
+        _locations = self.process_locations(location, "track_point")
+
     def river_line(
         self,
         location: str = None,
