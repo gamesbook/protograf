@@ -11,36 +11,41 @@ Notes:
 
 Summary of functions:
 
-The 18xx map "blueprint" feature covers:
+The 18xx map "blueprint" feature covers depiction of:
 
-* depiction of towns as filled-in circles (may include a border)
-* depiction of cities (different sizes) as open circles; may include
+* towns as filled-in, black circles, or rectangles
+* cities (different sizes) as white circles; may include
   the railroad logo or a custom shape or text inset into it
-* depiction of revenue as circle with an amount
-* depiction of track, curved or straight
-* depiction of track extending from a city
-* depiction of terminal spikes running off-board (short, medium and long)
-* depiction of blocked hex-sides as thick lines
-* depiction of highlighted hex as a yellow band inside of all hex edges
-* depiction of private railways; either in-hex or across hexes
-* depiction of icons for common in-hex features; including mountains
+* revenue as an open (default) circle with an amount
+* track, curved or straight
+* track extending from a point to an edge
+* terminal spikes running off-board (short, medium and long)
+* blocked hex-sides as thick lines
+* a highlighted hex as a yellow band inside of all hex edges
+* private railways; either in-hex or across hexes
+* icons for common in-hex features; including mountains
   (two sizes), hills, and rivers
-* depiction of symbols for special features such as: coal, desert, factory,
-  fish, flag, forest, hills, lock, mine, noentry, oil, pennant, port,
+* symbols for special features such as: coal, desert, factory, fish,
+  flag, forest, hills, lock, mine, noentry, oil, pennant, port,
   swamp, train, tree, tunnel
-* depiction of a river; as "wavy line"; running through a hex
-* depiction of a custom shape in a hex
-* display of a single piece of text
-* display of hex coordinates along the edges of the map (above, below,
+* a river; as "wavy line"; running through a hex
+* a custom shape in a hex
+* a single piece of text
+* hex coordinates along the edges of the map (above, below,
   left-of, and right-of)
-* coloring ("fill") of a whole hex
-* creation of a small, multi-line, colored table to appear in an off-board
+* a whole, colored-in hex
+* a small, multi-line, colored table to appear in an off-board
   hexagon or area (showing revenue per phase of the game)
+
+Any or all locations are referenced by the commonly-used 18xx game grid
+coordinates, where letters, starting at "A", appear next to flat hexagon
+edges and numbers, starting at "1", appear next to the hexagon vertices.
 
 The blueprint will also provide:
 
 * standard, named 18xx colors
-* ability to set the map font names & sizes; or colors to use
+* ability to load different map font names & sizes, or colors to use, from
+  a settings file
 * ability to put labels next to icons, symbols, towns or cities
   (above, below, left-of, right-of)
 
@@ -58,7 +63,7 @@ Drawing will be done following the order in which features are provided.
 Setting of an off-board, colored, rectangular, or polyshape area - typically
 red and extending from the edge of the board hexagons - is not handled
 directly by XX18Game.  There is too much variation in how such areas are
-drawn to use a common formulae.  What is possible is to use the cell grid
+drawn to use a common formula.  What is possible is to use the cell grid
 references and hexagon geometry to set the vertices of such shapes relative
 to the board.
 
@@ -91,8 +96,12 @@ Modern 18xx Water  #A9CBE2  Very pale sky-blue. Desaturated, pastel light-blue
 """
 
 # lib
+import json
 from importlib.resources import files
 import math
+import os
+from pathlib import Path
+from sys import platform
 
 # third party
 
@@ -116,63 +125,62 @@ from protograf.utils.tools import _lower
 # local
 from .core_game import CoreGameObject
 
-# ---- "variable" constants
-# TODO => enable overwrite by loading via JSON
-XX18_HEX_SIDE = 2.3864  # cm
-XX18_CITY_DIAMETER = 1.45  # cm
-XX18_TOWN_DIAMETER = 0.45  # cm
-XX18_TOWN_HEIGHT = 0.45  # cm
-XX18_TOWN_HEIGHT = 0.7  # cm
-XX18_TOWN_HEIGHT_OUTER = 0.8  # cm
-XX18_TOWN_WIDTH = 0.4  # cm
-XX18_TOWN_WIDTH_OUTER = 0.5  # cm
-XX18_TOWN_DIAMETER_BORDER = 0.55  # cm; outer-circle
-XX18_PRIVATE_DIAMETER = 0.4  # cm
-XX18_REVENUE_DIAMETER = 0.8  # cm
-XX18_REVENUE_FILL = None  # no color
-XX18_REVENUE_STROKE = "black"
-XX18_TRACK_WIDTH_INNER = 0.4  # cm
-XX18_TRACK_WIDTH_OUTER = 0.5  # cm
-XX18_MOUNTAIN_SIDE = 0.6  # cm; equilateral triangle
-XX18_PHASE_REVENUE_BOX = 0.7  # cm
-XX18_STROKE_WIDTH = 1
-XX18_STROKE_WIDTH_HIGHLIGHT = 8
-XX18_TEXT_SMALL = 11
-XX18_TEXT_MEDIUM = 13
-XX18_TEXT_LARGE = 16
-XX18_TEXT_EXTRA = 20
-XX18_TEXT_FONT = "Times-Roman"
-XX18_TEXT_FONT_BOLD = "Times-Bold"
-XX18_RESOURCES = "resources/xx18/symbols/"
-
-# ---- color constants
-XX18_TILE_YELLOW = "#FFD200"
-XX18_TILE_GREEN = "#00A651"
-XX18_TILE_BROWN = "#7A4B1B"
-XX18_TILE_GRAY = "#7F8C8D"
-XX18_TILE_GREY = "#7F8C8D"
-XX18_TILE_YELLOW_MF = "#F1C40F"
-XX18_TILE_GREEN_MF = "#27AE60"
-XX18_TILE_BROWN_MF = "#7E5109"
-XX18_TILE_GRAY_MF = "#95A5A6"
-XX18_TILE_GREY_MF = "#95A5A6"
-XX18_HEX_BACK = "#EAEAEA"
-XX18_HEX_PLAIN = "#FFFFFF"
-XX18_HEX_PLAIN_OFF = "#F9f9f9"
-XX18_HEX_YELLOW = "#F1E351"
-XX18_HEX_GREEN = "#4CAF50"
-XX18_HEX_BROWN = "#8D6E63"
-XX18_HEX_GRAY = "#B0BEC5"
-XX18_HEX_GREY = "#B0BEC5"
-XX18_HEX_BARRIER = "#757575"
-XX18_HEX_OFFBOARD = "#EF5350"
-XX18_HEX_WATER = "#4A7F9D"
-XX18_HEX_RIVER = "#01A0D6"
-XX18_HEX_SEA = "#C1E6FD"
+DEFAULT_SETTINGS = {
+    # ---- size constants
+    "XX18_HEX_SIDE": 2.3864,  # cm
+    "XX18_CITY_DIAMETER": 1.45,  # cm
+    "XX18_TOWN_DIAMETER": 0.45,  # cm
+    # "XX18_TOWN_HEIGHT": 0.45, # cm
+    "XX18_TOWN_HEIGHT": 0.7,  # cm
+    "XX18_TOWN_HEIGHT_OUTER": 0.8,  # cm
+    "XX18_TOWN_WIDTH": 0.4,  # cm
+    "XX18_TOWN_WIDTH_OUTER": 0.5,  # cm
+    "XX18_TOWN_DIAMETER_BORDER": 0.55,  # cm; outer-circle
+    "XX18_PRIVATE_DIAMETER": 0.4,  # cm
+    "XX18_REVENUE_DIAMETER": 0.8,  # cm
+    "XX18_REVENUE_FILL": None,  # no color
+    "XX18_REVENUE_STROKE": "black",
+    "XX18_TRACK_WIDTH_INNER": 0.4,  # cm
+    "XX18_TRACK_WIDTH_OUTER": 0.5,  # cm
+    "XX18_MOUNTAIN_SIDE": 0.6,  # cm; equilateral triangle
+    "XX18_PHASE_REVENUE_BOX": 0.7,  # cm
+    "XX18_DEBUG_FONT_FRACTION": 0.75,
+    "XX18_STROKE_WIDTH": 1,
+    "XX18_STROKE_WIDTH_HIGHLIGHT": 8,
+    "XX18_TEXT_SMALL": 11,
+    "XX18_TEXT_MEDIUM": 13,
+    "XX18_TEXT_LARGE": 16,
+    "XX18_TEXT_EXTRA": 20,
+    "XX18_TEXT_FONT": "Times-Roman",
+    "XX18_TEXT_FONT_BOLD": "Times-Bold",
+    # ---- color constants
+    "XX18_TILE_YELLOW": "#FFD200",
+    "XX18_TILE_GREEN": "#00A651",
+    "XX18_TILE_BROWN": "#7A4B1B",
+    "XX18_TILE_GRAY": "#7F8C8D",
+    "XX18_TILE_GREY": "#7F8C8D",
+    "XX18_TILE_YELLOW_MF": "#F1C40F",
+    "XX18_TILE_GREEN_MF": "#27AE60",
+    "XX18_TILE_BROWN_MF": "#7E5109",
+    "XX18_TILE_GRAY_MF": "#95A5A6",
+    "XX18_TILE_GREY_MF": "#95A5A6",
+    "XX18_HEX_BACK": "#EAEAEA",
+    "XX18_HEX_PLAIN": "#FFFFFF",
+    "XX18_HEX_PLAIN_OFF": "#F9F9F9",
+    "XX18_HEX_YELLOW": "#F1E351",
+    "XX18_HEX_GREEN": "#4CAF50",
+    "XX18_HEX_BROWN": "#8D6E63",
+    "XX18_HEX_GRAY": "#B0BEC5",
+    "XX18_HEX_GREY": "#B0BEC5",
+    "XX18_HEX_BARRIER": "#757575",
+    "XX18_HEX_OFFBOARD": "#EF5350",
+    "XX18_HEX_WATER": "#4A7F9D",
+    "XX18_HEX_RIVER": "#01A0D6",
+    "XX18_HEX_SEA": "#C1E6FD",
+}
 
 # ---- fixed/derived constants
-XX18_HEX_HEIGHT = XX18_HEX_SIDE * math.sqrt(3)  # cm
-XX18_HEX_DIAMETER = 2 * XX18_HEX_SIDE
+XX18_RESOURCES = "resources/xx18/symbols/"
 XX18_SYMBOL_SET = [
     "coal",
     "desert",
@@ -197,6 +205,7 @@ XX18_SYMBOL_SET = [
 XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "town",
     "town_border",
+    "town-border",
     "city",
     "cityx1",
     "cityx2",
@@ -206,6 +215,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "private",
     "revenue",
     "phase_revenue",
+    "phase-revenue",
     "tile_letter",
     "tile-letter",
     "fill",
@@ -214,8 +224,11 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "spike",
     "track",
     "track_town",
+    "track-town",
     "track_point",
+    "track-point",
     "river_line",
+    "river-line",
 ]
 ALLOWED_POINTY = ["ne", "e", "se", "sw", "w", "nw", ""]
 ALLOWED_FLAT = ["n", "ne", "se", "s", "sw", "nw", ""]
@@ -231,7 +244,6 @@ class XX18GameObject(CoreGameObject):
         self.debug = self._commons("debug") or kwargs.get("debug") or False
         # print(f"&&& {self.features=}")
         # ---- 18xx game
-        self.cell_size = XX18_HEX_HEIGHT
         self.game_class = "XX18Game"
         self.board_type = AbstractBoardType.HEXAGONAL
         self.board_pattern = "hexagonal"
@@ -290,9 +302,19 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
+        # ---- settings
+        settings_file = kwargs.get("settings", None)
+        self.xxs = self.load_settings(filepath=settings_file)
+        self.hex_side = self.xxs["XX18_HEX_SIDE"]
+        self.hex_height = self.hex_side * math.sqrt(3)  # cm
+        self.hex_diameter = 2 * self.hex_side  # cm
+        self.cell_size = self.hex_height
+        self.stroke_width_xx = self.xxs["XX18_STROKE_WIDTH"]
         # ---- fonts
         self.label_font = (
-            self._commons("label_font") or kwargs.get("label_font") or XX18_TEXT_FONT
+            self._commons("label_font")
+            or kwargs.get("label_font")
+            or self.xxs["XX18_TEXT_FONT"]
         )
         # ---- add in defaults
         if not self.rows:
@@ -301,18 +323,18 @@ class XX18GameObject(CoreGameObject):
             self.cols = 8
         self._validate_choices()
         # ---- 18xx default colors
-        self.plain_hex = XX18_HEX_PLAIN
-        self.ground_hex = XX18_HEX_PLAIN_OFF
-        self.yellow_hex = XX18_HEX_YELLOW
-        self.green_hex = XX18_HEX_GREEN
-        self.brown_hex = XX18_HEX_BROWN
-        self.gray_hex = XX18_HEX_GRAY
-        self.grey_hex = XX18_HEX_GRAY
-        self.barrier_hex = XX18_HEX_BARRIER
-        self.offboard_hex = XX18_HEX_OFFBOARD
-        self.background = XX18_HEX_BACK
-        self.water_hex = XX18_HEX_WATER
-        self.sea_hex = XX18_HEX_SEA
+        self.plain_hex = self.xxs["XX18_HEX_PLAIN"]
+        self.ground_hex = self.xxs["XX18_HEX_PLAIN_OFF"]
+        self.yellow_hex = self.xxs["XX18_HEX_YELLOW"]
+        self.green_hex = self.xxs["XX18_HEX_GREEN"]
+        self.brown_hex = self.xxs["XX18_HEX_BROWN"]
+        self.gray_hex = self.xxs["XX18_HEX_GRAY"]
+        self.grey_hex = self.xxs["XX18_HEX_GRAY"]
+        self.barrier_hex = self.xxs["XX18_HEX_BARRIER"]
+        self.offboard_hex = self.xxs["XX18_HEX_OFFBOARD"]
+        self.background = self.xxs["XX18_HEX_BACK"]
+        self.water_hex = self.xxs["XX18_HEX_WATER"]
+        self.sea_hex = self.xxs["XX18_HEX_SEA"]
         # self. = self._commons("") or kwargs.get("") or COLORS_18XX['']
         if kwargs.get("greys"):
             self.yellow_hex = "#D4D4D4"
@@ -332,6 +354,42 @@ class XX18GameObject(CoreGameObject):
         """Check and reset user choices for valid selections."""
         return True
 
+    def load_settings(self, filepath: str = None) -> dict:
+        config = DEFAULT_SETTINGS.copy()  # copy of the defaults
+        if filepath:
+            path = Path(filepath)
+            if not path.exists():
+                # relative paths
+                if not os.path.isabs(filepath):
+                    script_path = tools.script_path()
+                    file_local = os.path.join(script_path, filepath)
+                # check image exists
+                if platform == "linux" or platform == "linux2":
+                    file_local = os.path.normpath(
+                        file_local.replace("\\", "/")
+                    ).replace(os.sep, "/")
+                path = Path(file_local)
+                if not path.exists():
+                    feedback(
+                        f'The settings file "{filepath}" cannot be found.',
+                        " Using the default settings.",
+                        False,
+                        True,
+                    )
+                    return config
+            try:
+                with path.open("r", encoding="utf-8") as file:
+                    user_settings = json.load(file)
+                    config.update(user_settings)  # override defaults with file values
+            except json.JSONDecodeError as err:
+                feedback(
+                    f'Invalid JSON syntax in "{filepath}" ({err}).',
+                    " Using the default settings.",
+                    False,
+                    True,
+                )
+        return config
+
     def draw_debug_labels(self):
         """Draw Hexagon labels overlays"""
         from protograf.protos import Text
@@ -345,7 +403,7 @@ class XX18GameObject(CoreGameObject):
             return
 
         lkeys = {}
-        LSIZE = XX18_HEX_SIDE * self.units * 0.75
+        LSIZE = self.hex_side * self.units * self.xxs["XX18_DEBUG_FONT_FRACTION"]
         lkeys["font_name"] = "Helvetica"
         lkeys["font_size"] = LSIZE
         lkeys["stroke"] = self.debug_color
@@ -546,12 +604,12 @@ class XX18GameObject(CoreGameObject):
             # single hexagon properties:-
             height=self.cell_size,
             stroke=self.stroke,
-            stroke_width=XX18_STROKE_WIDTH,
+            stroke_width=self.stroke_width_xx,
             fill=hex_color,
             debug=self.debug,
             # hex_shape=self.cell_shape,  # insert centre_image into hex?
         )
-        # print(f'&&& XX18 BOARD {self.board_layout.cells.keys()=}')
+        # print(f'&&& -XX18 BOARD {self.board_layout.cells.keys()=}')
 
         # ---- * track non-blank cells
         for row in range(1, self.rows + 1):
@@ -802,7 +860,7 @@ class XX18GameObject(CoreGameObject):
                     distance=fdistance,
                     **kwargs,
                 )
-            case "town_border":
+            case "town_border" | "town-border":
                 self.town(
                     location=fhexagon,
                     label=flabel,
@@ -818,7 +876,7 @@ class XX18GameObject(CoreGameObject):
                     position=fdirection,
                     **kwargs,
                 )
-            case "track_town":
+            case "track_town" | "track-town":
                 self.track(
                     location=fhexagon,
                     label=flabel,
@@ -826,7 +884,7 @@ class XX18GameObject(CoreGameObject):
                     town="middle",  # ALL POSITIONS NOT OPERATIONAL
                     **kwargs,
                 )
-            case "track_point":
+            case "track_point" | "track-point":
                 if len(feature) >= 5:
                     height = tools.as_float(feature[4], "height", default=0.0)
                 else:
@@ -839,7 +897,7 @@ class XX18GameObject(CoreGameObject):
                     height=height,
                     **kwargs,
                 )
-            case "river_line":
+            case "river_line" | "river-line":
                 self.river_line(
                     location=fhexagon,
                     position=fdirection,
@@ -886,7 +944,7 @@ class XX18GameObject(CoreGameObject):
                     distance=fdistance,
                     **kwargs,
                 )
-            case "phase_revenue":
+            case "phase_revenue" | "phase-revenue":
                 self.phase_revenue(
                     location=fhexagon,
                     income=flabel,
@@ -947,7 +1005,7 @@ class XX18GameObject(CoreGameObject):
     ) -> Point:
         """Get a feature's centre Point."""
         if direction is not None and distance is not None:
-            length = distance * XX18_HEX_SIDE  # fraction of radius
+            length = distance * self.hex_side  # fraction of radius
             fcentre = geoms.point_from_angle(geo.centre, length, direction)
         else:
             fcentre = geo.centre
@@ -995,13 +1053,13 @@ class XX18GameObject(CoreGameObject):
         label_align = "centre"
         match text_size:
             case "small" | "s":
-                font_size = XX18_TEXT_SMALL
+                font_size = self.xxs["XX18_TEXT_SMALL"]
             case "medium" | "m":
-                font_size = XX18_TEXT_MEDIUM
+                font_size = self.xxs["XX18_TEXT_MEDIUM"]
             case "large" | "l":
-                font_size = XX18_TEXT_LARGE
+                font_size = self.xxs["XX18_TEXT_LARGE"]
             case "extra" | "e" | "x":
-                font_size = XX18_TEXT_EXTRA
+                font_size = self.xxs["XX18_TEXT_EXTRA"]
             case _:
                 raise ValueError(
                     f'Text size "{text_size}" is not available for label processing.',
@@ -1026,19 +1084,19 @@ class XX18GameObject(CoreGameObject):
 
         kwargs["heading"] = heading
         kwargs["heading_size"] = font_size
-        kwargs["heading_font"] = XX18_TEXT_FONT
+        kwargs["heading_font"] = self.xxs["XX18_TEXT_FONT"]
         kwargs["heading_stroke"] = "black"
 
         kwargs["title"] = title
         kwargs["title_size"] = font_size
-        kwargs["title_font"] = XX18_TEXT_FONT
+        kwargs["title_font"] = self.xxs["XX18_TEXT_FONT"]
         kwargs["title_stroke"] = "black"
 
         kwargs["label"] = _label
         kwargs["label_mx"] = label_mx
         kwargs["label_align"] = label_align
         kwargs["label_size"] = font_size
-        kwargs["label_font"] = XX18_TEXT_FONT
+        kwargs["label_font"] = self.xxs["XX18_TEXT_FONT"]
         kwargs["label_stroke"] = "black"
         return kwargs
 
@@ -1246,17 +1304,19 @@ class XX18GameObject(CoreGameObject):
                 if paths or perbii:
                     hxw = Hexagon(  # underlying white
                         cxy=geo.centre,
-                        height=XX18_HEX_HEIGHT,
+                        height=self.hex_height,
                         fill=None,
                         stroke="black",
                         stroke_width=0.1,
                         orientation=self.orientation,
                         paths_stroke="white",
-                        paths_stroke_width=XX18_TRACK_WIDTH_OUTER * self.units,
+                        paths_stroke_width=self.xxs["XX18_TRACK_WIDTH_OUTER"]
+                        * self.units,
                         paths=paths,
                         perbii=perbii,
                         perbii_stroke="white",
-                        perbii_stroke_width=XX18_TRACK_WIDTH_OUTER * self.units,
+                        perbii_stroke_width=self.xxs["XX18_TRACK_WIDTH_OUTER"]
+                        * self.units,
                         **kwargs,
                     )
                     # ---- town-on-track
@@ -1268,39 +1328,43 @@ class XX18GameObject(CoreGameObject):
                         _label_loc = kwargs.get("label_location", "above")
                         relative_location = self.relative_location(_label_loc)
                         lwargs = self.process_label(
-                            label, relative_location, XX18_TOWN_DIAMETER / 2.0
+                            label,
+                            relative_location,
+                            self.xxs["XX18_TOWN_DIAMETER"] / 2.0,
                         )
                         Rectangle(
                             cxy=ccentre,
-                            height=XX18_TOWN_HEIGHT_OUTER,
-                            width=XX18_TOWN_WIDTH_OUTER,
+                            height=self.xxs["XX18_TOWN_HEIGHT_OUTER"],
+                            width=self.xxs["XX18_TOWN_WIDTH_OUTER"],
                             fill_stroke="white",
-                            stroke_width=XX18_STROKE_WIDTH,
+                            stroke_width=self.stroke_width_xx,
                             rotation=rotation,
                             **{**kwargs, **lwargs},
                         )
                     Hexagon(  # overlying black
                         cxy=geo.centre,
-                        height=XX18_HEX_HEIGHT,
+                        height=self.hex_height,
                         fill=None,
                         stroke="black",
                         stroke_width=0.1,
                         orientation=self.orientation,
                         paths_stroke="black",
-                        paths_stroke_width=XX18_TRACK_WIDTH_INNER * self.units,
+                        paths_stroke_width=self.xxs["XX18_TRACK_WIDTH_INNER"]
+                        * self.units,
                         paths=paths,
                         perbii=perbii,
                         perbii_stroke="black",
-                        perbii_stroke_width=XX18_TRACK_WIDTH_INNER * self.units,
+                        perbii_stroke_width=self.xxs["XX18_TRACK_WIDTH_INNER"]
+                        * self.units,
                         **kwargs,
                     )
                     if town:
                         Rectangle(
                             cxy=ccentre,  # as set for white above
-                            height=XX18_TOWN_HEIGHT,
-                            width=XX18_TOWN_WIDTH,
+                            height=self.xxs["XX18_TOWN_HEIGHT"],
+                            width=self.xxs["XX18_TOWN_WIDTH"],
                             fill_stroke="black",
-                            stroke_width=XX18_STROKE_WIDTH,
+                            stroke_width=self.stroke_width_xx,
                             rotation=rotation,  # as set for white above
                             **kwargs,
                         )
@@ -1377,7 +1441,7 @@ class XX18GameObject(CoreGameObject):
                     xy=start,
                     xy1=end,
                     stroke="white",
-                    stroke_width=XX18_TRACK_WIDTH_OUTER * self.units,
+                    stroke_width=self.xxs["XX18_TRACK_WIDTH_OUTER"] * self.units,
                     curve=height,
                     **kwargs,
                 )
@@ -1385,7 +1449,7 @@ class XX18GameObject(CoreGameObject):
                     xy=start,
                     xy1=end,
                     stroke="black",
-                    stroke_width=XX18_TRACK_WIDTH_INNER * self.units,
+                    stroke_width=self.xxs["XX18_TRACK_WIDTH_INNER"] * self.units,
                     curve=height,
                     **kwargs,
                 )
@@ -1411,7 +1475,7 @@ class XX18GameObject(CoreGameObject):
         _locations = self.process_locations(location, "river_line")
         if position is None:
             position = []
-        river_stroke = stroke or XX18_HEX_RIVER
+        river_stroke = stroke or self.xxs["XX18_HEX_RIVER"]
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         edges = ", ".join(_positions[1:])
         point = _positions[0]
@@ -1442,6 +1506,8 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         border: bool = False,
+        style: str = "circle",  # or rectangle
+        rotation: float = 0.0,
         **kwargs,
     ):
         """Draw Town shape at hex location(s).
@@ -1451,8 +1517,10 @@ class XX18GameObject(CoreGameObject):
             label (str): the name of the town
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
+            style (str): circle or rectangle
+            rotation (float): degrees of rotation of rectangular town
         """
-        from protograf.protos import Circle
+        from protograf.protos import Circle, Rectangle
 
         _locations = self.process_locations(location, "town")
         for _loc in _locations:
@@ -1461,23 +1529,52 @@ class XX18GameObject(CoreGameObject):
             label_location = kwargs.get("label_location", "below")
             relative_location = self.relative_location(label_location)
             lwargs = self.process_label(
-                label, relative_location, XX18_TOWN_DIAMETER / 2.0
+                label, relative_location, self.xxs["XX18_TOWN_DIAMETER"] / 2.0
             )
-            # ---- circle
-            if border:
-                Circle(
-                    cxy=ccentre,
-                    radius=XX18_TOWN_DIAMETER_BORDER / 2.0,
-                    fill_stroke="white",
-                    stroke_width=XX18_STROKE_WIDTH,
+            # ---- style
+            if not isinstance(style, str):
+                feedback(
+                    "The town style must be a string;",
+                    f" the value '{style}' is not allowed.",
+                    True,
+                    True,
                 )
-            Circle(
-                cxy=ccentre,
-                radius=XX18_TOWN_DIAMETER / 2.0,
-                fill_stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
-                **{**kwargs, **lwargs},
-            )
+            match _lower(style):
+                case "c" | "circle" | "circular" | "round":
+                    # ---- * circle
+                    if border:
+                        Circle(
+                            cxy=ccentre,
+                            radius=self.xxs["XX18_TOWN_DIAMETER_BORDER"] / 2.0,
+                            fill_stroke="white",
+                            stroke_width=self.stroke_width_xx,
+                        )
+                    Circle(
+                        cxy=ccentre,
+                        radius=self.xxs["XX18_TOWN_DIAMETER"] / 2.0,
+                        fill_stroke="black",
+                        stroke_width=self.stroke_width_xx,
+                        **{**kwargs, **lwargs},
+                    )
+                case "r" | "rectangle" | "rectangular" | "flat":
+                    # ---- * rectangle
+                    if border:
+                        Rectangle(
+                            cxy=ccentre,
+                            height=self.xxs["XX18_TOWN_HEIGHT_OUTER"],
+                            width=self.xxs["XX18_TOWN_WIDTH_OUTER"],
+                            fill_stroke="white",
+                            stroke_width=self.stroke_width_xx,
+                            rotation=rotation,
+                        )
+                    Rectangle(
+                        cxy=ccentre,
+                        height=self.xxs["XX18_TOWN_HEIGHT"],
+                        width=self.xxs["XX18_TOWN_WIDTH"],
+                        fill_stroke="black",
+                        stroke_width=self.stroke_width_xx,
+                        rotation=rotation,
+                    )
 
     def city(
         self,
@@ -1502,7 +1599,8 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Circle, Rectangle, Triangle, Polyshape
 
         _locations = self.process_locations(location, "city")
-        _radius = XX18_CITY_DIAMETER / 2.0
+        _radius = self.xxs["XX18_CITY_DIAMETER"] / 2.0
+        city_diameter = self.xxs["XX18_CITY_DIAMETER"]
         if count:
             city_count = tools.as_int(count, "city count", maximum=6, minimum=1)
         else:
@@ -1522,7 +1620,7 @@ class XX18GameObject(CoreGameObject):
             cwargs["radius"] = _radius
             cwargs["fill"] = "white"
             cwargs["stroke"] = "black"
-            cwargs["stroke_width"] = XX18_STROKE_WIDTH
+            cwargs["stroke_width"] = self.stroke_width_xx
             cwargs["centre_shape"] = shapes
             match city_count:
                 # ---- city 1
@@ -1541,13 +1639,13 @@ class XX18GameObject(CoreGameObject):
                     cw = ccentre.centre.x - _radius
                     ce = ccentre.centre.x + _radius
                     Rectangle(
-                        height=XX18_CITY_DIAMETER,
-                        width=XX18_CITY_DIAMETER,
+                        height=city_diameter,
+                        width=city_diameter,
                         cx=ccentre.centre.x,
                         cy=ccentre.centre.y,
                         fill="white",
                         stroke="black",
-                        stroke_width=XX18_STROKE_WIDTH,
+                        stroke_width=self.stroke_width_xx,
                         **{**kwargs, **lwargs},
                     )
                     if shapes and len(shapes) > 0:
@@ -1572,12 +1670,12 @@ class XX18GameObject(CoreGameObject):
                     rwargs = {}
                     rwargs["fill"] = "white"
                     rwargs["stroke"] = "black"
-                    rwargs["stroke_width"] = XX18_STROKE_WIDTH
+                    rwargs["stroke_width"] = self.stroke_width_xx
                     # fill background
                     tri = Triangle(
                         cx=geo.centre.x,
                         cy=geo.centre.y,
-                        side=XX18_CITY_DIAMETER,
+                        side=city_diameter,
                         **{**kwargs, **rwargs},
                     )
                     csw = tri.geo.sw
@@ -1586,19 +1684,19 @@ class XX18GameObject(CoreGameObject):
                     Polyshape(
                         x=cn.x,
                         y=cn.y,
-                        snail=f"a30 {_radius} r90 {XX18_CITY_DIAMETER} r90 {_radius} r90 {XX18_CITY_DIAMETER}",
+                        snail=f"a30 {_radius} r90 {city_diameter} r90 {_radius} r90 {city_diameter}",
                         **{**kwargs, **rwargs},
                     )
                     Polyshape(
                         x=cn.x,
                         y=cn.y,
-                        snail=f"a150 {_radius} l90 {XX18_CITY_DIAMETER} l90 {_radius} l90 {XX18_CITY_DIAMETER}",
+                        snail=f"a150 {_radius} l90 {city_diameter} l90 {_radius} l90 {city_diameter}",
                         **{**kwargs, **rwargs},
                     )
                     # label below csw-cse rectangle
                     Rectangle(
                         height=_radius,
-                        width=XX18_CITY_DIAMETER,
+                        width=city_diameter,
                         x=csw.x,
                         y=csw.y,
                         # title=label,
@@ -1643,17 +1741,17 @@ class XX18GameObject(CoreGameObject):
                     rwargs = {}
                     rwargs["fill"] = "white"
                     rwargs["stroke"] = "black"
-                    rwargs["stroke_width"] = XX18_STROKE_WIDTH
+                    rwargs["stroke_width"] = self.stroke_width_xx
                     Rectangle(
-                        height=2 * XX18_CITY_DIAMETER,
-                        width=XX18_CITY_DIAMETER,
+                        height=2 * city_diameter,
+                        width=city_diameter,
                         cx=ccentre.centre.x,
                         cy=ccentre.centre.y,
                         **{**kwargs, **rwargs, **lwargs},
                     )
                     Rectangle(
-                        height=XX18_CITY_DIAMETER,
-                        width=2 * XX18_CITY_DIAMETER,
+                        height=city_diameter,
+                        width=city_diameter,
                         cx=ccentre.centre.x,
                         cy=ccentre.centre.y,
                         **{**kwargs, **rwargs},
@@ -1726,12 +1824,12 @@ class XX18GameObject(CoreGameObject):
             ccentre = self.feature_location(geo, direction, distance)
             Circle(
                 cxy=ccentre,
-                radius=XX18_REVENUE_DIAMETER / 2.0,
-                fill=XX18_REVENUE_FILL,
-                stroke=XX18_REVENUE_STROKE,
-                stroke_width=XX18_STROKE_WIDTH,
+                radius=self.xxs["XX18_REVENUE_DIAMETER"] / 2.0,
+                fill=self.xxs["XX18_REVENUE_FILL"],
+                stroke=self.xxs["XX18_REVENUE_STROKE"],
+                stroke_width=self.stroke_width_xx,
                 label=label if label else "",
-                label_size=XX18_TEXT_MEDIUM,
+                label_size=self.xxs["XX18_TEXT_MEDIUM"],
             )
 
     def spike(
@@ -1779,19 +1877,21 @@ class XX18GameObject(CoreGameObject):
         _positions = tools.split(position, separator=" ", clean=True)
         stroke = stroke if stroke else "white"
         # stroke_color = colrs.get_color(stroke)
-        height_shrink = XX18_TRACK_WIDTH_OUTER - XX18_TRACK_WIDTH_INNER
+        height_shrink = (
+            self.xxs["XX18_TRACK_WIDTH_OUTER"] - self.xxs["XX18_TRACK_WIDTH_INNER"]
+        )
         match _lower(size):
             case "short" | "s":
-                height = XX18_HEX_DIAMETER * 0.1
+                height = self.hex_diameter * 0.1
             case "medium" | "m":
-                height = XX18_HEX_DIAMETER * 0.25
+                height = self.hex_diameter * 0.25
             case "long" | "l":
-                height = XX18_HEX_DIAMETER * 0.5
+                height = self.hex_diameter * 0.5
         for _loc in _locations:
             geo = self.cells.get(_loc)
             Hexagon(
                 cxy=geo.centre,
-                height=XX18_HEX_HEIGHT,
+                height=self.hex_height,
                 fill=None,
                 stroke="black",
                 stroke_width=0.1,
@@ -1799,12 +1899,12 @@ class XX18GameObject(CoreGameObject):
                 spikes=_positions,
                 spikes_stroke="white",
                 spikes_fill="white",
-                spikes_width=XX18_TRACK_WIDTH_OUTER,
+                spikes_width=self.xxs["XX18_TRACK_WIDTH_OUTER"],
                 spikes_height=-height,
             )
             Hexagon(
                 cxy=geo.centre,
-                height=XX18_HEX_HEIGHT,
+                height=self.hex_height,
                 fill=None,
                 stroke="black",
                 stroke_width=0.1,
@@ -1812,7 +1912,7 @@ class XX18GameObject(CoreGameObject):
                 spikes=_positions,
                 spikes_stroke="black",
                 spikes_fill="black",
-                spikes_width=XX18_TRACK_WIDTH_INNER,
+                spikes_width=self.xxs["XX18_TRACK_WIDTH_INNER"],
                 spikes_height=-(height - height_shrink),
             )
 
@@ -1926,9 +2026,9 @@ class XX18GameObject(CoreGameObject):
                 text=letter,
                 xy=ccentre,
                 stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
-                font_size=XX18_TEXT_EXTRA,
-                font_name=XX18_TEXT_FONT_BOLD,
+                stroke_width=self.stroke_width_xx,
+                font_size=self.xxs["XX18_TEXT_EXTRA"],
+                font_name=self.xxs["XX18_TEXT_FONT_BOLD"],
             )
 
     def fill_hex(
@@ -1947,16 +2047,23 @@ class XX18GameObject(CoreGameObject):
 
         _locations = self.process_locations(location, "fill_hex")
         if color:
+            if "XX18_" in color:
+                try:
+                    color = self.xxs[color]
+                except KeyError:
+                    feedback(
+                        f"{color} is not a XX18 color usuable for a fill.", False, True
+                    )
             the_color = colrs.get_color(color)
             for _loc in _locations:
                 geo = self.cells.get(_loc)
                 ccentre = geo.centre
                 Hexagon(
                     cxy=ccentre,
-                    height=XX18_HEX_HEIGHT,
+                    height=self.hex_height,
                     fill=the_color,
                     stroke="black",
-                    stroke_width=XX18_STROKE_WIDTH,
+                    stroke_width=self.stroke_width_xx,
                     orientation=self.orientation,
                 )
         else:
@@ -1977,9 +2084,9 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Hexagon
 
         _locations = self.process_locations(location, "highlight")
-        _color = color if color else XX18_HEX_YELLOW
+        _color = color if color else self.xxs["XX18_HEX_YELLOW"]
         the_color = colrs.get_color(_color)
-        _height = XX18_HEX_HEIGHT - XX18_STROKE_WIDTH_HIGHLIGHT / self.units
+        _height = self.hex_height - self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"] / self.units
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = geo.centre
@@ -1988,7 +2095,7 @@ class XX18GameObject(CoreGameObject):
                 height=_height,
                 fill=None,
                 stroke=the_color,
-                stroke_width=XX18_STROKE_WIDTH_HIGHLIGHT,
+                stroke_width=self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"],
                 orientation=self.orientation,
             )
 
@@ -2017,13 +2124,13 @@ class XX18GameObject(CoreGameObject):
             label_location = kwargs.get("label_location", "below")
             relative_location = self.relative_location(label_location)
             lwargs = self.process_label(
-                label, relative_location, XX18_MOUNTAIN_SIDE / 2.0, "small"
+                label, relative_location, self.xxs["XX18_MOUNTAIN_SIDE"] / 2.0, "small"
             )
             Triangle(
                 cx=ccentre.x,
                 cy=ccentre.y,
-                side=XX18_MOUNTAIN_SIDE,
-                stroke_width=XX18_STROKE_WIDTH,
+                side=self.xxs["XX18_MOUNTAIN_SIDE"],
+                stroke_width=self.stroke_width_xx,
                 fill="black",
                 **{**kwargs, **lwargs},
             )
@@ -2056,7 +2163,12 @@ class XX18GameObject(CoreGameObject):
             _colors = colors
             colors_default = True
         else:
-            _colors = [XX18_HEX_YELLOW, XX18_HEX_GREEN, XX18_HEX_BROWN, XX18_HEX_GREY]
+            _colors = [
+                self.xxs["XX18_HEX_YELLOW"],
+                self.xxs["XX18_HEX_GREEN"],
+                self.xxs["XX18_HEX_BROWN"],
+                self.xxs["XX18_HEX_GREY"],
+            ]
             colors_default = True
         orientation = orientation if orientation else "horizontal"
         if not isinstance(orientation, str) or _lower(orientation) not in [
@@ -2087,9 +2199,9 @@ class XX18GameObject(CoreGameObject):
                 True,
             )
         if len(incomes) == 2 and colors_default:
-            _colors = [XX18_HEX_YELLOW, XX18_HEX_BROWN]
-        box_width = XX18_PHASE_REVENUE_BOX
-        box_height = XX18_PHASE_REVENUE_BOX * 0.8
+            _colors = [self.xxs["XX18_HEX_YELLOW"], self.xxs["XX18_HEX_BROWN"]]
+        box_width = self.xxs["XX18_PHASE_REVENUE_BOX"]
+        box_height = self.xxs["XX18_PHASE_REVENUE_BOX"] * 0.8
         if table_orientation == "H":
             offset = box_width * len(incomes) / 2.0
         else:
@@ -2101,12 +2213,12 @@ class XX18GameObject(CoreGameObject):
             x1 = (
                 ccentre.x - offset
                 if table_orientation == "H"
-                else ccentre.x - XX18_PHASE_REVENUE_BOX / 2.0
+                else ccentre.x - self.xxs["XX18_PHASE_REVENUE_BOX"] / 2.0
             )
             y1 = (
                 ccentre.y - offset
                 if table_orientation == "V"
-                else ccentre.y - XX18_PHASE_REVENUE_BOX / 2.0
+                else ccentre.y - self.xxs["XX18_PHASE_REVENUE_BOX"] / 2.0
             )
             x, y = x1, y1
             for key, inc in enumerate(incomes):
@@ -2117,7 +2229,7 @@ class XX18GameObject(CoreGameObject):
                     width=box_width,
                     fill_stroke=_colors[key],
                     label=inc,
-                    label_font=XX18_TEXT_FONT,
+                    label_font=self.xxs["XX18_TEXT_FONT"],
                     label_stroke="black",
                     **kwargs,
                 )
@@ -2131,7 +2243,7 @@ class XX18GameObject(CoreGameObject):
                     width=box_width * len(incomes),
                     fill=None,
                     stroke="black",
-                    stroke_width=XX18_STROKE_WIDTH,
+                    stroke_width=self.stroke_width_xx,
                 )
             else:
                 Rectangle(
@@ -2141,7 +2253,7 @@ class XX18GameObject(CoreGameObject):
                     width=box_width,
                     fill=None,
                     stroke="black",
-                    stroke_width=XX18_STROKE_WIDTH,
+                    stroke_width=self.stroke_width_xx,
                 )
 
     def private(
@@ -2184,14 +2296,14 @@ class XX18GameObject(CoreGameObject):
             lheading, ltitle, labove = "", "", False
             if label:
                 lwargs = {}
-                lwargs["font_name"] = XX18_TEXT_FONT
-                lwargs["font_size"] = XX18_TEXT_SMALL
+                lwargs["font_name"] = self.xxs["XX18_TEXT_FONT"]
+                lwargs["font_size"] = self.xxs["XX18_TEXT_SMALL"]
                 kwargs["stroke"] = "black"
-                lwargs["heading_font"] = XX18_TEXT_FONT
-                lwargs["heading_size"] = XX18_TEXT_SMALL
+                lwargs["heading_font"] = self.xxs["XX18_TEXT_FONT"]
+                lwargs["heading_size"] = self.xxs["XX18_TEXT_SMALL"]
                 kwargs["heading_stroke"] = "black"
-                lwargs["title_font"] = XX18_TEXT_FONT
-                lwargs["title_size"] = XX18_TEXT_SMALL
+                lwargs["title_font"] = self.xxs["XX18_TEXT_FONT"]
+                lwargs["title_size"] = self.xxs["XX18_TEXT_SMALL"]
                 kwargs["title_stroke"] = "black"
 
                 label_location = kwargs.get("label_location", "below")
@@ -2229,20 +2341,20 @@ class XX18GameObject(CoreGameObject):
             # ---- private features; circles with title or heading
             pcs = Circle(
                 cxy=c_s,
-                radius=XX18_PRIVATE_DIAMETER / 2.0,
+                radius=self.xxs["XX18_PRIVATE_DIAMETER"] / 2.0,
                 fill=None,
                 stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
+                stroke_width=self.stroke_width_xx,
                 title=pcs_title,
                 heading=pcs_heading,
                 **lwargs,
             )
             pce = Circle(
                 cxy=c_e,
-                radius=XX18_PRIVATE_DIAMETER / 2.0,
+                radius=self.xxs["XX18_PRIVATE_DIAMETER"] / 2.0,
                 fill=None,
                 stroke="black",
-                stroke_width=XX18_STROKE_WIDTH,
+                stroke_width=self.stroke_width_xx,
                 title=pce_title,
                 heading=pce_heading,
                 **lwargs,
@@ -2256,12 +2368,13 @@ class XX18GameObject(CoreGameObject):
             if label and (ltitle or lheading):
                 lcntr = geoms.fraction_along_line(c_e, c_s, 0.5)
                 llabel = lheading or ltitle
+                talign = "centre"
                 if c_e.y != c_s.y:
                     # align text in/out from line centre
                     if labove:
-                        delta_y = -XX18_TEXT_SMALL / self.units / 2.0
+                        delta_y = -self.xxs["XX18_TEXT_SMALL"] / self.units / 2.0
                     else:
-                        delta_y = XX18_TEXT_SMALL / self.units
+                        delta_y = self.xxs["XX18_TEXT_SMALL"] / self.units
 
                     if c_e.x > c_s.x and c_e.y < c_s.y:
                         talign = "left"
@@ -2277,9 +2390,9 @@ class XX18GameObject(CoreGameObject):
                 else:
                     # centre text over/above the line
                     if labove:
-                        delta_y = -XX18_TEXT_SMALL / self.units / 2.0
+                        delta_y = -self.xxs["XX18_TEXT_SMALL"] / self.units / 2.0
                     else:
-                        delta_y = XX18_TEXT_SMALL / self.units
+                        delta_y = self.xxs["XX18_TEXT_SMALL"] / self.units
                     Text(llabel, x=lcntr.x, y=lcntr.y + delta_y, **lwargs)  # centre
 
     def symbol(
