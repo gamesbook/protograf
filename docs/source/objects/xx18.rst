@@ -78,29 +78,58 @@ as tiles, and, optionally, annotated or marked.
 Features
 ========
 
-Below is a short summary of features available:
+Below is a short summary of the features available.
 
-* depiction of towns as filled-in circles (including optional border)
-* depiction of cities (single, double) as open circles; may include
+The ``XX18Game()`` command can depict:
+
+* towns as filled-in, black circles, or rectangles
+* cities (different sizes) as white circles; may include
   the railroad logo or a custom shape or text inset into it
-* depiction of revenue as circle with an amount
-* depiction of track, curved or straight; by itself or extending from a city
-* depiction of terminal spikes running off-board (short, medium and long)
-* depiction of blocked hex-sides as thick lines
-* depiction of private railways; either in-hex or across hexes
-* depiction of icons for common in-hex features; including mountains
+* revenue as an open (default) circle with an amount
+* track, curved or straight
+* track extending from a point to an edge
+* terminal spikes running off-board (short, medium and long)
+* blocked hex-sides as thick lines
+* a highlighted hex as a yellow band inside of all hex edges
+* private railways; either in-hex or across hexes
+* icons for common in-hex features; including mountains
   (two sizes), hills, and rivers
-* depiction of symbols for special features such coal, desert, factory,
-  fish, flag, forest, hills, lock, mine, noentry, oil, pennant, port,
+* symbols for special features such as: coal, desert, factory, fish,
+  flag, forest, hills, lock, mine, noentry, oil, pennant, port,
   swamp, train, tree, tunnel
-* depiction of a river; as "wavy line"; running through a hex
-* depiction of a custom shape in a hex
-* display of a single piece of text
-* display of hex coordinates along the edges of the map
-* coloring ("fill") of a whole hex
-* setting of a shaded rectangular area (typically red and at the edge of the map)
-* creation of a small multi-line table to appear in an off-board hex
-  (typically income per stage of the game)
+* a river; as "wavy line"; running through a hex
+* a custom shape in a hex
+* a single piece of text
+* hex coordinates along the edges of the map (above, below,
+  left-of, and right-of)
+* a whole, colored-in hex
+* a small, multi-line, colored table to appear in an off-board
+  hexagon or area (showing revenue per phase of the game)
+
+The command also provides:
+
+* standard, named 18xx colors
+* the ability to load different map font names & sizes, or colors to use,
+  from a settings file
+* simple labelling for use with icons, symbols, towns or cities
+
+In-hex features, for example, cities, towns, icons, symbols or lettering will,
+by default, appear at the centre of a hex. These can be repositioned using a
+combination of direction (in degrees clockwise from east) and distance (as a
+fraction of the hex radius).
+
+Positioning of features, such as lines, spikes, bumps or numbered circles, on
+hex edges will be done using standard compass directions; "ne" for northeast,
+"s" for south, etc., and will be centred on that edge.
+
+Drawing of features is done following the order in which they are provided.
+
+Setting of an off-board, colored, rectangular, or polyshape area |dash|
+typically reddish and extending from the edge of the board hexagons |dash| is
+not handled directly by the ``XX18Game()`` command.  There is simply too much
+variation in how such areas are drawn to use a common formula.  What **is**
+possible is to use the grid references and hexagon geometry to set the
+vertices of such shapes relative to the board.
 
 
 .. _xx18game-command:
@@ -154,7 +183,7 @@ The key properties that can be set for an ``XX18Game()`` command are:
 Other useful properties that can be set for an XX18Game are:
 
 * *side*: sets the length of the side of a single hexagon; by default this is
-  ~1 inch (2.3864 cm)
+  slighly less than 1 inch (2.3864 cm)
 * *label*: if ``True``, draw labels around the board's edges; use the
   normal styling options for a label; *label_font*, *label_size*,
   *label_stroke* etc.
@@ -163,6 +192,8 @@ Other useful properties that can be set for an XX18Game are:
   *bottom-right* (``BR``) or *top-right* (``TR``).
 * *label_offset*: how far away label are drawn from the board edge(s); if not
   set, this is calculated based on the label's font size
+* *settings*: this is the name of JSON file, including its path, that can be
+  used to override some of the default sizes and style of features
 
 .. NOTE::
 
@@ -170,7 +201,7 @@ Other useful properties that can be set for an XX18Game are:
 
     * *rows*: ``8``
     * *cols*: ``8``
-    * *side*: ~1 inch (2.3864 cm)
+    * *side*: about 1 inch (2.3864 cm)
 
 
 .. _xx18GameGrid:
