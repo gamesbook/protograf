@@ -77,22 +77,28 @@ class Hexagons(ProtografGrid):
             center=hexgn.geo.centre,
             c=hexgn.geo.centre,
             height=hexgn.geo.height,
+            ht=hexgn.geo.height,
             side=hexgn.geo.side,
-            # vertices  // FLAT
+            radius=hexgn.geo.side,
+            r=hexgn.geo.side,
+            # vertices and perbii
             ne=hexgn.geo.ne,
             se=hexgn.geo.se,
             e=hexgn.geo.e,
             w=hexgn.geo.w,
             sw=hexgn.geo.sw,
             nw=hexgn.geo.nw,
-            # perbii // FLAT
+            nnw=hexgn.geo.nnw,
+            nne=hexgn.geo.nne,
+            ssw=hexgn.geo.ssw,
+            sse=hexgn.geo.sse,
             n=hexgn.geo.n,
             s=hexgn.geo.s,
             wnw=hexgn.geo.wnw,
             ene=hexgn.geo.ene,
             ese=hexgn.geo.ese,
             wsw=hexgn.geo.wsw,
-            # # meta
+            # meta
             blank=self.is_blank,  # signals "no Shape drawn here"
             t="HexShape",
             type="HexShape",

@@ -129,6 +129,8 @@ XX18_TOWN_WIDTH_OUTER = 0.5  # cm
 XX18_TOWN_DIAMETER_BORDER = 0.55  # cm; outer-circle
 XX18_PRIVATE_DIAMETER = 0.4  # cm
 XX18_REVENUE_DIAMETER = 0.8  # cm
+XX18_REVENUE_FILL = None  # no color
+XX18_REVENUE_STROKE = "black"
 XX18_TRACK_WIDTH_INNER = 0.4  # cm
 XX18_TRACK_WIDTH_OUTER = 0.5  # cm
 XX18_MOUNTAIN_SIDE = 0.6  # cm; equilateral triangle
@@ -212,8 +214,11 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "spike",
     "track",
     "track_town",
+    "track_point",
     "river_line",
 ]
+ALLOWED_POINTY = ["ne", "e", "se", "sw", "w", "nw", ""]
+ALLOWED_FLAT = ["n", "ne", "se", "s", "sw", "nw", ""]
 
 
 class XX18GameObject(CoreGameObject):
@@ -640,7 +645,9 @@ class XX18GameObject(CoreGameObject):
                 )
         return _locations
 
-    def feature_position(self, position: tuple | str = None) -> tuple:
+    def feature_position(
+        self, position: tuple | str = None, hexagon: str = None
+    ) -> tuple:
         """Extract either (direction, distance) tuple or string from a string."""
         if not position:
             return None, None
@@ -659,12 +666,11 @@ class XX18GameObject(CoreGameObject):
                 distance = tools.as_float(_fdist, "distance")
             return direction, distance
         elif isinstance(position, str):
-            # TODO - validate hexside position !
-            # print(f"hexside: {position}")
             return position, None
         else:
             feedback(
-                f'The position must be a set of two numbers or a hex side, not "{position}"',
+                "The position must be a set of two numbers or a hex side,"
+                f' not "{position}" in {hexagon}"',
                 True,
                 True,
             )
@@ -730,9 +736,9 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
-        flabel, flabel_loc, fdirection, fdistance, fshapes = "", None, None, None, []
+        flabel, fdirection, fdistance, fshapes = "", None, None, []
         if len(feature) >= 3:
-            fdirection, fdistance = self.feature_position(feature[2])
+            fdirection, fdistance = self.feature_position(feature[2], hexagon=fhexagon)
         if len(feature) >= 4:
             flabel = str(feature[3])
         if len(feature) >= 5 and ftype != "private":  # see below; private overloads
@@ -820,6 +826,19 @@ class XX18GameObject(CoreGameObject):
                     town="middle",  # ALL POSITIONS NOT OPERATIONAL
                     **kwargs,
                 )
+            case "track_point":
+                if len(feature) >= 5:
+                    height = tools.as_float(feature[4], "height", default=0.0)
+                else:
+                    height = 0.0
+                self.track_point(
+                    location=fhexagon,
+                    position=flabel,
+                    direction=fdirection,
+                    distance=fdistance,
+                    height=height,
+                    **kwargs,
+                )
             case "river_line":
                 self.river_line(
                     location=fhexagon,
@@ -843,7 +862,9 @@ class XX18GameObject(CoreGameObject):
                     if flocation1 in ["", None]:
                         flocation1 = fhexagon
                 if len(feature) >= 6:
-                    fdirection1, fdistance1 = self.feature_position(feature[5])
+                    fdirection1, fdistance1 = self.feature_position(
+                        feature[5], hexagon=fhexagon
+                    )
                 if len(feature) >= 7:
                     kwargs["label_location"] = feature[6]
                 # print(f"&&& private {flocation1=} {fdirection1=} {fdistance1=}")
@@ -1203,20 +1224,18 @@ class XX18GameObject(CoreGameObject):
                     start, end = edges, ""
                 # ---- validate allowed track directions
                 if self.orientation == HexOrientationName.POINTY.value:
-                    allowed = ["ne", "e", "se", "sw", "w", "nw", ""]
-                    if start not in allowed or end not in allowed:
+                    if start not in ALLOWED_POINTY or end not in ALLOWED_POINTY:
                         feedback(
-                            f"The track start and end must be chosen from '{allowed}';",
-                            f" the option '{edges}' is not allowed.",
+                            f"The track start and end must be chosen from '{ALLOWED_POINTY}';",
+                            f" the option '{edges}' is not allowed for {_loc}.",
                             True,
                             True,
                         )
                 elif self.orientation == HexOrientationName.FLAT.value:
-                    allowed = ["n", "ne", "se", "s", "sw", "nw", ""]
-                    if start not in allowed or end not in allowed:
+                    if start not in ALLOWED_FLAT or end not in ALLOWED_FLAT:
                         feedback(
-                            f"The track start and end must be chosen from '{allowed}';",
-                            f" the option '{edges}' is not allowed.",
+                            f"The track start and end must be chosen from '{ALLOWED_FLAT}';",
+                            f" the option '{edges}' is not allowed for {_loc}.",
                             True,
                             True,
                         )
@@ -1302,7 +1321,7 @@ class XX18GameObject(CoreGameObject):
         height: float = None,
         **kwargs,
     ):
-        """Draw track between hexside and a point at hex location(s).
+        """Draw track between a hexside and a point at a hex location(s).
 
         Args:
             location (str): grid reference or references for one or more cells
@@ -1311,9 +1330,65 @@ class XX18GameObject(CoreGameObject):
             distance (float): distance from hex centre to end point
             height (float): height of the curve above the baseline joining its points
         """
-        from protograf.protos import Hexagon, Line
+        from protograf.protos import Line
 
         _locations = self.process_locations(location, "track_point")
+        if position is None:
+            position = []
+        _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
+        # ---- validate allowed track position
+        for pos in _positions:
+            if self.orientation == HexOrientationName.POINTY.value:
+                if pos not in ALLOWED_POINTY:
+                    feedback(
+                        f"The track edge point must be chosen from '{ALLOWED_POINTY}';",
+                        f" the option '{position}' is not valid for '{location}'.",
+                        True,
+                        True,
+                    )
+            elif self.orientation == HexOrientationName.FLAT.value:
+                if pos not in ALLOWED_FLAT:
+                    feedback(
+                        f"The track edge point must be chosen from '{ALLOWED_FLAT}';",
+                        f" the option '{position}' is not valid for '{location}'.",
+                        True,
+                        True,
+                    )
+
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            start = self.feature_location(geo, direction, distance)
+            for pos in _positions:
+                # ---- get end with correct internal compass for  hex
+                if self.orientation == HexOrientationName.POINTY.value:
+                    if pos in ["ne", "nw"]:
+                        pos = "n" + pos
+                    if pos in ["se", "sw"]:
+                        pos = "s" + pos
+                elif self.orientation == HexOrientationName.FLAT.value:
+                    if pos in ["ne", "se"]:
+                        pos = "e" + pos
+                    if pos in ["nw", "sw"]:
+                        pos = "w" + pos
+                end = getattr(geo, pos, None)
+                # print(f"&&& track point {location=} {pos=} {end=}")
+                # ---- draw curve track
+                Line(  # underlying white
+                    xy=start,
+                    xy1=end,
+                    stroke="white",
+                    stroke_width=XX18_TRACK_WIDTH_OUTER * self.units,
+                    curve=height,
+                    **kwargs,
+                )
+                Line(  # overlying black
+                    xy=start,
+                    xy1=end,
+                    stroke="black",
+                    stroke_width=XX18_TRACK_WIDTH_INNER * self.units,
+                    curve=height,
+                    **kwargs,
+                )
 
     def river_line(
         self,
@@ -1652,8 +1727,8 @@ class XX18GameObject(CoreGameObject):
             Circle(
                 cxy=ccentre,
                 radius=XX18_REVENUE_DIAMETER / 2.0,
-                fill=None,
-                stroke="black",
+                fill=XX18_REVENUE_FILL,
+                stroke=XX18_REVENUE_STROKE,
                 stroke_width=XX18_STROKE_WIDTH,
                 label=label if label else "",
                 label_size=XX18_TEXT_MEDIUM,
@@ -2305,4 +2380,4 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            thing.draw(off_x=ccentre.x, off_y=ccentre.y)
+            thing.draw(off_x=ccentre.x, off_y=ccentre.y, **kwargs)
