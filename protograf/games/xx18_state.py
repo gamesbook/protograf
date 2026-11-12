@@ -1,29 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 protograf XX1StateObject class
-
-Notes:
-    * all arrays, such the cells of a board, are (col,row) with 1-based values
 """
 
 # lib
-import math
-import re
 
 # third party
 
 # module
 from protograf import globals
-from protograf.base import BaseShape
-from protograf.shapes import ImageShape
-from protograf.utils import tools
 from protograf.utils.messaging import feedback
-from protograf.utils.structures import (  # named tuples; enums
-    AbstractBoardType,
-    Point,
-    ShapeGeometry,
-)
-from protograf.utils.tools import _lower
 
 # local
 # local

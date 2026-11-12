@@ -273,6 +273,8 @@ def Create(**kwargs):
     - Will use argparse to process command-line keyword args
     - Allows shortcut creation of cards
     """
+    from .proto_cards import Deck
+
     # ---- set and confirm globals
     globals.initialize()
     if utils.globals_set:

@@ -108,7 +108,7 @@ from sys import platform
 # module
 from protograf import globals
 from protograf.base import BaseShape
-from protograf.utils import tools, colrs, geoms
+from protograf.utils import tools, colrs, geoms, support
 
 # from protograf.utils.constants import GRID_SHAPES_WITH_CENTRE
 from protograf.utils.messaging import feedback
@@ -130,27 +130,36 @@ DEFAULT_SETTINGS = {
     "XX18_HEX_SIDE": 2.3864,  # cm
     "XX18_CITY_DIAMETER": 1.45,  # cm
     "XX18_TOWN_DIAMETER": 0.45,  # cm
+    "XX18_TOWN_DIAMETER_BORDER": 0.55,  # cm; outer-circle
     # "XX18_TOWN_HEIGHT": 0.45, # cm
     "XX18_TOWN_HEIGHT": 0.7,  # cm
     "XX18_TOWN_HEIGHT_OUTER": 0.8,  # cm
     "XX18_TOWN_WIDTH": 0.4,  # cm
     "XX18_TOWN_WIDTH_OUTER": 0.5,  # cm
-    "XX18_TOWN_DIAMETER_BORDER": 0.55,  # cm; outer-circle
     "XX18_PRIVATE_DIAMETER": 0.4,  # cm
     "XX18_REVENUE_DIAMETER": 0.8,  # cm
     "XX18_REVENUE_FILL": None,  # no color
     "XX18_REVENUE_STROKE": "black",
-    "XX18_TRACK_WIDTH_INNER": 0.4,  # cm
-    "XX18_TRACK_WIDTH_OUTER": 0.5,  # cm
-    "XX18_MOUNTAIN_SIDE": 0.6,  # cm; triangle
+    "XX18_TRACK_INNER_WIDTH": 0.4,  # cm
+    "XX18_TRACK_OUTER_WIDTH": 0.5,  # cm
+    "XX18_TRACK_OUTER_FILL": "white",
+    "XX18_MOUNTAIN_SIDE": 0.6,  # cm; side of triangle
+    "XX18_MOUNTAIN_FILL": "black",  # inside triangle
+    "XX18_SPIKE_FRACTION_SHORT": 0.1,  # fraction of hex
+    "XX18_SPIKE_FRACTION_MEDIUM": 0.25,  # fraction of hex
+    "XX18_SPIKE_FRACTION_LONG": 0.45,  # fraction of hex
     "XX18_PHASE_REVENUE_BOX": 0.7,  # cm
     "XX18_DEBUG_FONT_FRACTION": 0.75,
     "XX18_STROKE_WIDTH": 1,  # points
     "XX18_STROKE_WIDTH_HIGHLIGHT": 8,  # points
+    "XX18_TEXT_XXS": 7,  # points
+    "XX18_TEXT_XS": 9,  # points
     "XX18_TEXT_SMALL": 11,  # points
     "XX18_TEXT_MEDIUM": 13,  # points
     "XX18_TEXT_LARGE": 16,  # points
-    "XX18_TEXT_EXTRA": 20,  # points
+    "XX18_TEXT_XL": 20,  # points
+    "XX18_TEXT_XXL": 24,  # points
+    "XX18_TEXT_XXXL": 28,  # points
     "XX18_TEXT_FONT": "Times-Roman",
     "XX18_TEXT_FONT_BOLD": "Times-Bold",
     # ---- color constants
@@ -1059,14 +1068,18 @@ class XX18GameObject(CoreGameObject):
         heading, title, _label = "", "", ""
         label_align = "centre"
         match text_size:
+            case "tiny" | "i" | "xs":
+                font_size = self.xxs["XX18_TEXT_XS"]
             case "small" | "s":
                 font_size = self.xxs["XX18_TEXT_SMALL"]
             case "medium" | "m":
                 font_size = self.xxs["XX18_TEXT_MEDIUM"]
             case "large" | "l":
                 font_size = self.xxs["XX18_TEXT_LARGE"]
-            case "extra" | "e" | "x":
-                font_size = self.xxs["XX18_TEXT_EXTRA"]
+            case "extra" | "e" | "x" | "xl":
+                font_size = self.xxs["XX18_TEXT_XL"]
+            case "tower" | "towering" | "o" | "xxl":
+                font_size = self.xxs["XX18_TEXT_XXL"]
             case _:
                 raise ValueError(
                     f'Text size "{text_size}" is not available for label processing.',
@@ -1316,13 +1329,13 @@ class XX18GameObject(CoreGameObject):
                         stroke="black",
                         stroke_width=0.1,
                         orientation=self.orientation,
-                        paths_stroke="white",
-                        paths_stroke_width=self.xxs["XX18_TRACK_WIDTH_OUTER"]
+                        paths_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
+                        paths_stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"]
                         * self.units,
                         paths=paths,
                         perbii=perbii,
-                        perbii_stroke="white",
-                        perbii_stroke_width=self.xxs["XX18_TRACK_WIDTH_OUTER"]
+                        perbii_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
+                        perbii_stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"]
                         * self.units,
                         **kwargs,
                     )
@@ -1356,12 +1369,12 @@ class XX18GameObject(CoreGameObject):
                         stroke_width=0.1,
                         orientation=self.orientation,
                         paths_stroke="black",
-                        paths_stroke_width=self.xxs["XX18_TRACK_WIDTH_INNER"]
+                        paths_stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"]
                         * self.units,
                         paths=paths,
                         perbii=perbii,
                         perbii_stroke="black",
-                        perbii_stroke_width=self.xxs["XX18_TRACK_WIDTH_INNER"]
+                        perbii_stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"]
                         * self.units,
                         **kwargs,
                     )
@@ -1447,8 +1460,8 @@ class XX18GameObject(CoreGameObject):
                 Line(  # underlying white
                     xy=start,
                     xy1=end,
-                    stroke="white",
-                    stroke_width=self.xxs["XX18_TRACK_WIDTH_OUTER"] * self.units,
+                    stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
+                    stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units,
                     curve=height,
                     **kwargs,
                 )
@@ -1456,7 +1469,7 @@ class XX18GameObject(CoreGameObject):
                     xy=start,
                     xy1=end,
                     stroke="black",
-                    stroke_width=self.xxs["XX18_TRACK_WIDTH_INNER"] * self.units,
+                    stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units,
                     curve=height,
                     **kwargs,
                 )
@@ -1885,15 +1898,19 @@ class XX18GameObject(CoreGameObject):
         stroke = stroke if stroke else "white"
         # stroke_color = colrs.get_color(stroke)
         height_shrink = (
-            self.xxs["XX18_TRACK_WIDTH_OUTER"] - self.xxs["XX18_TRACK_WIDTH_INNER"]
+            self.xxs["XX18_TRACK_OUTER_WIDTH"] - self.xxs["XX18_TRACK_INNER_WIDTH"]
         )
         match _lower(size):
             case "short" | "s":
-                height = self.hex_diameter * 0.1
+                height = (
+                    self.hex_diameter * self.xxs["XX18_SPIKE_FRACTION_SHORT"]
+                )  # 0.1
             case "medium" | "m":
-                height = self.hex_diameter * 0.25
+                height = (
+                    self.hex_diameter * self.xxs["XX18_SPIKE_FRACTION_MEDIUM"]
+                )  # 0.25
             case "long" | "l":
-                height = self.hex_diameter * 0.5
+                height = self.hex_diameter * self.xxs["XX18_SPIKE_FRACTION_LONG"]  # 0.5
         for _loc in _locations:
             geo = self.cells.get(_loc)
             Hexagon(
@@ -1904,9 +1921,9 @@ class XX18GameObject(CoreGameObject):
                 stroke_width=0.1,
                 orientation=self.orientation,
                 spikes=_positions,
-                spikes_stroke="white",
-                spikes_fill="white",
-                spikes_width=self.xxs["XX18_TRACK_WIDTH_OUTER"],
+                spikes_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
+                spikes_fill=self.xxs["XX18_TRACK_OUTER_FILL"],
+                spikes_width=self.xxs["XX18_TRACK_OUTER_WIDTH"],
                 spikes_height=-height,
             )
             Hexagon(
@@ -1919,7 +1936,7 @@ class XX18GameObject(CoreGameObject):
                 spikes=_positions,
                 spikes_stroke="black",
                 spikes_fill="black",
-                spikes_width=self.xxs["XX18_TRACK_WIDTH_INNER"],
+                spikes_width=self.xxs["XX18_TRACK_INNER_WIDTH"],
                 spikes_height=-(height - height_shrink),
             )
 
@@ -2034,7 +2051,7 @@ class XX18GameObject(CoreGameObject):
                 xy=ccentre,
                 stroke="black",
                 stroke_width=self.stroke_width_xx,
-                font_size=self.xxs["XX18_TEXT_EXTRA"],
+                font_size=self.xxs["XX18_TEXT_XXL"],
                 font_name=self.xxs["XX18_TEXT_FONT_BOLD"],
             )
 
@@ -2138,7 +2155,7 @@ class XX18GameObject(CoreGameObject):
                 cy=ccentre.y,
                 side=self.xxs["XX18_MOUNTAIN_SIDE"],
                 stroke_width=self.stroke_width_xx,
-                fill="black",
+                fill=self.xxs["XX18_MOUNTAIN_FILL"],
                 **{**kwargs, **lwargs},
             )
 
@@ -2149,7 +2166,7 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         colors: list = None,
-        orientation: str = "v",  # None,
+        orientation: str = None,
         **kwargs,
     ):
         """Draw a Phase Revenue table at hex location(s).
@@ -2177,7 +2194,12 @@ class XX18GameObject(CoreGameObject):
                 self.xxs["XX18_HEX_GREY"],
             ]
             colors_default = True
-        orientation = orientation if orientation else "horizontal"
+        # ---- determine orientation
+        if not orientation:
+            if self.orientation == "flat":
+                orientation = "horizontal"
+            if self.orientation == "pointy":
+                orientation = "vertical"
         if not isinstance(orientation, str) or _lower(orientation) not in [
             "v",
             "vertical",
@@ -2191,6 +2213,7 @@ class XX18GameObject(CoreGameObject):
                 True,
             )
         table_orientation = "V" if _lower(orientation) in ["v", "vertical"] else "H"
+        # ---- income and colors
         incomes = tools.split(income, separator=" ", clean=True, no_blanks=True)
         if not incomes or len(incomes) < 2:
             feedback(
@@ -2207,6 +2230,7 @@ class XX18GameObject(CoreGameObject):
             )
         if len(incomes) == 2 and colors_default:
             _colors = [self.xxs["XX18_HEX_YELLOW"], self.xxs["XX18_HEX_BROWN"]]
+        # ---- table sizes
         box_width = self.xxs["XX18_PHASE_REVENUE_BOX"]
         box_height = self.xxs["XX18_PHASE_REVENUE_BOX"] * 0.8
         if table_orientation == "H":
@@ -2214,6 +2238,7 @@ class XX18GameObject(CoreGameObject):
         else:
             offset = box_height * len(incomes) / 2.0
 
+        # ---- draw tables
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
@@ -2368,6 +2393,7 @@ class XX18GameObject(CoreGameObject):
             )
             Line(
                 links=[pcs, pce],
+                stroke_width=self.stroke_width_xx,
                 **lwargs,
             )
             # ---- label - title or heading - for private line
@@ -2377,6 +2403,7 @@ class XX18GameObject(CoreGameObject):
                 llabel = lheading or ltitle
                 talign = "centre"
                 if c_e.y != c_s.y:
+                    # breakpoint(); print(llabel)
                     # align text in/out from line centre
                     if labove:
                         delta_y = -self.xxs["XX18_TEXT_SMALL"] / self.units / 2.0
@@ -2386,14 +2413,32 @@ class XX18GameObject(CoreGameObject):
                     if c_e.x > c_s.x and c_e.y < c_s.y:
                         talign = "left"
                     if c_e.x < c_s.x and c_e.y > c_s.y:
-                        talign = "left"
+                        talign = "right" if labove else "left"
 
                     if c_e.x > c_s.x and c_e.y > c_s.y:
                         talign = "right"
                     if c_e.x < c_s.x and c_e.y < c_s.y:
                         talign = "right"
 
-                    Text(llabel, x=lcntr.x, y=lcntr.y + delta_y, align=talign, **lwargs)
+                    if c_e.x == c_s.x:
+                        # vertically rotate text
+                        text_rotation = kwargs.get("rotation", 90)
+                        Text(
+                            llabel,
+                            x=lcntr.x + delta_y,
+                            y=lcntr.y,
+                            rotation=text_rotation,
+                            align="centre",
+                            **lwargs,
+                        )  # centre
+                    else:
+                        Text(
+                            llabel,
+                            x=lcntr.x,
+                            y=lcntr.y + delta_y,
+                            align=talign,
+                            **lwargs,
+                        )
                 else:
                     # centre text over/above the line
                     if labove:
@@ -2441,7 +2486,7 @@ class XX18GameObject(CoreGameObject):
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/river.svg")
             case "swamp":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/swamp.svg")
-            case "factry":
+            case "factory":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/factory.svg")
             case "fish":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/fish.svg")
@@ -2487,17 +2532,26 @@ class XX18GameObject(CoreGameObject):
         thing: object = None,
         **kwargs,
     ):
-        """Draw a symbol/shape at hex location(s).
+        """Draw a protograf shape at hex location(s).
 
         Args:
             location (str): grid reference or references for one or more cells
             label (str): the label for the symbol
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
-            name (str): the name the symbol
+            thing (object): a protograf shape
         """
+        if not isinstance(thing, BaseShape):
+            feedback(
+                f"The figure 'thing' property cannot be a '{type(thing)}';",
+                " it must be protograf shape.",
+                True,
+                True,
+            )
         _locations = self.process_locations(location, "figure")
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
-            thing.draw(off_x=ccentre.x, off_y=ccentre.y, **kwargs)
+            cx = (ccentre.x + self.margin_left) * globals.units
+            cy = (ccentre.y + self.margin_top) * globals.units
+            thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs)
