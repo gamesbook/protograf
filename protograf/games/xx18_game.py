@@ -142,15 +142,15 @@ DEFAULT_SETTINGS = {
     "XX18_REVENUE_STROKE": "black",
     "XX18_TRACK_WIDTH_INNER": 0.4,  # cm
     "XX18_TRACK_WIDTH_OUTER": 0.5,  # cm
-    "XX18_MOUNTAIN_SIDE": 0.6,  # cm; equilateral triangle
+    "XX18_MOUNTAIN_SIDE": 0.6,  # cm; triangle
     "XX18_PHASE_REVENUE_BOX": 0.7,  # cm
     "XX18_DEBUG_FONT_FRACTION": 0.75,
-    "XX18_STROKE_WIDTH": 1,
-    "XX18_STROKE_WIDTH_HIGHLIGHT": 8,
-    "XX18_TEXT_SMALL": 11,
-    "XX18_TEXT_MEDIUM": 13,
-    "XX18_TEXT_LARGE": 16,
-    "XX18_TEXT_EXTRA": 20,
+    "XX18_STROKE_WIDTH": 1,  # points
+    "XX18_STROKE_WIDTH_HIGHLIGHT": 8,  # points
+    "XX18_TEXT_SMALL": 11,  # points
+    "XX18_TEXT_MEDIUM": 13,  # points
+    "XX18_TEXT_LARGE": 16,  # points
+    "XX18_TEXT_EXTRA": 20,  # points
     "XX18_TEXT_FONT": "Times-Roman",
     "XX18_TEXT_FONT_BOLD": "Times-Bold",
     # ---- color constants
@@ -177,6 +177,13 @@ DEFAULT_SETTINGS = {
     "XX18_HEX_WATER": "#4A7F9D",
     "XX18_HEX_RIVER": "#01A0D6",
     "XX18_HEX_SEA": "#C1E6FD",
+    # ---- shades of grey
+    "XX18_GRY_YELLOW": "#D4D4D4",
+    "XX18_GRY_GREEN": "#B4B4B4",
+    "XX18_GRY_GRAY": "#909090",
+    "XX18_GRY_GREY": "#909090",
+    "XX18_GRY_BROWN": "#636363",
+    "XX18_GRY_OFFBOARD": "#494848",
 }
 
 # ---- fixed/derived constants
@@ -337,12 +344,12 @@ class XX18GameObject(CoreGameObject):
         self.sea_hex = self.xxs["XX18_HEX_SEA"]
         # self. = self._commons("") or kwargs.get("") or COLORS_18XX['']
         if kwargs.get("greys"):
-            self.yellow_hex = "#D4D4D4"
-            self.green_hex = "#B4B4B4"
-            self.grey_hex = "#909090"
-            self.gray_hex = "#909090"
-            self.brown_hex = "#636363"
-            self.offboard_hex = "#494848"
+            self.yellow_hex = self.xxs["XX18_GRY_YELLOW"]
+            self.green_hex = self.xxs["XX18_GRY_GREEN"]
+            self.grey_hex = self.xxs["XX18_GRY_GREY"]
+            self.gray_hex = self.xxs["XX18_GRY_GRAY"]
+            self.brown_hex = self.xxs["XX18_GRY_BROWN"]
+            self.offboard_hex = self.xxs["XX18_GRY_OFFBOARD"]
         # ---- setup
         self.setup_board()
         self.setup_pieces()  # none as yet

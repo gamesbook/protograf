@@ -98,6 +98,9 @@ xgfc = XX18Game(
         ('C5', 'city', None, 'Cuwate', 'above',
             [text("8", font_name="Times-Bold", font_size=24)]),
 
+        ('D2', 'city', None, 'Darpa'),
+        ('D2', 'revenue',  (330, .6), '20'),
+
         ('D4', 'cityx3', None, 'Delroux', "b",
             [
               image("images/Jinchu_Railway.svg"),
