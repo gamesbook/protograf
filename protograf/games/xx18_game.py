@@ -108,7 +108,7 @@ from sys import platform
 # module
 from protograf import globals
 from protograf.base import BaseShape
-from protograf.utils import tools, colrs, geoms, support
+from protograf.utils import tools, colrs, geoms
 
 # from protograf.utils.constants import GRID_SHAPES_WITH_CENTRE
 from protograf.utils.messaging import feedback
@@ -130,12 +130,13 @@ DEFAULT_SETTINGS = {
     "XX18_HEX_SIDE": 2.3864,  # cm
     "XX18_CITY_DIAMETER": 1.45,  # cm
     "XX18_TOWN_DIAMETER": 0.45,  # cm
-    "XX18_TOWN_DIAMETER_BORDER": 0.55,  # cm; outer-circle
+    "XX18_TOWN_BORDER_DIAMETER": 0.55,  # cm; outer-circle
     # "XX18_TOWN_HEIGHT": 0.45, # cm
     "XX18_TOWN_HEIGHT": 0.7,  # cm
     "XX18_TOWN_HEIGHT_OUTER": 0.8,  # cm
     "XX18_TOWN_WIDTH": 0.4,  # cm
     "XX18_TOWN_WIDTH_OUTER": 0.5,  # cm
+    "XX18_TOWN_BORDER_STROKE": "white",
     "XX18_PRIVATE_DIAMETER": 0.4,  # cm
     "XX18_REVENUE_DIAMETER": 0.8,  # cm
     "XX18_REVENUE_FILL": None,  # no color
@@ -150,7 +151,11 @@ DEFAULT_SETTINGS = {
     "XX18_SPIKE_FRACTION_LONG": 0.45,  # fraction of hex
     "XX18_PHASE_REVENUE_BOX": 0.7,  # cm
     "XX18_DEBUG_FONT_FRACTION": 0.75,
+    "XX18_DEBUG_FONT_OFFSET_X": 0.0,
+    "XX18_DEBUG_FONT_OFFSET_Y": 0.0,
+    "XX18_DEBUG_FONT_NAME": "Helvetica",
     "XX18_STROKE_WIDTH": 1,  # points
+    "XX18_STROKE_WIDTH_BLOCK": 7,  # points
     "XX18_STROKE_WIDTH_HIGHLIGHT": 8,  # points
     "XX18_TEXT_XXS": 7,  # points
     "XX18_TEXT_XS": 9,  # points
@@ -225,6 +230,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "city",
     "cityx1",
     "cityx2",
+    "cityx2v",
     "cityx3",
     "cityx4",
     "mountain",
@@ -325,7 +331,7 @@ class XX18GameObject(CoreGameObject):
         self.hex_height = self.hex_side * math.sqrt(3)  # cm
         self.hex_diameter = 2 * self.hex_side  # cm
         self.cell_size = self.hex_height
-        self.stroke_width_xx = self.xxs["XX18_STROKE_WIDTH"]
+        self.stroke_width_xx = kwargs.get("stroke_width", self.xxs["XX18_STROKE_WIDTH"])
         # ---- fonts
         self.label_font = (
             self._commons("label_font")
@@ -371,6 +377,7 @@ class XX18GameObject(CoreGameObject):
         return True
 
     def load_settings(self, filepath: str = None) -> dict:
+        """Load settings to override dfaults from a JSON file."""
         config = DEFAULT_SETTINGS.copy()  # copy of the defaults
         if filepath:
             path = Path(filepath)
@@ -388,7 +395,7 @@ class XX18GameObject(CoreGameObject):
                 if not path.exists():
                     feedback(
                         f'The settings file "{filepath}" cannot be found.',
-                        " Using the default settings.",
+                        " Reverting to the default settings.",
                         False,
                         True,
                     )
@@ -400,7 +407,7 @@ class XX18GameObject(CoreGameObject):
             except json.JSONDecodeError as err:
                 feedback(
                     f'Invalid JSON syntax in "{filepath}" ({err}).',
-                    " Using the default settings.",
+                    " Reverting to the default settings.",
                     False,
                     True,
                 )
@@ -419,19 +426,28 @@ class XX18GameObject(CoreGameObject):
             return
 
         lkeys = {}
-        LSIZE = self.hex_side * self.units * self.xxs["XX18_DEBUG_FONT_FRACTION"]
-        lkeys["font_name"] = "Helvetica"
-        lkeys["font_size"] = LSIZE
+        _label_size = self.hex_side * self.units * self.xxs["XX18_DEBUG_FONT_FRACTION"]
+        lkeys["font_name"] = self.xxs["XX18_DEBUG_FONT_NAME"]
+        lkeys["font_size"] = _label_size
         lkeys["stroke"] = self.debug_color
         lkeys["stroke_transparency"] = 50
         lkeys["align"] = "centre"
+        if self.xxs["XX18_DEBUG_FONT_OFFSET_Y"]:
+            offset_y = self.xxs["XX18_DEBUG_FONT_OFFSET_Y"]
+        else:
+            offset_y = _label_size / self.units / 2.5
 
         end_col, end_row = self.cols + 1, self.rows + 1
         for col_no in range(1, end_col):
             for row_no in range(1, end_row):
                 cell = self.board_layout.cells[(col_no, row_no)]
                 label = get_label(row_no - 1, col_no - 1)
-                Text(label, x=cell.c.x, y=cell.c.y + LSIZE / self.units / 2.5, **lkeys)
+                Text(
+                    label,
+                    x=cell.c.x + self.xxs["XX18_DEBUG_FONT_OFFSET_X"],
+                    y=cell.c.y + offset_y,
+                    **lkeys,
+                )
 
     def draw_labels(self):
         """Draw row and column labels at the board edges."""
@@ -854,11 +870,16 @@ class XX18GameObject(CoreGameObject):
                     color=flabel,
                     **kwargs,
                 )
-            case "city" | "cityx1" | "cityx2" | "cityx3" | "cityx4":
+            case "city" | "cityx1" | "cityx2" | "cityx2v" | "cityx3" | "cityx4":
                 if "x" in ftype:
                     _, count = ftype.split("x")
                 else:
                     count = 1
+                if "x2v" in ftype:
+                    rotation = 90
+                    count = 2
+                else:
+                    rotation = None
                 self.city(
                     location=fhexagon,
                     label=flabel,
@@ -866,6 +887,7 @@ class XX18GameObject(CoreGameObject):
                     distance=fdistance,
                     count=count,
                     shapes=fshapes,
+                    rotation=rotation,
                     **kwargs,
                 )
             case "town":
@@ -917,7 +939,7 @@ class XX18GameObject(CoreGameObject):
                 self.river_line(
                     location=fhexagon,
                     position=fdirection,
-                    stroke=None,  # TODO => how to set
+                    stroke=flabel,
                     breadth="medium",  # all thicknesses: medium/m; narrow/n; wide/w
                     **kwargs,
                 )
@@ -980,7 +1002,7 @@ class XX18GameObject(CoreGameObject):
                 self.block(
                     location=fhexagon,
                     position=fdirection,
-                    stroke=None,  # TODO => how to set
+                    stroke=flabel,
                     **kwargs,
                 )
             case "spike":
@@ -1565,8 +1587,8 @@ class XX18GameObject(CoreGameObject):
                     if border:
                         Circle(
                             cxy=ccentre,
-                            radius=self.xxs["XX18_TOWN_DIAMETER_BORDER"] / 2.0,
-                            fill_stroke="white",
+                            radius=self.xxs["XX18_TOWN_BORDER_DIAMETER"] / 2.0,
+                            fill_stroke=self.xxs["XX18_TOWN_BORDER_STROKE"],
                             stroke_width=self.stroke_width_xx,
                         )
                     Circle(
@@ -1603,7 +1625,8 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         count: str | int = None,
-        shapes: list = None,  # list of BaseShape
+        rotation: float = None,
+        shapes: list = None,  # list of BaseShapes
         **kwargs,
     ):
         """Draw City shape at hex location(s).
@@ -1614,6 +1637,7 @@ class XX18GameObject(CoreGameObject):
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
             count (str|int): number of circles in the city
+            rotation (float): the angle at which the city is drawn
             shapes (list): a list of shapes to be drawn inside the city circle(s)
         """
         from protograf.protos import Circle, Rectangle, Triangle, Polyshape
@@ -1656,16 +1680,26 @@ class XX18GameObject(CoreGameObject):
                 # ---- city 1
                 case 2:
                     ccentre = geo
-                    cw = ccentre.centre.x - _radius
-                    ce = ccentre.centre.x + _radius
+                    cw = Point(ccentre.centre.x - _radius, ccentre.centre.y)
+                    ce = Point(ccentre.centre.x + _radius, ccentre.centre.y)
+                    if rotation:
+                        _rotation = tools.as_float(rotation, "town rotation")
+                        cw = geoms.rotate_point_around_point(
+                            cw, ccentre.centre, _rotation
+                        )
+                        ce = geoms.rotate_point_around_point(
+                            ce, ccentre.centre, _rotation
+                        )
+                    else:
+                        _rotation = 0.0
                     Rectangle(
                         height=city_diameter,
                         width=city_diameter,
-                        cx=ccentre.centre.x,
-                        cy=ccentre.centre.y,
+                        cxy=ccentre.centre,
                         fill="white",
                         stroke="black",
                         stroke_width=self.stroke_width_xx,
+                        rotation=_rotation,
                         **{**kwargs, **lwargs},
                     )
                     if shapes and len(shapes) > 0:
@@ -1673,15 +1707,13 @@ class XX18GameObject(CoreGameObject):
                     else:
                         cwargs["centre_shape"] = None
                     Circle(
-                        cx=cw,
-                        cy=geo.centre.y,
+                        cxy=cw,
                         **{**kwargs, **cwargs},
                     )
                     if shapes and len(shapes) > 1:
                         cwargs["centre_shape"] = shapes[1]
                     Circle(
-                        cx=ce,
-                        cy=geo.centre.y,
+                        cxy=ce,
                         **{**kwargs, **cwargs},
                     )
                 # ---- city 3
@@ -2021,7 +2053,14 @@ class XX18GameObject(CoreGameObject):
                                 True,
                             )
                 if start and end:
-                    Line(xy=start, xy1=end, stroke=edge_color, stroke_width=7, **kwargs)
+                    kwargs["stroke_ends"] = "rounded"
+                    Line(
+                        xy=start,
+                        xy1=end,
+                        stroke=edge_color,
+                        stroke_width=self.xxs["XX18_STROKE_WIDTH_BLOCK"],
+                        **kwargs,
+                    )
 
     def tile_letter(
         self,

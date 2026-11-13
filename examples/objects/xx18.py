@@ -10,7 +10,7 @@ from protograf import *
 Create(
     filename="xx18.pdf",
     paper="A5",
-    margin=2,
+    margin=1,
     page_grid=1)
 
 header = Common(x=0, y=0, font_size=18, align="left")
@@ -49,15 +49,18 @@ xgld = XX18Game(
 XX18State(board=xgld)
 Text("XX18Game: label edges & debug", common=footer)
 
-# ---- XX18Game Grid: basic styles
+# ---- XX18Game Grid: Styled
 PageBreak()
-Text("XX18Game: Styled Board", common=header)
+Text("XX18Game: Styled & Shifted Board", common=header)
 xgs = XX18Game(
     rows=4, cols=3,
+    x=1.5, y=2,
+    label=True,
+    label_size=24,
     name="grid",
     fill="khaki",
     stroke="red",
-    stroke_width=2)
+    stroke_width=3)
 XX18State(board=xgs)
 
 # ---- XX18Game Grid: fill pattern
@@ -98,15 +101,18 @@ xgfc = XX18Game(
         ('C5', 'city', None, 'Cuwate', 'above',
             [text("8", font_name="Times-Bold", font_size=24)]),
 
-        ('D2', 'city', None, 'Darpa'),
-        ('D2', 'revenue',  (330, .6), '20'),
+        ('D2', 'cityx2v', None, 'Darpa'),
 
         ('D4', 'cityx3', None, 'Delroux', "b",
             [
               image("images/Jinchu_Railway.svg"),
               image("images/Panama_Canal_Railway.svg"),
               circle(fill="orange", label="6")
-            ]),
+            ]
+        ),
+
+        ('D6', 'city', None, 'Domrus'),
+        ('D6', 'revenue',  (240, .6), '20'),
     ]
 )
 XX18State(board=xgfc)
@@ -331,19 +337,20 @@ Text("XX18Game: Track-to-Point", common=footer)
 
 # ---- XX18Game: Miscellaneous
 PageBreak()
-poly5 = polygon(sides=5, side=0.5, fill_stroke="purple")
 xgmis = XX18Game(
     rows=4, cols=3,
     fill='berylgreen',
     label=True,
     label_size=18,
     features=[
+        ('B2', 'river_line', 'sw ne e ne', 'aqua'),
         ('A1', 'tile-letter', (330, 0.6), "Y"),
         ('A5', 'track', 'e,w'),
         ('A5', 'town_border', None),
         ('B4', 'block', "w nw ne"),
         ('C1', 'river_line', 'nw se e se'),
-        ('D2 D4', poly5, (90, 0.7)),
+        ('C5', 'block', "nw", "xred"),
+        ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
     ]
 )
 XX18State(board=xgmis)
@@ -361,6 +368,8 @@ xgzz = XX18Game(
         ('A1', 'mountain', None, '$20'),
         ('A3', 'track', 'e,w'),
         ('A3', 'town_border', None, 'St. Agnes', "below"),
+        ('B2', 'city', None, 'Brodie'),
+        ('B2', 'revenue',  (240, .6), '30'),
     ]
 )
 XX18State(board=xgzz)
