@@ -32,9 +32,10 @@ the :doc:`Customised Shapes <../customised_shapes>`.
     - XX18Game Board: Functions
     - XX18Game Board: AdHoc Drawing
 
-    - `XX18Game Board: Hexagonal`_
-- `XX18Game Command`_
+- `XX18State Command`_
+- `18xx Advanced Tips and Options`_
 - `18xx Resources`_
+
 
 .. _xx18Backround:
 
@@ -210,13 +211,12 @@ XX18Game Board: Base Grid
 -------------------------
 `^ <xx18game-command_>`_
 
-Below are some examples of  18XX boards.  There are further examples in
-the section on the `XX18Game Command`_.
+Below are some examples of how to set the basic parameters for 18XX boards.
 
 
 Example 1. Default Board
 ~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <abstractGameGrid_>`_
+`^ <xxGameGrid_>`_
 
 .. |ab1| image:: ../images/objects/xx18_default.png
    :width: 330
@@ -240,7 +240,7 @@ Example 1. Default Board
 
 Example 2. Board Size, Color and Position
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <abstractGameGrid_>`_
+`^ <xxGameGrid_>`_
 
 .. |ab2| image:: ../images/objects/xx18_size_position.png
    :width: 330
@@ -290,7 +290,7 @@ Example 2. Board Size, Color and Position
 
 Example 3. Styled Board
 ~~~~~~~~~~~~~~~~~~~~~~~
-`^ <abstractGameGrid_>`_
+`^ <xxGameGrid_>`_
 
 .. |ab3| image:: ../images/objects/xx18_styled.png
    :width: 330
@@ -326,141 +326,9 @@ Example 3. Styled Board
 ===== ======
 
 
-Example 4. Board with custom areas
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <abstractGameGrid_>`_
-
-.. |ab4| image:: ../images/objects/xx18_chess_custom_board.png
-   :width: 330
-
-===== ======
-|ab4| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        htch = Default(
-            hatches='ne',
-            hatches_count=15,
-            hatches_stroke_width=1,
-            hatches_stroke="dimgray")
-        sqr = Default(
-            fill="white",
-            stroke=None,
-            height=1,
-            width=1)
-
-        agcb = XX18Game(
-            name="chess",
-            areas=[
-                rectangle(default=sqr),
-                rectangle(default=[sqr, htch])
-            ]
-        )
-        XX18Game(board=agcb)
-
-      In this example the type of ``XX18Game`` board is set by its
-      *name* property to ``chess``.
-
-      This board appears as a square layout of 8 rows by 8 columns
-      such is used for a regular game of Chess.
-
-      In addition, the *areas* for the board are supplied as a list of
-      two customised rectangles.  These are drawn in turn at alternating
-      positions on the underlying row/column grid.
-
-      Each rectangle has the same shape, as set by the
-      :ref:`Default() <the-default-command>` command named ``sqr``, but
-      the second one also contains a series of :ref:`hatches <rectHatches>`,
-      as set by the :ref:`Default() <the-default-command>` command
-      named ``htch``.
-
-      Because the Chess tiling pattern is a snake-like one, starting at the
-      upper-left and then wrapping around at the end of each row, these
-      rectangle shapes appear at different positions on alternating rows.
-
-===== ======
-
-
-Example 5. Board with cell shape
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <abstractGameGrid_>`_
-
-.. |ab5| image:: ../images/objects/xx18_hexagons_cell_shape.png
-   :width: 330
-
-===== ======
-|ab5| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        ags = XX18Game(
-            name="hexhex",
-            hexes=4,
-            label=True,
-            cell_shape=circle(
-                radius=0.56,
-                stroke="red",
-                stroke_width=1),
-            stroke="white",
-            label_stroke="grey",
-        )
-        XX18Game(board=ags)
-
-      The *cell_shape* property is assigned to another shape |dash| one which
-      has a centre |dash| and this is drawn at the centre of each hexagon.
-
-      By setting the *stroke* to white, the hexagonal grid becomes "invisible",
-      effectively leaving the circles as the only visible grid cells.
-
-===== ======
-
-
-.. _xx18GameHexagonal:
-
-XX18Game Board: Hexagonal
--------------------------
-`^ <xx18game-command_>`_
-
-A grid made up hexagons is used in a number of abstract games.  There are
-different styles, or type of hexagonal grids, all referenced through the
-board's *name* property.
-
-
-Example 1. Rectangular Hexagonal Grid
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <abstractGameHexagonal_>`_
-
-.. |ah1| image:: ../images/objects/xx18_hexagons_default.png
-   :width: 330
-
-===== ======
-|ah1| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        aghd = XX18Game(
-            name="hexagons",
-            label=True)
-        XX18Game(board=aghd)
-
-      The default hexagonal board size is a 8x8 arrangement of hexagonal
-      cells in a "pointy" orientation.
-
-      As shown, this type of board is  set via its *name* property to
-      ``hexagons`` |dash| a *name* property of ``hexagonal`` can also be
-      used.
-
-      Setting ``label=True`` activates the default labellng; stating at the
-      bottom-left of the grid, letters are assigned to the diagonally-sloping
-      columns, and numbers to the rows.
-
-===== ======
-
-
-
 Example 4. Pattern Grid
 ~~~~~~~~~~~~~~~~~~~~~~~
-`^ <abstractGameHexagonal_>`_
+`^ <xxGameGrid_>`_
 
 If a hexagonal grid for a game contains a custom number of hexagons,
 that may vary across the rows of the board, then a pattern design,
@@ -496,7 +364,6 @@ single ``O`` (capital "oh").
       .. code:: python
 
         aghp = XX18Game(
-            name="hexagons",
             rows=5,
             cols=7,
             pattern = """
@@ -508,7 +375,7 @@ single ``O`` (capital "oh").
             """)
         XX18Game(board=aghp)
 
-      In this example the type of board is set via its *name* property to
+      In this example, the type of board is set via its *name* property to
       ``hexagons``.
 
       The *pattern* property shows, in string format, an arrangement of
@@ -525,453 +392,290 @@ single ``O`` (capital "oh").
 ===== ======
 
 
+.. _xx18GameFeatures:
+
+XX18Game: Features
+------------------
+`^ <xx18game-command_>`_
+
+An 18xx game board can display numerous features that each have different
+effects on game play, inclduing cities, towns, tracks, railroads and the
+labels and income associated with these, as well as host of other symbols
+that help characterise hexagons.
+
+General Example Construction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All of the feature examples follow the same overall construction, and
+for sake of brevity, that construction is not repeated every time.
+
+Essentially, each follows the pattern below: the *rows* and *cols* setup
+the size of the board; the *fill* sets the defult color for all hexagons;
+the ``label=True`` turns on the grid labels |dash| by default, along the
+top and left-side of the grid; the *label_size* sets the font point size
+of those labels.
+
+Finally, the *features* list contains the "specifications" for all the
+features for that board; this is the part that differs for each example.
+
+.. code:: python
+
+    xgfc = XX18Game(
+        rows=4, cols=3,
+        fill='berylgreen',
+        label=True,
+        label_size=18,
+        features=[
+          ...
+        ]
+    )
+    XX18State(board=xgfc)
+
+
+General Feature Specification
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each feature contains two or more pieces of information as a *set* of values
+enclosed in round brackets ``( ... )``. The **order of these items is vital**
+and must follow the list of options below.
+
+
+
+Example 1. Cities
+~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gfc| image:: ../images/objects/xx18_features_city.png
+   :width: 330
+
+===== ======
+|gfc| This example shows the *features* of an `XX18Game``:
+
+      .. code:: python
+
+        ('A1', 'city', None),
+        ('A3', 'city', None, 'Arkwright', 'above'),
+        ('A5', 'city', (180, .4), 'Aylish', 'right'),
+
+        ('B2', 'cityx2', None, 'Baroque'),
+        ('B4', 'cityx3', None, 'Blau'),
+        ('B6', 'cityx4', None, 'Branth'),
+
+        ('C1', 'city', None, 'Cantile', 'b',
+            [image("images/Panama_Canal_Railway.svg")]),
+        ('C3', 'city', None, 'Colwa', 'below',
+            [circle(fill="aqua", label="6", radius=0.7)]),
+        ('C5', 'city', None, 'Cuwate', 'above',
+            [text("8", font_name="Times-Bold", font_size=24)]),
+
+        ('D2', 'cityx2v', None, 'Darpa'),
+
+        ('D4', 'cityx3', None, 'Delroux', "b",
+            [
+              image("images/Jinchu_Railway.svg"),
+              image("images/Panama_Canal_Railway.svg"),
+              circle(fill="orange", label="6")
+            ]
+        ),
+
+        ('D6', 'city', None, 'Domrus'),
+        ('D6', 'revenue',  (240, .6), '20'),
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+Example N. NAME OF FEATURE
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xxGameFeatures_>`_
+
+.. |gf0| image:: ../images/objects/xx18_???.png
+   :width: 330
+
+===== ======
+|gf0| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+        aghp = XX18Game(
+
+
+      In this example, the
+
+===== ======
+
+
+
 .. _xx18state-command:
 
-XX18Game Command
-================
-`↑ <abstractIndex_>`_
+XX18State Command
+==================
+`↑ <xx18Index_>`_
 
-The ``XX18Game()`` command will create a display of a board and its pieces
+The ``XX18State()`` command will create a display of a board and its pieces
 that have been defined in an :ref:`XX18Game <xx18game-command>`. This
 display represents a given point during the play of an abstract game |dash| a
 situation commonly referred to as "the game state".
 
-- `XX18Game Properties`_
-- `XX18Game Positions`_
-- `XX18Game Annotations`_
-- `XX18Game Markers`_
-- `XX18Game Examples`_
-
-
-.. _xx18StateProperties:
-
-XX18Game Properties
--------------------
-`^ <xx18state-command_>`_
-
-The properties that can be set for an XX18Game command are:
-
-* *board*: an ``XX18Game`` object; this is a required setting and the
-  XX18Game object cannot be displayed without it
-* *positions*: details of where an XX18Game's pieces go on the board;
-  see below for details
-* *setup*: if set to ``True``, and the game is one whose initial position is
-  stored in **protograf**, then the pieces will be assigned to the board to
-  match that predefined setup
-* *annotations*: a list of XX18Game annotations; see below for details
-* *markers*: a list of XX18Game markers; see below for details
-
-
-.. _xx18StatePositions:
-
-XX18Game Positions
-------------------
-`^ <xx18state-command_>`_
-
-The *positions* property of an XX18Game indicates where the pieces |dash|
-as defined for the XX18Game by the shapes, icons or images associated with
-a character |dash| are placed.
-
-The notation for doing this is by providing a string of characters in one
-of two different notational styles.
-
-.. _xx18StateFEN:
-
-FEN-like Notation
-~~~~~~~~~~~~~~~~~
-`^ <abstractStatePositions_>`_
-
-This notation is based on the **Chess** notation called "FEN" (see:
-https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)
-in which the characters, representing pieces, are separated by a combination
-of numbers, to represent consecutive blank cells, and/or ``/`` (forward slash)
-characters to mark the end of a row.
-
-For example, a **Chess** game might have:
+In the current version of the software, there are no other specific settings
+for the ``XX18State()`` command other than the *board* property, which refers
+to the name assigned to the ``XX18Game()``.
 
 .. code:: python
 
-   positions = "rnbqkbnr/pppppppp/8"
+    xx_game = XX18Game()
+    XX18State(board=xx_game)
 
-to represent three rows |dash| the Black pieces as setup at the start of
-the game |dash| as well as the unoccupied row in front of the Black pawns.
 
-If there are more than nine adjacent blank cells in a row, as there might be in
-a game of **Go**, then use multiple numbers, for example:
 
-.. code:: python
+.. _xx18-advanced-tips:
 
-   positions = "9B9/B99"
+18xx Advanced Tips and Options
+==============================
+`↑ <xx18Index_>`_
 
-This represents a situation where the first row has 9 empty points, a Black
-stone, and then 9 empty points; whereas the second row has a Black stone,
-followed by 9 empty points, and then another 9 empty points |dash| 18
-empty points in total.
 
-The FEN-like notation is converted internally by **protograf** into
-`Row-and-Dot Notation`_.
-
-
-.. _xx18StateRowDot:
-
-Row-and-Dot Notation
-~~~~~~~~~~~~~~~~~~~~
-`^ <abstractStatePositions_>`_
-
-This notation represents each **row** as separate line, and each blank
-cell with a ``.`` (**dot** or full stop).
-
-The best way to represent a multi-line list of characters such as this is
-by starting and ending all the lines with triple quotes |dash| ``"""``.
-
-For example:
-
-.. code:: python
-
-   positions = """
-   r.bqkb.r
-   .ppppppp
-   """
-
-would show two rows near the start of a **Chess** game where Black has
-moved both Knights and one Pawn.
-
-Note that empty lines, as well as "whitespace" at the start and end of any
-line, are ignored.
-
-If a row on the board contains **no** pieces, this can be shown with a single
-``.`` (dot or full stop).
-
-
-.. |sp1| image:: ../images/objects/xx18_chess_positions.png
-   :width: 330
-
-===== ======
-|sp1| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        agcp = XX18Game(name="chess")
-        XX18Game(
-            board=agcp,
-            positions="""
-            r..qr.k.
-            p....pbp
-            bp...np.
-            ...p....
-            .
-            BPN.P.P.
-            P.Q.NnBP
-            R..R..K.
-            """
-        )
-
-      In this example the type of board is set via its *name* property to
-      ``chess``.  This results in the default grid with alternating colored
-      squares.
-
-      The *positions* property of XX18Game is used to show **Chess**
-      pieces on the board; in this case, the "state" at the end of move 15
-      in the 1963/64 USA Chess Championship with R.J. Fischer (Black) playing
-      R.E. Byrne (White).
-
-===== ======
-
-
-.. _xx18StateAnnotations:
-
-XX18Game Annotations
---------------------
-`^ <xx18state-command_>`_
-
-An annotation is typically an :ref:`element <element-concept>` that needs to
-be drawn to customise the board in some way |dash| this can be via text,
-a shape or an image.  For example, a cross can be drawn in the centre square
-of the board.
-
-Annnotations are always drawn **before** any `XX18Game Markers`_ or
-any pieces that may appear on the board.
-
-.. _xx18StateLocations:
-
-Annnotations Locations
-~~~~~~~~~~~~~~~~~~~~~~
-
-Although it is possible to use the **protograf** absolute
-:ref:`positioning <position-concept>` notation to annotate the board, a more
-convenient way is to use a **board.reference.position** notation.  In this
-notation, the name assigned to the board is used first, followed by a dot,
-then the grid reference as set by the labelling method, followed by a dot,
-and then the position on the cell at that grid reference.
-
-For example, given a normal board, the upper left hexagon, assuming it is
-not a blank, will be referred to as ``A1``.
-
-So the position |dash| the x- and y- coordinates |dash| of the centre of
-that hex, for an ``XX18Game`` named ``xx02`` would be ``xx02.A1.c``.
-
-The various positions for a hexagonal cell, there are  n (north), s (south),
-ne (north-east), nw (north-west), sw (south-west), and se (south-east),
-as well as c (centre/center).
-
-.. |sp2| image:: ../images/objects/xx18_grid_annotations.png
-   :width: 330
-
-===== ======
-|sp2| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        aga = XX18Game(
-            label=True,
-            rows=6, cols=6,
-            default=thick
-        )
-        cross = Common(
-            side=aga.a6.ht,
-            stroke_width=0.5,
-            hatches='d',
-            hatches_count=2,
-            hatches_stroke='red',
-            hatches_stroke_width=1.5)
-        annotations = [
-            square(cxy=aga.a6.c, common=cross),
-            square(cxy=aga.f6.c, common=cross),
-            square(cxy=aga.a1.c, common=cross),
-            square(cxy=aga.f1.c, common=cross),
-            circle(cxy=aga.c3.ne,
-                   fill_stroke="red",
-                   transparency=50),
-        ]
-        XX18Game(
-            board=aga,
-            annotations=annotations,
-        )
-
-      In this example, *annotations* for the board are defined with a list
-      of shapes: a :ref:`circle <circle-command>` and four
-      :ref:`squares <square-command>`.  These have some styling added |dash|
-      color and transparency for the circle and :ref:`hatches <rectHatches>`
-      for the squares.
-
-      The centre locations of the shapes being used for the annotations are
-      set with their *cxy* property.  This property's value uses the
-      **board.reference.position** notation described earlier to place the
-      shape on the board.  For example, the circle's centre is set to the
-      north-east corner of cell ``c3``.
-
-===== ======
-
-
-.. _xx18StateMarkers:
-
-XX18Game Markers
-----------------
-`^ <xx18state-command_>`_
-
-A marker is typically an :ref:`element <element-concept>` that needs to be
-shown to draw attention to some aspect of the current state of the board and
-its pieces |dash| this can be via text, a shape or an image.   For example,
-an arrow can be drawn to show how a piece can, or should, move from one
-square to another.
-
-Markers are always drawn **after** any `XX18Game Annotations`_ and
-**after** any pieces that may appear on the board.
-
-Markers are supplied as a list of **protograf** shapes, whose position is
-set in the same way as :ref:`Annnotations Locations <xx18StateLocations>`.
-
-
-.. |sp3| image:: ../images/objects/xx18_grid_chess_markers.png
-   :width: 330
-
-===== ======
-|sp3| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        amca = XX18Game(
-            name="chess",
-            label=True
-        )
-        XX18Game(
-            board=amca,
-            positions='8/8/8/8/3N4/8/8/8',
-            markers=[
-                dot(cxy=amca.d4.c, fill_stroke="red", dot_width=5),
-                line(
-                    links=[amca.d4.c, amca.d6.c, amca.e6.w],
-                    stroke="red",
-                    stroke_width=2),
-                square(
-                    cxy=amca.e6.c,
-                    height=0.9,
-                    width=0.9,
-                    stroke="red",
-                    stroke_width=2),
-            ]
-        )
-
-      In this example, a **Chess** game shows three markers being used:
-
-      1. The **dot** shape appears at the centre of the Knight's square,
-      2. The **line** shape uses the *links* property to join the centre
-         of the two squares making up the first part of the Knight's move
-         and ending at the west-edge of square ``e6``.
-      3. The **square** shape is drawn with its centre in square ``e6``.
-
-      All shapes are given a *stroke* color of ``red``, and the line and
-      square are drawn with a *stroke_width* of 2.
-
-===== ======
-
-.. _xx18StateMarkersShortcuts:
-
-XX18Game Markers Shortcuts
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Although the above method for setting markers is very flexible, its also a
-little cumbersome, particularly if only relatively simple markers need to be
-used; for example, drawing a line or an arrow between cells or highlighting
-the outline of a cell.
-
-The "shortcut" approach provides a limited set of shapes, and restricts their
-position to align with the cell centres; all shapes (except for the dot) are
-sized to just fit inside the cell.
-
-The shortcuts, prefixed by one or two letters are:
-
-- ``a``: draw an **arrow** between two cells
-- ``ac``: draw an **arrow**, with a curve, between two cells
-- ``l``: draw a **line** between two cells
-- ``lc``: draw a **line**, with a curve, between two cells
-- ``c``: draw a **circle** inside a cell
-- ``d``: draw a **dot** inside a cell
-- ``s``: draw a **square** inside a cell
-- ``h``: draw a **hexagon** inside a cell
-- ``x``: draw an **X** inside a cell (between diagonally opposite vertices)
-
-These shapes are always drawn in "outline" mode; that is to say, there is
-no fill color for the area shapes.
-
-The other shortcut that can be used is that of a color, referenced by its
-:ref:`RGB hexadecimal <termsColor>` value. This is a single color used to fill
-the cell |dash| a hexagon on a hexagonal board and a square on a grid board.
-(Note that, unlike in most other places in **protograf**, the hexadecimal form
-is the only way to specify color here.)
-
-Along with this prefix, there also needs to be a reference for at least one
-cell or, in the case of line or arrow, a reference for at least two cells
-|dash| the start and end locations.  For all shortcuts, it is possible to
-supply a list of multiple locations in which that shape appears.
-
-All these details appear together in a single string for a single shape, and
-one or these strings is then assigned to the *markers* property list, and
-is drawn in that order.
-
-Some basic customisation is possible:
-
-- *markers_stroke*: sets the color of all the shortcut markers; this defaults
-  to ``yellow``
-- *markers_fraction*: sets the width of all the shortcut markers lines as a
-  fraction of the cell size; this defaults to ``0.1`` (one tenth)
-- *markers_transparency*: sets the transparency of all the shortcut markers;
-  this defaults to no transparency
-
-The two different styles of creating markers can be mixed together in the
-same list.
-
-
-.. |sp4| image:: ../images/objects/xx18_hexagons_markers_shortcuts.png
-   :width: 330
-
-===== ======
-|sp4| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        aml = XX18Game(
-            rows=4,
-            col=4,
-            side=0.25,
-            label=True,
-        )
-        XX18Game(
-            board=aml,
-            markers_transparency=50,
-            markers=[
-                'a a1 c1',
-                'ac a1 c2',
-                'd a3',
-                'l b4 b3 c5 c4',
-                'lc c4 e5',
-                'c c3',
-                'h e4',
-                's d2',
-                'x a2',
-                '#7FFF00 d5 b2',
-            ]
-        )
-
-      In this example, markers are drawn with default color and stroke
-      thickness, but the *markers_transparency* is set to ``50`` percent.
-
-      Markers are drawn on a ``hexhex`` board; as can be seen, the square
-      marker does not really suit this style of cell.
-
-      In this example, the *l* (line) marker has a number of different
-      grid references included |dash| this means that a continuous line
-      is drawn between the centre of each cell in the sequence.  This
-      drawing method is making use of a Line's
-      :ref:`Links <lineLinksShapes>` property.
-
-      In this example, two cells |dash| ``b2`` and ``d5`` |dash| are
-      completely "colored in" with a green color defined by ``#7FFF00``.
-
-===== ======
-
-.. |sp5| image:: ../images/objects/xx18_grid_markers_shortcuts.png
-   :width: 330
-
-===== ======
-|sp5| This example shows an ``XX18Game`` constructed using these commands:
-
-      .. code:: python
-
-        amg = XX18Game(
-            cols=2,
-            rows=2,
-            label=True,
-        )
-        XX18Game(
-            board=amg,
-            markers_stroke="red",
-            markers_fraction=0.05,
-            markers=[
-                'a a1 c1',
-                'ac a1 c2',
-                'd a3 d3 e1',
-                'l b4 a5 b5 c4',
-                'lc c4 e5',
-                'c c3',
-                'h e4',
-                's d2',
-                'x a2',
-            ]
-        )
-
-      In this example, the markers styles are changed: *markers_stroke*
-      (their color) is set to ``red``; while the *markers_fraction* is set to
-      ``0.05`` |dash| the line thickness relative to the cell size.
-
-      Markers are drawn on a ``grid`` board; as can be seen, the hexagon
-      marker does not really suit this style of cell.
-
-      In this example, the *d* (dot) marker has a number of different
-      grid references listed with it |dash| this means that the dot is
-      drawn at the centres of all of those cells.
-
-===== ======
 
 
 .. _xx18-resources:
@@ -979,3 +683,13 @@ same list.
 18xx Resources
 ==============
 `↑ <abstractIndex_>`_
+
+The primary resource for working with 18xx games is the online tool
+*18xx Maker* (https://18xx-maker.com/). This tool takes 18xx game definitions
+written in JSON, displays them, and renders them for printing. This can
+create the game Map, Tiles and Tile Manifest, Tokens and Charters, Tokens
+(without companies) and the Stock Market.
+
+A comprehensive resource of available games can be found at
+http://www.fwtwr.com/18xx/index.htm and games themselves can be played at
+https://18xx.games/ .

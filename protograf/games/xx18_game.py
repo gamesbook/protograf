@@ -129,6 +129,7 @@ DEFAULT_SETTINGS = {
     # ---- size constants
     "XX18_HEX_SIDE": 2.3864,  # cm
     "XX18_CITY_DIAMETER": 1.45,  # cm
+    "XX18_CITY_BACKGROUND_FILL": "white",
     "XX18_TOWN_DIAMETER": 0.45,  # cm
     "XX18_TOWN_BORDER_DIAMETER": 0.55,  # cm; outer-circle
     # "XX18_TOWN_HEIGHT": 0.45, # cm
@@ -1696,7 +1697,7 @@ class XX18GameObject(CoreGameObject):
                         height=city_diameter,
                         width=city_diameter,
                         cxy=ccentre.centre,
-                        fill="white",
+                        fill=self.xxs["XX18_CITY_BACKGROUND_FILL"],
                         stroke="black",
                         stroke_width=self.stroke_width_xx,
                         rotation=_rotation,
@@ -1720,7 +1721,7 @@ class XX18GameObject(CoreGameObject):
                 case 3:
                     ccentre = geo
                     rwargs = {}
-                    rwargs["fill"] = "white"
+                    rwargs["fill"] = self.xxs["XX18_CITY_BACKGROUND_FILL"]
                     rwargs["stroke"] = "black"
                     rwargs["stroke_width"] = self.stroke_width_xx
                     # fill background
@@ -1791,7 +1792,7 @@ class XX18GameObject(CoreGameObject):
                     cx4 = ccentre.centre.x - _radius
                     cy4 = ccentre.centre.y + _radius
                     rwargs = {}
-                    rwargs["fill"] = "white"
+                    rwargs["fill"] = self.xxs["XX18_CITY_BACKGROUND_FILL"]
                     rwargs["stroke"] = "black"
                     rwargs["stroke_width"] = self.stroke_width_xx
                     Rectangle(

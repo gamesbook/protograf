@@ -90,6 +90,11 @@ CSS_COLOR_NAMES = {
     "internationalorange": "#FF5202",
     "spindle": "#ADCBF4",
     "governorbay": "#1444D5",
+    # Railways of the Lost Atlas
+    "cinnabar": "#EB3433",  # RLA Red
+    "casablanca": "#FAB857",  # RLA Yellow
+    "halfbaked": "#76C6CA",  # RLA Blue
+    # "": "",
     # Catan!
     "catandesert": "#E6AD3A",
     "catanwheat": "#FFCF1A",
