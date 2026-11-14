@@ -150,6 +150,15 @@ columns.
 
   The hexagonal locations on the board are termed **cells** in this guide.
 
+Topics covered are:
+
+- `XX18Game Properties`_
+- `XX18Game Board Grid`_
+- `XX18Game Features`_
+- `XX18Game JSON Styles`_
+- `XX18Game Functions`_
+- `XX18Game AdHoc Drawing`_
+
 
 .. _xx18GameProperties:
 
@@ -210,26 +219,38 @@ XX18Game Board Grid
 -------------------
 `^ <xx18game-command_>`_
 
-Below are some examples of how to set the basic parameters for the hexagonal
-grid that is used for all 18xx game boards.
+Below are some examples of how to set the basic parameters to configure the
+hexagonal grid that is used for all 18xx game boards:
+
+- `Example 1. Default Board`_
+- `Example 2. Default Board - Flat Hexagons`_
+- `Example 3. Default Board - Pointy Hexagons - Offset`_
+- `Example 5. Grid Labels & Debug`_
+- `Example 6. Styled Board`_
+- `Example 7. Pattern Grid`_
 
 
 Example 1. Default Board
 ~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameGrid_>`_
 
-.. |ab1| image:: ../images/objects/xx18_default.png
+.. |xb1| image:: ../images/objects/xx18_grid_pointy.png
    :width: 330
 
 ===== ======
-|ab1| This example shows an ``XX18Game`` constructed using these commands:
+|xb1| This example shows an ``XX18Game`` constructed using these commands:
 
       .. code:: python
 
          xx1 = XX18Game()
          XX18Game(board=xx1)
 
-      The default settings for a board are those of a 8x8 grid of hexagons.
+      The default settings for an 18xx game's board are those of a 8x8
+      grid of ``pointy`` hexagons i.e. two flat sides of each hexagon are
+      parallel to the left and right of the board.
+
+      Because a small page size is being used, the full extent of the grid
+      i.e. all 64 hexagons, is not visible.
 
       As can be seen, the board is drawn when it is referenced by the *board*
       property of an ``XX18Game`` command.  In short: the ``XX18Game``
@@ -238,73 +259,141 @@ Example 1. Default Board
 ===== ======
 
 
-Example 2. Board Size, Color and Position
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 2. Default Board - Flat Hexagons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameGrid_>`_
 
-.. |ab2| image:: ../images/objects/xx18_size_position.png
+.. |xb2| image:: ../images/objects/xx18_grid_flat.png
    :width: 330
 
 ===== ======
-|ab2| This example shows ``XX18Game`` used with these commands:
+|xb2| This example shows an ``XX18Game`` constructed using these commands:
 
       .. code:: python
 
-        agsp = XX18Game(
-            x=0, y=0,
-            side=0.25,
-            rows=3, cols=3,
-            fill="khaki"
-        )
-        XX18Game(board=agsp)
+         xx1 = XX18Game(orientation="flat")
+         XX18Game(board=xx1)
 
-        ahsp = XX18Game(
-            name="hexagons",
-            x=4, y=4,
-            height=1.25,
-            rows=3, cols=3,
-            fill="berylgreen"
-        )
-        XX18Game(board=ahsp)
+      For this example, the *orientation* of the hexagons in the grid are
+      changed to ``flat`` i.e. two flat sides of each hexagon are parallel
+      to the top and bottom of the board.
 
-      Each of the two boards shown have their own *rows*, *cols* and *height*
-      values set in order to determine their size.
-
-      Each of the two boards shown make use of custom *x* and *y* values to
-      set their position on the page.
-
-      Each of the boards sets the default color of the cells to a light
-      brown and light green, respectively, via the *fill* property. It
-      is also possible to choose from the built-in 18xx colors.
-
-      The board on the lower-right also has the *name* set to ``hexagons``
-      in order to change its layout; more example of these types can be
-      seen in :ref:`Hexagonal XX18Game Boards <abstractGameHexagonal>`.
-
-      As can be seen, the boards are drawn when the name assigned to them is
-      referenced by the *board* property of the ``XX18Game`` commands
-      (``agsp`` and ``ahsp`` respectively).
+      Because a small page size is being used, the full extent of the grid
+      i.e. all 64 hexagons, is not visible.
 
 ===== ======
 
 
-Example 3. Styled Board
-~~~~~~~~~~~~~~~~~~~~~~~
+Example 3. Default Board - Pointy Hexagons - Offset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameGrid_>`_
 
-.. |ab3| image:: ../images/objects/xx18_styled.png
+.. |xb3| image:: ../images/objects/xx18_grid_pointy_offset.png
    :width: 330
 
 ===== ======
-|ab3| This example shows an ``XX18Game`` constructed using these commands:
+|xb3| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+         xx1 = XX18Game(hex_offset="odd")
+         XX18Game(board=xx1)
+
+      For this example, the *orientation* of the hexagons in the grid are,
+      by default, already set to ``pointy``. In addition, the *hex_offset* is
+      set to ``odd``, thereby shifting down the top-left hexagon.
+
+      Because a small page size is being used, the full extent of the grid
+      i.e. all 64 hexagons, is not visible.
+
+===== ======
+
+
+Example 4. Default Board - Flat Hexagons - Offset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameGrid_>`_
+
+.. |xb4| image:: ../images/objects/xx18_grid_flat_offset.png
+   :width: 330
+
+===== ======
+|xb4| This example shows an ``XX18Game`` constructed using these commands:
+
+      .. code:: python
+
+         xx1 = XX18Game(
+           orientation="flat",
+           hex_offset="odd")
+         XX18Game(board=xx1)
+
+      For this example, the *orientation* of the hexagons in the grid are
+      set to ``flat``. In addition, the *hex_offset* is set to ``odd``,
+      thereby shifting down the top-left hexagon.
+
+      Because a small page size is being used, the full extent of the grid
+      i.e. all 64 hexagons, is not visible.
+
+===== ======
+
+
+Example 5. Grid Labels & Debug
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameGrid_>`_
+
+.. |xb5| image:: ../images/objects/xx18_grid_labels_debug.png
+   :width: 330
+
+===== ======
+|xb5| This example shows ``XX18Game`` used with these commands:
+
+      .. code:: python
+
+        xgld = XX18Game(
+            rows=4, cols=3,
+            label=True,
+            debug=True,
+        )
+        XX18State(board=xgld)
+
+      For this example, the default number of *rows* and *cols* have been
+      changed; the whole board is now displayed on this smaller page size.
+
+      Setting the *label* property to ``True`` enables labels to be placed
+      at the board edges. The labels defaults to the *above-left* (``AL``);
+      numbers for the columns increase from ``1``, starting at the top-left,
+      and the letters for the rows go from top to bottom along the left edge.
+
+      Note that the 18xx grid style of numbering means the column numbers for
+      odd rows start at 1 and increment by 2 i.e. all odd numbers, whereas
+      the column numbers for even rows start at 2 and increment by 2
+      i.e. they are all even numbers.
+
+      Setting the *debug* property to ``True`` activates the display of
+      large, in-hex grid reference labels that appear inside each hexagon.
+      This is useful when designing a layout but is obviously not something
+      that would be shown in a final version.
+
+===== ======
+
+
+Example 6. Styled Board
+~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameGrid_>`_
+
+.. |xb6| image:: ../images/objects/xx18_styled.png
+   :width: 330
+
+===== ======
+|xb6| This example shows an ``XX18Game`` constructed using these commands:
 
       .. code:: python
 
         ags = XX18Game(
             rows=4, cols=3,
-            x=1.5, y=2,
+            x=1.25, y=2,
             label=True,
             label_size=24,
+            label_locations="BL",
             fill="khaki",
             stroke="red",
             stroke_width=3
@@ -318,24 +407,20 @@ Example 3. Styled Board
       - *x* and *y* - set the offset of the top-left of the grid from
         the page margins
       - *label* - if ``True``, the labels will be drawn
-      - *label_stroke* - the color of the labels
+      - *label_locations* - where the labels are drawn at the grid edges
       - *label_size* - the point height of the labels
       - *fill* - the default color of the hexagons
       - *stroke* - the default color for lines and labels
       - *stroke_width* - the default width of lines
 
-      The *label_start* defaults to the *above-left* (``AL``), so
-      letters for the rows go from top to bottom along the left edge, and
-      numbers for the columns increase from ``1`` starting at the top-left.
-
-      As can be seen, the board is drawn when the name assigned to it
-      (``ags``) is referenced by the *board* property of an
-      ``XX18Game`` command.
+      Unlike in .., here the location of the grid labels is changed by
+      setting ``label_locations="BL"`` i.e. to appear below and to the
+      left of the grid.
 
 ===== ======
 
 
-Example 4. Pattern Grid
+Example 7. Pattern Grid
 ~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameGrid_>`_
 
@@ -364,11 +449,11 @@ If a row on the board contains only hexagons, this can be shown with a
 single ``O`` (capital "oh").
 
 
-.. |ah4| image:: ../images/objects/xx18_hexagons_pattern.png
+.. |xb7| image:: ../images/objects/xx18_hexagons_pattern.png
    :width: 330
 
 ===== ======
-|ah4| This example shows an ``XX18Game`` constructed using these commands:
+|xb7| This example shows an ``XX18Game`` constructed using these commands:
 
       .. code:: python
 
@@ -403,6 +488,24 @@ single ``O`` (capital "oh").
 XX18Game Features
 -----------------
 `^ <xx18game-command_>`_
+
+- `Summary`_
+- `General Feature Specification`_
+- `Construction of Examples`_
+- `Feature #1. Town and Mountain`_
+- `Feature #2. City`_
+- `Feature #3. Train Track`_
+- `Feature #4. Train Track & Town`_
+- `Feature #5. Train track-to-edge`_
+- `Feature #6. Symbols`_
+- `Feature #7. Colored Hexagon`_
+- `Feature #8. Private Railroad`_
+- `Feature #9. Offboard Income: Pointy`_
+- `Feature #10. Offboard Income: Flat`_
+- `Feature #11. Miscellaneous`_
+- `XX18Game JSON Styles`_
+- `XX18Game Functions`_
+- `XX18Game AdHoc Drawing`_
 
 Summary
 ~~~~~~~
@@ -449,8 +552,8 @@ following features: fill, private railroads, ???.  See the specifif feature
 example and description below for details of the changes.
 
 
-General Example Construction
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Construction of Examples
+~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameFeatures_>`_
 
 All of the feature examples follow the same overall construction, and
@@ -623,7 +726,7 @@ Feature #4. Train Track & Town
 ===== ======
 
 
-Feature #5. Train Track-to-edge
+Feature #5. Train track-to-edge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameFeatures_>`_
 

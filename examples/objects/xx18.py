@@ -54,9 +54,10 @@ PageBreak()
 Text("XX18Game: Styled & Shifted Board", common=header)
 xgs = XX18Game(
     rows=4, cols=3,
-    x=1.5, y=2,
+    x=1.25, y=2,
     label=True,
     label_size=24,
+    label_locations="BL",
     fill="khaki",
     stroke="red",
     stroke_width=3)
