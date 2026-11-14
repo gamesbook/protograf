@@ -254,7 +254,7 @@ Install the following packages (assuming you are using ``uv``)::
 
 Then, from the project folder, display the documentation via::
 
-    sphinx-autobuild docs/source docs/_build/html --open-browse
+    sphinx-autobuild docs/source docs/_build/html --open-browser
 
 This should open the index documentation page in your default browser; pages
 will automatically refresh as you make changes to the source ``.rst`` files.

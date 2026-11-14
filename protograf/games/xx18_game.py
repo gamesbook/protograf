@@ -248,8 +248,8 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "track",
     "track_town",
     "track-town",
-    "track_point",
-    "track-point",
+    "track_edge",
+    "track-edge",
     "river_line",
     "river-line",
 ]
@@ -923,12 +923,12 @@ class XX18GameObject(CoreGameObject):
                     town="middle",  # ALL POSITIONS NOT OPERATIONAL
                     **kwargs,
                 )
-            case "track_point" | "track-point":
+            case "track_edge" | "track-edge":
                 if len(feature) >= 5:
                     height = tools.as_float(feature[4], "height", default=0.0)
                 else:
                     height = 0.0
-                self.track_point(
+                self.track_edge(
                     location=fhexagon,
                     position=flabel,
                     direction=fdirection,
@@ -1419,7 +1419,7 @@ class XX18GameObject(CoreGameObject):
                         alert=True,
                     )
 
-    def track_point(
+    def track_edge(
         self,
         location: str = None,
         position: str = None,
@@ -1439,7 +1439,7 @@ class XX18GameObject(CoreGameObject):
         """
         from protograf.protos import Line
 
-        _locations = self.process_locations(location, "track_point")
+        _locations = self.process_locations(location, "track_edge")
         if position is None:
             position = []
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)

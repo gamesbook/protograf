@@ -57,7 +57,6 @@ xgs = XX18Game(
     x=1.5, y=2,
     label=True,
     label_size=24,
-    name="grid",
     fill="khaki",
     stroke="red",
     stroke_width=3)
@@ -86,8 +85,8 @@ xgfc = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('A1', 'city', None),
-        ('A3', 'city', None, 'Arkwright', 'above'),
+        ('A1', 'city'),
+        ('A3', 'city', None, 'Arkwright'),
         ('A5', 'city', (180, .4), 'Aylish', 'right'),
 
         ('B2', 'cityx2', None, 'Baroque'),
@@ -95,24 +94,24 @@ xgfc = XX18Game(
         ('B6', 'cityx4', None, 'Branth'),
 
         ('C1', 'city', None, 'Cantile', 'b',
-            [image("images/Panama_Canal_Railway.svg")]),
+            [image('images/Panama_Canal_Railway.svg')]),
         ('C3', 'city', None, 'Colwa', 'below',
             [circle(fill="aqua", label="6", radius=0.7)]),
         ('C5', 'city', None, 'Cuwate', 'above',
-            [text("8", font_name="Times-Bold", font_size=24)]),
+            [text("8", font_name='Times-Bold', font_size=24)]),
 
         ('D2', 'cityx2v', None, 'Darpa'),
 
-        ('D4', 'cityx3', None, 'Delroux', "b",
+        ('D4', 'cityx3', None, 'Delroux', 'b',
             [
-              image("images/Jinchu_Railway.svg"),
-              image("images/Panama_Canal_Railway.svg"),
-              circle(fill="orange", label="6")
+              image('images/Jinchu_Railway.svg'),
+              image('images/Panama_Canal_Railway.svg'),
+              circle(fill="orange", label='6')
             ]
         ),
 
-        ('D6', 'city', None, 'Domrus'),
-        ('D6', 'revenue',  (240, .6), '20'),
+        ('D6', 'city', None, 'Domrus', 'above'),
+        ('D6', 'revenue',  (120, .6), '20'),
     ]
 )
 XX18State(board=xgfc)
@@ -126,10 +125,10 @@ xgft = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('A1', 'town', None),
+        ('A1', 'town'),
         ('B4', 'town', (90, .3), 'Burham', 'above'),
-        ('C1', 'mountain', None, '$40'),
-        ('C3 D2 D4', 'mountain', (90, .5)),
+        ('C1', 'mountain'),
+        ('C3 D2 D4', 'mountain', (270, .5), '$40'),
         ('C5', 'mountains', None, "mountains"),
     ]
 )
@@ -161,7 +160,7 @@ xgfk = XX18Game(
 XX18State(board=xgfk)
 Text("XX18Game: Track", common=footer)
 
-# ---- XX18Game: Features: Track
+# ---- XX18Game: Features: Track & Town
 PageBreak()
 xgfkt = XX18Game(
     rows=4, cols=3,
@@ -195,7 +194,6 @@ xgff = XX18Game(
         ('C5', 'fill', None, 'pink'),
         ('D2', 'fill', None, 'xoffboard'),
         ('D4', 'highlight', None, 'yellow'),
-
     ]
 )
 XX18State(board=xgff)
@@ -224,7 +222,6 @@ xgfs = XX18Game(
         ('E1', 'flag', None, 'flag'),
         ('E3', 'pennant', None, 'pennant'),
         ('E5', 'noentry', None, 'noentry'),
-
     ]
 )
 XX18State(board=xgfs)
@@ -292,6 +289,7 @@ xgprv = XX18Game(
     label_size=18,
     features=[
         ('A1', 'private', None, ""),
+        ('A1', 'private'),
         ('A3', 'private', None, "L&L", "A3",  None, "left"),
         ('B2', 'private', ( 15, .7), "R&R", "B2", (140, .4), "above"),
         ('B4', 'private', ( 15, .6), "D&D", "B6", (140, .5), "below"),
@@ -305,30 +303,30 @@ xgprv = XX18Game(
 XX18State(board=xgprv)
 Text("XX18Game: Private Railroads", common=footer)
 
-# ---- XX18Game: Track-to-Point
+# ---- XX18Game: Track-to-Edge
 PageBreak()
-B3 = (270, .4)
+C3 = (270, .4)
 xgttp = XX18Game(
     rows=4, cols=3,
     fill='berylgreen',
     label=True,
     label_size=18,
     features=[
-        ('A1', 'track_point', (210, .3), 'ne', -0.1),
-        ('A1', 'track_point', (210, .3), 'sw', 0.2),
+        ('A1', 'track_edge', (210, .3), 'ne', -0.1),
+        ('A1', 'track_edge', (210, .3), 'sw', 0.2),
         ('A1', 'city', (210, .3), 'Archide', "above"),
 
-        ('A3', 'track_point', (210, .3), 'ne', -0.1),
-        ('A3', 'track_point', (210, .3), 'sw', 0.2),
+        ('A3', 'track_edge', (210, .3), 'ne', -0.1),
+        ('A3', 'track_edge', (210, .3), 'sw', 0.2),
 
-        ('B2', 'track_point', (180, .3), 'w', 0),
+        ('B2', 'track_edge', (180, .3), 'w', 0),
 
-        ('C3', 'track_point', B3, 'w', 0.25),
-        ('C3', 'track_point', B3, 'se', -0.1),
+        ('C3', 'track_edge', C3, 'w', 0.25),
+        ('C3', 'track_edge', C3, 'se', -0.1),
 
-        ('C5', 'track_point', B3, 'w', 0.25),
-        ('C5', 'track_point', B3, 'se', -0.1),
-        ('C5', 'city', B3, 'Cron', "above"),
+        ('C5', 'track_edge', C3, 'w', 0.25),
+        ('C5', 'track_edge', C3, 'se', -0.1),
+        ('C5', 'city', C3, 'Cron', "above"),
     ]
 )
 XX18State(board=xgttp)
@@ -410,7 +408,7 @@ Save(
         'xx18_offboard',
         'xx18_offboard_flat',
         'xx18_private',
-        'xx18_tracktopoint',
+        'xx18_tracktoedge',
         'xx18_miscellaneous',
         'xx18_json',
         'xx18_zz',

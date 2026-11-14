@@ -4,7 +4,7 @@ XX18Game and XX18State
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-The ``XX18tGame`` and ``XX18State`` are two of a number of commands
+The ``XX18Game`` and ``XX18State`` are two of a number of commands
 used to create what are termed :doc:`Compound Objects <index>`.
 
 This section assumes you are very familiar with the concepts, terms and ideas
@@ -13,24 +13,23 @@ for :doc:`protograf <../index>`  as presented in the
 :doc:`Additional Concepts <../additional_concepts>` and that you've created some
 basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You
 should also be familiar with the various types of shapes' properties described in
-the :doc:`Customised Shapes <../customised_shapes>`.
+the :doc:`Customised Shapes <../customised_shapes>`.  Being familiar with
+:doc:`Hexagonal Grids <../hexagonal_grids>` will also help with understanding
+how an 18xx game board is created and used.
 
 .. _xx18Index:
 
-- `Overview`_
 - `Background`_
+- `Overview`_
 - `Features`_
 - `XX18Game Command`_
 
     - `XX18Game Properties`_
-    - `XX18Game Board: Grid`_
-
-        - *Grid Orientation and Offset*
-        - *Grid Coordinates and Labels*
-
-    - XX18Game Board: Features
-    - XX18Game Board: Functions
-    - XX18Game Board: AdHoc Drawing
+    - `XX18Game Board Grid`_
+    - `XX18Game Features`_
+    - `XX18Game JSON Styles`_
+    - `XX18Game Functions`_
+    - `XX18Game AdHoc Drawing`_
 
 - `XX18State Command`_
 - `18xx Advanced Tips and Options`_
@@ -41,26 +40,27 @@ the :doc:`Customised Shapes <../customised_shapes>`.
 
 Background
 ==========
+`↑ <xx18Index_>`_
 
 **protograf** is a general purpose tool and is not designed to produce prototypes
-for specific games.  However, there are hundreds of games in the 18XX series, and
-so it seemd worthwile was worth developing custom functionality to allow this
-type of game to be more easily prototyped.
+for specific games.  However, there are hundreds of games in the 18xx series of
+railroad board games, and so it seemed worthwhile developing custom functionality
+to allow this type of game to be more easily prototyped.
 
 The very first game in the series was *1829*, designed by Francis Tresham, and
 published in 1974.  It was the forerunner to the series, but the game that has
 really provided the foundation for all the ones that came after was *1830*,
-developed by Avalon Hill in collaboration with Francis Tresham.
+developed by The Avalon Hill Game Company in collaboration with Francis Tresham.
 
-*1830* also set the tone of the graphic design that has been used in many of the
-games in the series and the prototyping capability provided here is modeled
+*1830* also set the style for the graphic design that has been used in many of
+the games in the series and the prototyping capability provided here is modeled
 after that design.
 
 .. _xx18Over:
 
 Overview
 ========
-`↑ <abstractIndex_>`_
+`↑ <xx18Index_>`_
 
 The aim of the ``XX18Game`` and ``XX18Game`` commands is to allow
 diagrams for many of the 18Xx series of games to be easily created.
@@ -78,6 +78,7 @@ as tiles, and, optionally, annotated or marked.
 
 Features
 ========
+`↑ <xx18Index_>`_
 
 Below is a short summary of the features available.
 
@@ -90,20 +91,20 @@ The ``XX18Game()`` command can depict:
 * track, curved or straight
 * track extending from a point to an edge
 * terminal spikes running off-board (short, medium and long)
-* blocked hex-sides as thick lines
-* a highlighted hex as a yellow band inside of all hex edges
-* private railways; either in-hex or across hexes
-* icons for common in-hex features; including mountains
+* blocked hexagon-sides as thick lines
+* a highlighted hexagon as a yellow band inside all the hexagon edges
+* private railways; either in-hexagon or across hexagons
+* icons for common in-hexagon features; including mountains
   (two sizes), hills, and rivers
 * symbols for special features such as: coal, desert, factory, fish,
   flag, forest, hills, lock, mine, noentry, oil, pennant, port,
   swamp, train, tree, tunnel
-* a river; as "wavy line"; running through a hex
-* a custom shape in a hex
+* a river; as "wavy line"; running through a hexagon
+* a custom shape in a hexagon
 * a single piece of text
-* hex coordinates along the edges of the map (above, below,
+* hexagon coordinates along the edges of the map (above, below,
   left-of, and right-of)
-* a whole, colored-in hex
+* a whole, colored-in hexagon
 * a small, multi-line, colored table to appear in an off-board
   hexagon or area (showing revenue per phase of the game)
 
@@ -114,13 +115,13 @@ The command also provides:
   from a settings file
 * simple labelling for use with icons, symbols, towns or cities
 
-In-hex features, for example, cities, towns, icons, symbols or lettering will,
-by default, appear at the centre of a hex. These can be repositioned using a
+In-hexagon features, for example, cities, towns, icons, symbols or lettering will,
+by default, appear at the centre of a hexagon. These can be repositioned using a
 combination of direction (in degrees clockwise from east) and distance (as a
-fraction of the hex radius).
+fraction of the hexagon radius).
 
 Positioning of features, such as lines, spikes, bumps or numbered circles, on
-hex edges will be done using standard compass directions; "ne" for northeast,
+hexagon edges will be done using standard compass directions; "ne" for northeast,
 "s" for south, etc., and will be centred on that edge.
 
 Drawing of features is done following the order in which they are provided.
@@ -137,9 +138,9 @@ vertices of such shapes relative to the board.
 
 XX18Game Command
 ================
-`↑ <abstractIndex_>`_
+`↑ <xx18Index_>`_
 
-The ``XX18Game()`` command defines the parts of an 18XX game; primarily
+The ``XX18Game()`` command defines the parts of an 18xx game; primarily
 the construction and styling, of the board and features.
 
 The overall **size** of the board is set by a combination of rows and
@@ -148,10 +149,6 @@ columns.
 .. NOTE::
 
   The hexagonal locations on the board are termed **cells** in this guide.
-
-- `XX18Game Properties`_
-- `XX18Game Board: Grid`_
-- `XX18Game Board: Hexagonal`_
 
 
 .. _xx18GameProperties:
@@ -166,20 +163,22 @@ The key properties that can be set for an ``XX18Game()`` command are:
   regular layout; a default of ``8`` is used
 * *rows*: then this is the number of cells, in the vertical direction,
   for a regular layout; a default of ``8`` is used
-* *pattern*: an on/off design showing which cells should be used and which
-  should be blank i.e. unused
-* *orientation*: whether the edges of the hexes are parallel to the top of
-  the mapbard ("flat") or pointing at it ("pointy"); the default of "pointy"
-  matches that of *1830*
 * *fill*: the default color with which most of the hexagons will be filled;
   by default this is white, but many maps use a light brown or light green.
+* *features*: the "things" that need to be drawn on the board; there are
+  :ref:`many possible features <xx18GameFeatures>`
+* *orientation*: whether the edges of the hexagons are parallel to the top of
+  the mapbard ("flat") or pointing at it ("pointy"); the default of "pointy"
+  matches that of *1830*
+* *pattern*: an on/off design showing which cells should be used and which
+  should be blank i.e. unused
 
 .. IMPORTANT::
 
     Unlike many other shapes or objects in **protograf**, the *height* property
-    is used to set the height of a cell on the board, and **not** the height
+    is used to set the height of a hexagon on the board, and **not** the height
     of the board itself |dash| this being derived from the combination of
-    the number of rows and columns as well the cell *height*.
+    the number of rows and columns as well the hexagon *height*.
 
 Other useful properties that can be set for an XX18Game are:
 
@@ -207,16 +206,17 @@ Other useful properties that can be set for an XX18Game are:
 
 .. _xx18GameGrid:
 
-XX18Game Board: Base Grid
--------------------------
+XX18Game Board Grid
+-------------------
 `^ <xx18game-command_>`_
 
-Below are some examples of how to set the basic parameters for 18XX boards.
+Below are some examples of how to set the basic parameters for the hexagonal
+grid that is used for all 18xx game boards.
 
 
 Example 1. Default Board
 ~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameGrid_>`_
+`^ <xx18GameGrid_>`_
 
 .. |ab1| image:: ../images/objects/xx18_default.png
    :width: 330
@@ -240,7 +240,7 @@ Example 1. Default Board
 
 Example 2. Board Size, Color and Position
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameGrid_>`_
+`^ <xx18GameGrid_>`_
 
 .. |ab2| image:: ../images/objects/xx18_size_position.png
    :width: 330
@@ -275,7 +275,7 @@ Example 2. Board Size, Color and Position
 
       Each of the boards sets the default color of the cells to a light
       brown and light green, respectively, via the *fill* property. It
-      is also possible to choose from the built-in 18XX colors.
+      is also possible to choose from the built-in 18xx colors.
 
       The board on the lower-right also has the *name* set to ``hexagons``
       in order to change its layout; more example of these types can be
@@ -290,7 +290,7 @@ Example 2. Board Size, Color and Position
 
 Example 3. Styled Board
 ~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameGrid_>`_
+`^ <xx18GameGrid_>`_
 
 .. |ab3| image:: ../images/objects/xx18_styled.png
    :width: 330
@@ -301,23 +301,32 @@ Example 3. Styled Board
       .. code:: python
 
         ags = XX18Game(
+            rows=4, cols=3,
+            x=1.5, y=2,
             label=True,
-            label_stroke="blue"
+            label_size=24,
+            fill="khaki",
+            stroke="red",
+            stroke_width=3
         )
         XX18Game(board=ags)
 
-      The default board size is a 8x8 ``grid`` of square cells; in this
-      example the type of board is explicitly set by its *name* property.
+      In this case, the 18xx board is further styled by setting:
 
-      In this case, the board is further styled by setting:
-
+      - *rows* - the number of rows in the grid
+      - *cols* - the number of columns in the grid
+      - *x* and *y* - set the offset of the top-left of the grid from
+        the page margins
       - *label* - if ``True``, the labels will be drawn
       - *label_stroke* - the color of the labels
+      - *label_size* - the point height of the labels
+      - *fill* - the default color of the hexagons
+      - *stroke* - the default color for lines and labels
+      - *stroke_width* - the default width of lines
 
-      The *label_start* defaults to the *bottom-left* (``BL``),
-      and the *label_type* defaults to  *alpha-numeric* (``AN```); so
-      letters for the columns go from left to right along the bottom edge
-      and numbers for the rows increase from ``1`` up along the left edge.
+      The *label_start* defaults to the *above-left* (``AL``), so
+      letters for the rows go from top to bottom along the left edge, and
+      numbers for the columns increase from ``1`` starting at the top-left.
 
       As can be seen, the board is drawn when the name assigned to it
       (``ags``) is referenced by the *board* property of an
@@ -328,18 +337,18 @@ Example 3. Styled Board
 
 Example 4. Pattern Grid
 ~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameGrid_>`_
+`^ <xx18GameGrid_>`_
 
-If a hexagonal grid for a game contains a custom number of hexagons,
-that may vary across the rows of the board, then a pattern design,
-or layout, can be defined for the ``XX18Game``.
+While the extent of an 18xx game board may stretch across a number of
+hexagons for both rows and columns, typically there are also unused
+hexagons in that grid, because the outline is meant to conform to some
+underlying terrain e.g. the borders of a state, country or even a
+continent.
 
-A pattern grid uses a cell-and-dot notation which is set with the
-*pattern* property.
-
-This notation represents each row as separate line, with each regular, or
-normal hexagon with a ``O`` (the letter "oh"), and each blank, or missing,
-cell with a ``.`` (dot or full stop).
+To achieve this effect, a *pattern* design must be created that uses a
+circle-and-dot notation. This notation represents each row as separate line,
+showing each regular, or normal, hexagon with a ``O`` (the letter "oh"),
+and each blank, or missing, hexagon with a ``.`` (dot or full stop).
 
 There should be as many lines in the pattern as are set in the *rows* value
 for the ``XX18Game``. Similarly, the total combined number of hexagons
@@ -364,24 +373,21 @@ single ``O`` (capital "oh").
       .. code:: python
 
         aghp = XX18Game(
-            rows=5,
-            cols=7,
+            rows=5, cols=4,
+            fill='berylgreen',
             pattern = """
-            . O O . O O .
-             O O O O O O .
-            O O . O . O O
-             O O O O O O .
-            . O O . O O .
+            . O O .
+             O O O .
+            O O O .
+             . O O .
+             . O O .
             """)
         XX18Game(board=aghp)
 
-      In this example, the type of board is set via its *name* property to
-      ``hexagons``.
-
       The *pattern* property shows, in string format, an arrangement of
-      hexagonal cells (``O``) and empty cells (``.``).
+      available hexagons (``O``) and empty positions (``.``).
 
-      Note that the spaces in the pattern are ignored when constructing the
+      Note that any spaces in the pattern are ignored when constructing the
       board; they are just used to help visualise the pattern being created.
 
       .. NOTE::
@@ -394,26 +400,68 @@ single ``O`` (capital "oh").
 
 .. _xx18GameFeatures:
 
-XX18Game: Features
-------------------
+XX18Game Features
+-----------------
 `^ <xx18game-command_>`_
+
+Summary
+~~~~~~~
+`^ <xx18GameFeatures_>`_
 
 An 18xx game board can display numerous features that each have different
 effects on game play, inclduing cities, towns, tracks, railroads and the
 labels and income associated with these, as well as host of other symbols
 that help characterise hexagons.
 
+Features are set in a list i.e. enclosed in square brackets ``[ ... ]``
+and set via the *features* property.
+
+General Feature Specification
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
+
+Each feature contains two or more pieces of information as a *set* of values
+enclosed in round brackets ``( ... )``. The **order of these items is vital**
+and must follow the sequence below.
+
+1. Feature **location**: this is a grid reference of one or more hexagons,
+   with each reference separated by a space; for example ``A1 B4```.  In
+   pointy hexagons grid, the letter is the row identifier, and in a grid
+   with flat hexagons, the letter is the column identifier.
+2. Feature **name**: the lowercase name of the feature, such as town, city,
+   track etc.
+3. Feature **offset**: by default, a feature is drawn in the centre of the
+   hexagon.  By specifying an offset, the feature can be moved elsewhere in
+   the hexagon. The offset is defined by a pair of values enclosed in round
+   brackets ``( ... )``: direction |dash| in degrees clockwise from the east
+   |dash| and distance |dash| a fraction of the hexagon's radius from the
+   location's centre. For example, ``(90, 0.5)`` is point in the "south"
+   direction, half-way along the radius.
+4. Feature **label**:  the name or text associated with a feature; for example,
+   the name of a city, or the cost associated with a mountain.
+5. Feature **label location**: the place where the label is drawn relative
+   to the feature, by default it is drawn below it.  Possible label locations
+   are: above, below, left, or right.
+
+
+This general pattern of feature specification is changed somewhat for the
+following features: fill, private railroads, ???.  See the specifif feature
+example and description below for details of the changes.
+
+
 General Example Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
 All of the feature examples follow the same overall construction, and
 for sake of brevity, that construction is not repeated every time.
 
-Essentially, each follows the pattern below: the *rows* and *cols* setup
-the size of the board; the *fill* sets the defult color for all hexagons;
-the ``label=True`` turns on the grid labels |dash| by default, along the
-top and left-side of the grid; the *label_size* sets the font point size
-of those labels.
+Essentially, each follows the approach shown in the code fragment below:
+the *rows* and *cols* define the extent of the board |dash| the number of
+hexagons in each direction; the *fill* sets the default color for all the
+hexagons on the board; the ``label=True`` turns on the grid labels |dash|
+by default, along the top and left-side of the grid; and the *label_size*
+sets the font point size of those labels.
 
 Finally, the *features* list contains the "specifications" for all the
 features for that board; this is the part that differs for each example.
@@ -432,28 +480,52 @@ features for that board; this is the part that differs for each example.
     XX18State(board=xgfc)
 
 
-General Feature Specification
+Feature #1. Town and Mountain
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-Each feature contains two or more pieces of information as a *set* of values
-enclosed in round brackets ``( ... )``. The **order of these items is vital**
-and must follow the list of options below.
+.. |gft| image:: ../images/objects/xx18_features_town.png
+   :width: 330
+
+===== ======
+|gft| This example shows setting of *features* of an ``XX18Game``:
+
+      .. code:: python
+
+        ('A1', 'town'),
+        ('B4', 'town', (90, .3), 'Burham', 'above'),
+        ('C1', 'mountain'),
+        ('C3 D2 D4', 'mountain', (270, .5), '$40'),
+        ('C5', 'mountains', None, "mountains"),
+
+      This example shows how to add a town or a mountain to the board.
+
+      A town is typically depicted by a small, solid black circle.
+
+      A town is by default drawn at the centre of the hexagon, or hexagons,
+      in which it is located (``A1`` in this example).
+
+      A mountain is typically depicted by a small, solid black triangle.
+
+      A mountain is by default drawn at the centre of the hexagon, or hexagons,
+      in which it is located (``C1`` in this example).
+
+===== ======
 
 
-
-Example 1. Cities
-~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #2. City
+~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
 .. |gfc| image:: ../images/objects/xx18_features_city.png
    :width: 330
 
 ===== ======
-|gfc| This example shows the *features* of an `XX18Game``:
+|gfc| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        ('A1', 'city', None),
+        ('A1', 'city'),
         ('A3', 'city', None, 'Arkwright', 'above'),
         ('A5', 'city', (180, .4), 'Aylish', 'right'),
 
@@ -481,169 +553,381 @@ Example 1. Cities
         ('D6', 'city', None, 'Domrus'),
         ('D6', 'revenue',  (240, .6), '20'),
 
-      In this example, the
+      This example shows how to add cities of different sizes to the board.
+
+      A city is depicted by large circle, usually white, with a black border.
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #3. Train Track
+~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gfk| image:: ../images/objects/xx18_features_track.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gfk| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        ('A1', 'track', 'e,w'),
+        ('A3', 'track', 'ne,sw'),
+        ('A5', 'track', 'se,nw'),
+        ('B2', 'track', 'nw,sw'),
+        ('B4', 'track', 'se,w'),
+        ('B6', 'track', 'w,ne'),
+        ('C1', 'track', 'nw,w'),
+        ('C3', 'track', 'se,sw'),
+        ('C5', 'track', 'ne,e'),
+        ('D2', 'track', 'nw'),
+        ('D4', 'track', 'w ne,sw'),
+        ('D6', 'track', 'w,e w,ne w,sw'),
 
+      This example shows how to add railroad track to the board.
 
-      In this example, the
+      Railroad track is depicted as a thick line, straight or curved, usually
+      with a white border, that typically connects two edges of a hexagon.
+
+      The name of this feature is ``track``, and it should be followed by
+      the track settings.  These are the compass location of one or more
+      pairs of edges, separated by a comma.  Each pair should be separated
+      by a space.
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #4. Train Track & Town
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gfn| image:: ../images/objects/xx18_features_track_town.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gfn| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        ('A1', 'track_town', 'e,w'),
+        ('B2', 'track_town', 'nw,sw'),
+        ('C1', 'track_town', 'nw,w'),
 
+      This example shows how to add track, with a town on it, to the board.
 
-      In this example, the
+      The name of this feature is ``track_town``, and it should be followed by
+      the track settings for a single piece of track that connects two hexagon
+      edges (see `Feature #3. Train Track`_).
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #5. Train Track-to-edge
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gfe| image:: ../images/objects/xx18_tracktoedge.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gfe| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        C3 = (270, .4)
 
+        ('A1', 'track_edge', (210, .3), 'ne', -0.1),
+        ('A1', 'track_edge', (210, .3), 'sw', 0.2),
+        ('A1', 'city', (210, .3), 'Archide', "above"),
 
-      In this example, the
+        ('A3', 'track_edge', (210, .3), 'ne', -0.1),
+        ('A3', 'track_edge', (210, .3), 'sw', 0.2),
+
+        ('B2', 'track_edge', (180, .3), 'w', 0),
+
+        ('C3', 'track_edge', C3, 'w', 0.25),
+        ('C3', 'track_edge', C3, 'se', -0.1),
+
+        ('C5', 'track_edge', C3, 'w', 0.25),
+        ('C5', 'track_edge', C3, 'se', -0.1),
+        ('C5', 'city', C3, 'Cron', "above"),
+
+      This example shows how to add track to the board that extends from
+      a point to an edge.
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #6. Symbols
+~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gfs| image:: ../images/objects/xx18_symbols.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gfs| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        ('A1', 'oil', None, 'oil'),
+        ('A3', 'coal', None, 'coal'),
+        ('A5', 'factory', None, 'factory'),
+        ('B2', 'river', None, 'river'),
+        ('B4', 'swamp', None, 'swamp',),
+        ('B6', 'desert', None, 'desert'),
+        ('C1', 'forest', None, 'forest'),
+        ('C3', 'fish', None, 'fish'),
+        ('C5', 'tree', None, 'tree'),
+        ('D2', 'port', None, 'port'),
+        ('D4', 'tunnel', None, 'tunnel'),
+        ('D6', 'hills', None, 'hills'),
+        ('E1', 'flag', None, 'flag'),
+        ('E3', 'pennant', None, 'pennant'),
+        ('E5', 'noentry', None, 'noentry'),
 
+      This example shows how to add different symbols to the board.
 
-      In this example, the
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #7. Colored Hexagon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gff| image:: ../images/objects/xx18_fills.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gff| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        ('A1', 'fill', None, 'xyellow'),
+        ('A3', 'fill', None, 'xred'),
+        ('A5', 'fill', None, 'xbrown'),
+        ('B2', 'fill', None, 'xgrey'),
+        ('B4', 'fill', None, 'xgray'),
+        ('C1', 'fill', None, 'xwater'),
+        ('C3', 'fill', None, 'xplain'),
+        ('C5', 'fill', None, 'pink'),
+        ('D2', 'fill', None, 'xoffboard'),
+        ('D4', 'highlight', None, 'yellow'),
 
+      This example shows how to add hexagons filled with, or highlighted
+      by, a color to the board.
 
-      In this example, the
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #8. Private Railroad
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gfv| image:: ../images/objects/xx18_private.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gfv| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        ('A1', 'private', None, ""),
+        ('A1', 'private'),
+        ('A3', 'private', None, "L&L", "A3",  None, "left"),
+        ('B2', 'private', ( 15, .7), "R&R", "B2", (140, .4), "above"),
+        ('B4', 'private', ( 15, .6), "D&D", "B6", (140, .5), "below"),
+        ('C1', 'private', (210, .4), "DD", "C3", ( 15, .7), "left"),
+        ('C5', 'private', (140, .5), "RR", "C5", ( 15, .6),"right"),
+        ('D2', 'private', (180, .7), "RD", "D2", (0, .4), "above"),
+        ('D4', 'private', (270, .7), "D&R", "D4", (90, .4), "above"),
+        ('D6', 'private', (270, .7), "R&D", "D6", (90, .4), "below"),
 
-
-      In this example, the
+      This example shows how to add a private railroad to the board.
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #9. Offboard Income: Pointy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gf1| image:: ../images/objects/xx18_offboard.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gf1| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        # offboard color fills
+        ('A5', 'fill', None, 'xoffboard'),
+        ('C1', 'fill', None, 'xoffboard'),
+        ('D4', 'fill', None, 'xoffboard'),
+        # offboard tracks
+        ('A5', 'spike', 'w se', "short",),
+        ('D4', 'spike', 'nw ne', "long",),
+        ('C1', 'spike', 'ne se', "medium",),
+        # offboard phase revenue
+        ('C1', 'phase_revenue', (180, .3), '10 20 30 40'),
+        ('A5', 'phase_revenue', None, '20 50'),
 
-
-      In this example, the
+      This example shows how to add and annotate an offboard hex, to the
+      board, as well as to define its income.
 
 ===== ======
 
 
-Example N. NAME OF FEATURE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xxGameFeatures_>`_
+Feature #10. Offboard Income: Flat
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
 
-.. |gf0| image:: ../images/objects/xx18_???.png
+.. |gf2| image:: ../images/objects/xx18_offboard_flat.png
    :width: 330
 
 ===== ======
-|gf0| This example shows an ``XX18Game`` constructed using these commands:
+|gf2| This example shows setting of *features* of an ``XX18Game``:
 
       .. code:: python
 
-        aghp = XX18Game(
+        # offboard color fills
+        ('A5', 'fill', None, 'xoffboard'),
+        ('C1', 'fill', None, 'xoffboard'),
+        ('C5', 'fill', None, 'xoffboard'),
+        ('B8', 'fill', None, 'xoffboard'),
+        # offboard tracks
+        ('A5', 'spike', '"n se', "short",),
+        ('B8', 'spike', 'nw ne', "long",),
+        ('C1', 'spike', 'ne se', "medium",),
+        ('C5', 'spike', 'sw', "long",),
+        # offboard phase revenue
+        ('C1', 'phase_revenue', (180, .1), '10 20 30 40'),
+        ('A5', 'phase_revenue', None, '20 50'),
 
 
-      In this example, the
+      This example shows how to add and annotate an offboard hex, to a
+      board with flat hexes, as well as to define its income.
 
 ===== ======
+
+
+Feature #11. Miscellaneous
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
+
+.. |gfm| image:: ../images/objects/xx18_miscellaneous.png
+   :width: 330
+
+===== ======
+|gfm| This example shows setting of *features* of an ``XX18Game``:
+
+      .. code:: python
+
+        ('B2', 'river_line', 'sw ne e ne', 'aqua'),
+        ('A1', 'tile-letter', (330, 0.6), "Y"),
+        ('A5', 'track', 'e,w'),
+        ('A5', 'town_border', None),
+        ('B4', 'block', "w nw ne"),
+        ('C1', 'river_line', 'nw se e se'),
+        ('C5', 'block', "nw", "xred"),
+        ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
+
+
+      This example shows how to add various kinds of special, or more unusual,
+      features to the board.
+
+===== ======
+
+.. _xx18GameJSONStyles:
+
+XX18Game JSON Styles
+--------------------
+`^ <xx18game-command_>`_
+
+As mentioned at the start, the ``XX18Game()`` command adopts a set of styles
+|dash| sizes and colors |dash| for the features it provides that are largely
+modeled after those from *1830*.
+
+To alter these styles requires that you define and load a file containing the
+names of the styles you want to chamges along with there new values.
+
+The JSON file is a simple text file that follows common conventions.
+
+1. The first line must contain a single ``{`` curly open bracket.
+2. Each line must contain the name of a style, wrapped in ``""`` inverted
+   commas, followed by a colon ``:``, followed by the value of the style,
+   followed by a comma.
+3. **Exception** the second-last line must **NOT** end in a comma.
+4. The last line must contain a single ``}`` curly close bracket.
+
+
+.. |gfj| image:: ../images/objects/xx18_json.png
+   :width: 330
+
+===== ======
+|gfj| This example shows styling of *features* of an ``XX18Game``:
+
+      .. code:: python
+
+        xgzz = XX18Game(
+            rows=4, cols=3,
+            fill='berylgreen',
+            label=True,
+            label_size=18,
+            settings="xx18.json",
+            features=[
+                ('A1', 'mountain', None, '$20'),
+                ('A3', 'track', 'e,w'),
+                ('A3', 'town_border', None, 'St. Agnes', "below"),
+                ('B2', 'city', None, 'Brodie'),
+                ('B2', 'revenue',  (240, .6), '30'),
+            ]
+        )
+        XX18State(board=xgzz)
+
+      This example shows how to reference a JSON file using the *settings*
+      property.  The JSON file used here contains the following styles
+      and values:
+
+      .. code:: json
+
+        {
+          "XX18_MOUNTAIN_SIDE": 0.9,
+          "XX18_MOUNTAIN_FILL": null,
+          "XX18_TOWN_DIAMETER": 0.9,
+          "XX18_TOWN_BORDER_DIAMETER": 1.1,
+          "XX18_TOWN_BORDER_STROKE": "red",
+          "XX18_TRACK_OUTER_FILL": null,
+          "XX18_REVENUE_FILL": "white"
+        }
+
+===== ======
+
+
+.. _xx18GameFunctions:
+
+XX18Game Functions
+------------------
+`^ <xx18game-command_>`_
+
+The ``XX18Game()`` command comes with functions that allow creation of
+features without using the ``features`` property itself.  These functions,
+in some cases, allow further customisation than is otherwise possible.
+
+
+.. _xx18GameAdHocDrawing:
+
+XX18Game AdHoc Drawing
+----------------------
+`^ <xx18game-command_>`_
+
+While the ``XX18Game()`` command comes with numerous functions, and the ability
+to set and customise a whole range of commonly-used features, there are some
+exceptions.  For these cases, you need to fall back to using
+:doc:`protograf's <../index>` more general purpose drawing functionality.
 
 
 
@@ -684,8 +968,11 @@ to the name assigned to the ``XX18Game()``.
 ==============
 `↑ <abstractIndex_>`_
 
+An overview of what 18xx games are about can be found at Board Game Geek:
+https://boardgamegeek.com/boardgamefamily/19/series-18xx
+
 The primary resource for working with 18xx games is the online tool
-*18xx Maker* (https://18xx-maker.com/). This tool takes 18xx game definitions
+*18xx Maker* ( https://18xx-maker.com/ ). This tool takes 18xx game definitions
 written in JSON, displays them, and renders them for printing. This can
 create the game Map, Tiles and Tile Manifest, Tokens and Charters, Tokens
 (without companies) and the Stock Market.
