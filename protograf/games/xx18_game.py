@@ -150,6 +150,7 @@ DEFAULT_SETTINGS = {
     "XX18_SPIKE_FRACTION_SHORT": 0.1,  # fraction of hex
     "XX18_SPIKE_FRACTION_MEDIUM": 0.25,  # fraction of hex
     "XX18_SPIKE_FRACTION_LONG": 0.45,  # fraction of hex
+    "XX18_HEX_RIVER_WAVE_HEIGHT": 0.15,  # cm
     "XX18_PHASE_REVENUE_BOX": 0.7,  # cm
     "XX18_DEBUG_FONT_FRACTION": 0.75,
     "XX18_DEBUG_FONT_OFFSET_X": 0.0,
@@ -241,7 +242,7 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "phase-revenue",
     "tile_letter",
     "tile-letter",
-    "fill",
+    "hex_fill",
     "highlight",
     "block",
     "spike",
@@ -829,9 +830,19 @@ class XX18GameObject(CoreGameObject):
             )
         flabel, fdirection, fdistance, fshapes = "", None, None, []
         if len(feature) >= 3:
-            fdirection, fdistance = self.feature_position(feature[2], hexagon=fhexagon)
+            if ftype not in ["river_line", "river-line"]:
+                fdirection, fdistance = self.feature_position(
+                    feature[2], hexagon=fhexagon
+                )
+            else:
+                fdirection = feature[2]  # mix of cells and edges
         if len(feature) >= 4:
             flabel = str(feature[3])
+        if len(feature) >= 5 and ftype in [
+            "phase_revenue",
+            "phase-revenue",
+        ]:  # see below; phase_revenue overloads
+            kwargs["colors"] = feature[4]
         if len(feature) >= 5 and ftype != "private":  # see below; private overloads
             kwargs["label_location"] = feature[4]
         if len(feature) >= 6 and ftype != "private":  # see below; private overloads
@@ -859,8 +870,8 @@ class XX18GameObject(CoreGameObject):
         if isinstance(ftype, BaseShape):
             feature_type = "SHAPE"
         match feature_type:
-            case "fill":
-                self.fill_hex(
+            case "hex_fill":
+                self.hex_fill(
                     location=fhexagon,
                     color=flabel,
                     **kwargs,
@@ -1049,6 +1060,35 @@ class XX18GameObject(CoreGameObject):
         else:
             fcentre = geo.centre
         return fcentre
+
+    def validate_edge(
+        self, feature: str, location: str, position: str, multi: bool = False
+    ):
+        "Ensure a hexagon edge location is correct."
+        if multi:
+            if position not in ALLOWED_POINTY and position not in ALLOWED_FLAT:
+                feedback(
+                    f"The {feature} edge point '{position}' is not valid for '{location}'.",
+                    True,
+                    True,
+                )
+            return
+        if self.orientation == HexOrientationName.POINTY.value:
+            if position not in ALLOWED_POINTY:
+                feedback(
+                    f"The {feature} edge point must be chosen from '{ALLOWED_POINTY}';",
+                    f" the option '{position}' is not valid for '{location}'.",
+                    True,
+                    True,
+                )
+        elif self.orientation == HexOrientationName.FLAT.value:
+            if position not in ALLOWED_FLAT:
+                feedback(
+                    f"The {feature} edge point must be chosen from '{ALLOWED_FLAT}';",
+                    f" the option '{position}' is not valid for '{location}'.",
+                    True,
+                    True,
+                )
 
     def relative_location(self, location: str = None) -> int:
         """Convert a string into a RelativeLocation value."""
@@ -1445,23 +1485,7 @@ class XX18GameObject(CoreGameObject):
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         # ---- validate allowed track position
         for pos in _positions:
-            if self.orientation == HexOrientationName.POINTY.value:
-                if pos not in ALLOWED_POINTY:
-                    feedback(
-                        f"The track edge point must be chosen from '{ALLOWED_POINTY}';",
-                        f" the option '{position}' is not valid for '{location}'.",
-                        True,
-                        True,
-                    )
-            elif self.orientation == HexOrientationName.FLAT.value:
-                if pos not in ALLOWED_FLAT:
-                    feedback(
-                        f"The track edge point must be chosen from '{ALLOWED_FLAT}';",
-                        f" the option '{position}' is not valid for '{location}'.",
-                        True,
-                        True,
-                    )
-
+            self.validate_edge("track_edge", location, pos)
         for _loc in _locations:
             geo = self.cells.get(_loc)
             start = self.feature_location(geo, direction, distance)
@@ -1508,20 +1532,32 @@ class XX18GameObject(CoreGameObject):
         """Draw river path along/between hexsides starting at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
-            position (str): hex compass reference(s) for the path
+            location (str): grid reference or references for the start cell
+            position (str): cell and hex compass reference(s) for the path
             stroke: the name of a color (defaults to self.river)
             breadth (str): thickness of the river line; medium/m; narrow/n; wide/w
         """
-        from protograf.protos.proto_gridline import GridLine
+        from protograf.protos import Line
 
         _locations = self.process_locations(location, "river_line")
         if position is None:
-            position = []
-        river_stroke = stroke or self.xxs["XX18_HEX_RIVER"]
+            position = [
+                None,
+            ]
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
-        edges = ", ".join(_positions[1:])
-        point = _positions[0]
+        if len(_positions) < 2:
+            feedback(
+                f"The river_line at {location} needs at least two positions!.",
+                True,
+                True,
+            )
+        # start point
+        self.validate_edge("river_line", _locations[0], _positions[0], True)
+        _geo = self.cells.get(_locations[0])
+        start_point = getattr(_geo, _positions[0])
+
+        # set styles
+        river_stroke = stroke or self.xxs["XX18_HEX_RIVER"]
         match breadth:
             case "narrow" | "n":
                 _river_width = 2
@@ -1529,18 +1565,52 @@ class XX18GameObject(CoreGameObject):
                 _river_width = 4
             case "wide" | "w":
                 _river_width = 6
-        for _loc in _locations:
-            GridLine(
-                self.board_layout,
-                start=_loc,
-                point=point,
-                edges=edges,
+
+        # loop-through-points
+        for _pos in _positions[1:]:
+            # breakpoint()
+            result = tools.split(_pos, separator=",", clean=True, no_blanks=True)
+            if len(result) < 2:
+                feedback(
+                    f"Each position in river_line at {location} needs a cell and edge",
+                    f' joined with a comma; "{_pos}" is not valid.',
+                    True,
+                    True,
+                )
+            else:
+                hexagon, edge = result
+            if not hexagon and edge:
+                feedback(
+                    f"Each position in river_line at {location} needs a cell and edge",
+                    f' reference; "{_pos}" is not valid.',
+                    True,
+                    True,
+                )
+            _hexes = self.process_locations(hexagon, "river_line")
+            self.validate_edge("river_line", hexagon, edge, True)
+            geo = self.cells.get(_hexes[0])
+            current_point = getattr(geo, edge)  # Point
+            Line(
+                xy=start_point,
+                xy1=current_point,
                 stroke=river_stroke,
                 stroke_width=_river_width,
                 stroke_ends="rounded",
                 wave_style="wave",
                 wave_height=0.15,
             )
+            start_point = current_point
+            # GridLine(
+            #     self.board_layout,
+            #     start=_loc,
+            #     point=point,
+            #     edges=edges,
+            #     stroke=river_stroke,
+            #     stroke_width=_river_width,
+            #     stroke_ends="rounded",
+            #     wave_style="wave",
+            #     wave_height=0.15,
+            # )
 
     def town(
         self,
@@ -1859,6 +1929,7 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         direction: float = None,
         distance: float = None,
+        colors: list = None,
         **kwargs,
     ):
         """Draw Revenue shape at hex location(s).
@@ -2095,13 +2166,13 @@ class XX18GameObject(CoreGameObject):
                 font_name=self.xxs["XX18_TEXT_FONT_BOLD"],
             )
 
-    def fill_hex(
+    def hex_fill(
         self,
         location: str = None,
         color: object = None,
         **kwargs,
     ):
-        """Fill in color at hex location(s).
+        """Fill in a hexagon with a single color at grid location(s).
 
         Args:
             location (str): grid reference or references for one or more cells
@@ -2109,14 +2180,16 @@ class XX18GameObject(CoreGameObject):
         """
         from protograf.protos import Hexagon
 
-        _locations = self.process_locations(location, "fill_hex")
+        _locations = self.process_locations(location, "hex_fill")
         if color:
             if "XX18_" in color:
                 try:
                     color = self.xxs[color]
                 except KeyError:
                     feedback(
-                        f"{color} is not a XX18 color usuable for a fill.", False, True
+                        f"{color} is not a defined XX18 color usable for a fill.",
+                        False,
+                        True,
                     )
             the_color = colrs.get_color(color)
             for _loc in _locations:
@@ -2205,7 +2278,6 @@ class XX18GameObject(CoreGameObject):
         income: str = None,
         direction: float = None,
         distance: float = None,
-        colors: list = None,
         orientation: str = None,
         **kwargs,
     ):
@@ -2216,16 +2288,27 @@ class XX18GameObject(CoreGameObject):
             income (str): the phase revenue incomes (two to four values)
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
-            colors (list): the colors to use for the different incomes
             orientation (str):
                 the table layout; either vertical (v) or horizontal (h)
+
+        Kwargs:
+            colors (list): the colors to use for the different incomes
         """
         from protograf.protos import Rectangle
 
         _locations = self.process_locations(location, "phase_revenue")
-        if colors:
-            _colors = colors
-            colors_default = True
+        if kwargs.get("colors"):
+            _colors = kwargs.get("colors")
+            if not isinstance(_colors, (tuple, list)):
+                feedback(
+                    f"The phase_revenue setting '{_colors}' for {location}"
+                    f' must be a list, not "{_colors}"',
+                    True,
+                    True,
+                )
+            for _colr in _colors:
+                colrs.get_color(_colr)
+            colors_default = False
         else:
             _colors = [
                 self.xxs["XX18_HEX_YELLOW"],
@@ -2442,8 +2525,8 @@ class XX18GameObject(CoreGameObject):
                 lcntr = geoms.fraction_along_line(c_e, c_s, 0.5)
                 llabel = lheading or ltitle
                 talign = "centre"
+                # print(f"+++ {llabel=} {c_e.x=:.2f} {c_s.x=:.2f} {c_e.y=:.2f} {c_s.y=:.2f}")
                 if c_e.y != c_s.y:
-                    # breakpoint(); print(llabel)
                     # align text in/out from line centre
                     if labove:
                         delta_y = -self.xxs["XX18_TEXT_SMALL"] / self.units / 2.0
@@ -2456,7 +2539,7 @@ class XX18GameObject(CoreGameObject):
                         talign = "right" if labove else "left"
 
                     if c_e.x > c_s.x and c_e.y > c_s.y:
-                        talign = "right"
+                        talign = "left" if labove else "right"
                     if c_e.x < c_s.x and c_e.y < c_s.y:
                         talign = "right"
 

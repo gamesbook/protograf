@@ -185,16 +185,17 @@ xgff = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('A1', 'fill', None, 'xyellow'),
-        ('A3', 'fill', None, 'xred'),
-        ('A5', 'fill', None, 'xbrown'),
-        ('B2', 'fill', None, 'xgrey'),
-        ('B4', 'fill', None, 'xgray'),
-        ('C1', 'fill', None, 'xwater'),
-        ('C3', 'fill', None, 'xplain'),
-        ('C5', 'fill', None, 'pink'),
-        ('D2', 'fill', None, 'xoffboard'),
-        ('D4', 'highlight', None, 'yellow'),
+        ('A1', 'hex_fill', None, 'xyellow'),
+        ('A3', 'hex_fill', None, 'xred'),
+        ('A5', 'hex_fill', None, 'xbrown'),
+        ('B2', 'hex_fill', None, 'xgrey'),
+        ('B4', 'hex_fill', None, 'xgray'),
+        ('C1', 'hex_fill', None, 'xwater'),
+        ('C3', 'hex_fill', None, 'xplain'),
+        ('C5', 'hex_fill', None, 'pink'),
+        ('D2', 'hex_fill', None, 'xoffboard'),
+        ('D4', 'hex_fill', None, 'XX18_TILE_YELLOW'),
+        ('D6', 'highlight', None, 'yellow'),
     ]
 )
 XX18State(board=xgff)
@@ -237,16 +238,16 @@ xgfi = XX18Game(
     label_size=18,
     features=[
         # offboard color fills
-        ('A5', 'fill', None, 'xoffboard'),
-        ('C1', 'fill', None, 'xoffboard'),
-        ('D4', 'fill', None, 'xoffboard'),
+        ('A5', 'hex_fill', None, 'xoffboard'),
+        ('C1', 'hex_fill', None, 'xoffboard'),
+        ('D4', 'hex_fill', None, 'xoffboard'),
         # offboard tracks
         ('A5', 'spike', 'w se', "short",),
         ('D4', 'spike', 'nw ne', "long",),
         ('C1', 'spike', 'ne se', "medium",),
         # offboard phase revenue
         ('C1', 'phase_revenue', (180, .3), '10 20 30 40'),
-        ('A5', 'phase_revenue', None, '20 50'),
+        ('A5', 'phase_revenue', None, '20 40', ['xbrown', 'pink']),
 
     ]
 )
@@ -263,22 +264,19 @@ xgfif = XX18Game(
     orientation='flat',
     features=[
         # offboard color fills
-        ('A5', 'fill', None, 'xoffboard'),
-        ('C1', 'fill', None, 'xoffboard'),
-        ('C5', 'fill', None, 'xoffboard'),
-        ('B8', 'fill', None, 'xoffboard'),
+        ('A5', 'hex_fill', None, 'xoffboard'),
+        ('C1', 'hex_fill', None, 'xoffboard'),
+        ('B8', 'hex_fill', None, 'xoffboard'),
         # offboard tracks
         ('A5', 'spike', '"n se', "short",),
         ('B8', 'spike', 'nw ne', "long",),
         ('C1', 'spike', 'ne se', "medium",),
-        ('C5', 'spike', 'sw', "long",),
         # offboard phase revenue
         ('C1', 'phase_revenue', (180, .1), '10 20 30 40'),
-        ('A5', 'phase_revenue', None, '20 50'),
+        ('A5', 'phase_revenue', None, '30 50', ['xgrey', 'pink']),
     ]
 )
 XX18State(board=xgfif)
-xgfif.phase_revenue("C5", "30 40 50", 0, 0.3, ["xbrown","xgrey","pink"], "vertical")
 Text("XX18Game: Offboard Track & Income: Flat", common=footer)
 
 # ---- XX18Game: Private Railroads
@@ -289,16 +287,16 @@ xgprv = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('A1', 'private', None, ""),
+        ('A1', 'private', None, ''),
         ('A1', 'private'),
-        ('A3', 'private', None, "L&L", "A3",  None, "left"),
-        ('B2', 'private', ( 15, .7), "R&R", "B2", (140, .4), "above"),
-        ('B4', 'private', ( 15, .6), "D&D", "B6", (140, .5), "below"),
-        ('C1', 'private', (210, .4), "DD", "C3", ( 15, .7), "left"),
-        ('C5', 'private', (140, .5), "RR", "C5", ( 15, .6),"right"),
-        ('D2', 'private', (180, .7), "RD", "D2", (0, .4), "above"),
-        ('D4', 'private', (270, .7), "D&R", "D4", (90, .4), "above"),
-        ('D6', 'private', (270, .7), "R&D", "D6", (90, .4), "below"),
+        ('A3', 'private', None, 'L&L', 'A3',  None, 'left'),
+        ('B2', 'private', ( 15, .7), 'R&R', 'B2', (140, .4), 'below'),
+        ('B4', 'private', ( 15, .6), 'D&D', 'B6', (140, .5), 'above'),
+        ('C1', 'private', (210, .4), 'LL', 'C3', ( 15, .7), 'left'),
+        ('C5', 'private', (140, .5), 'RR', 'C5', ( 15, .6), 'right'),
+        ('D2', 'private', (180, .7), 'RD ', 'D2', (0, .4), 'above'),
+        ('D4', 'private', (270, .7), 'D&R', 'D4', (90, .4), 'above'),
+        ('D6', 'private', (270, .7), 'R&D', 'D6', (90, .4), 'below'),
     ]
 )
 XX18State(board=xgprv)
@@ -315,7 +313,7 @@ xgttp = XX18Game(
     features=[
         ('A1', 'track_edge', (210, .3), 'ne', -0.1),
         ('A1', 'track_edge', (210, .3), 'sw', 0.2),
-        ('A1', 'city', (210, .3), 'Archide', "above"),
+        ('A1', 'city', (210, .3), 'Archide', 'above'),
 
         ('A3', 'track_edge', (210, .3), 'ne', -0.1),
         ('A3', 'track_edge', (210, .3), 'sw', 0.2),
@@ -327,7 +325,7 @@ xgttp = XX18Game(
 
         ('C5', 'track_edge', C3, 'w', 0.25),
         ('C5', 'track_edge', C3, 'se', -0.1),
-        ('C5', 'city', C3, 'Cron', "above"),
+        ('C5', 'city', C3, 'Cron', 'above'),
     ]
 )
 XX18State(board=xgttp)
@@ -342,12 +340,12 @@ xgmis = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('B2', 'river_line', 'sw ne e ne', 'aqua'),
+        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne', 'aqua'),
         ('A1', 'tile-letter', (330, 0.6), "Y"),
         ('A5', 'track', 'e,w'),
         ('A5', 'town_border', None),
         ('B4', 'block', "w nw ne"),
-        ('C1', 'river_line', 'nw se e se'),
+        ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
         ('C5', 'block', "nw", "xred"),
         ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
     ]
@@ -366,13 +364,31 @@ xgzz = XX18Game(
     features=[
         ('A1', 'mountain', None, '$20'),
         ('A3', 'track', 'e,w'),
-        ('A3', 'town_border', None, 'St. Agnes', "below"),
+        ('A3', 'town_border', None, 'St. Agnes', 'below'),
         ('B2', 'city', None, 'Brodie'),
         ('B2', 'revenue',  (240, .6), '30'),
     ]
 )
 XX18State(board=xgzz)
 Text("XX18Game: JSON settings", common=footer)
+
+# ---- XX18Game: Functions
+PageBreak()
+xgffn = XX18Game(
+    rows=4, cols=3,
+    fill='berylgreen',
+    label=True,
+    label_size=18,
+    orientation='flat',
+)
+XX18State(board=xgffn)
+
+xgffn.hex_fill('C5', 'xoffboard')
+xgffn.phase_revenue(
+    "C5", "30 40 50", 0, 0.3, "vertical",
+    colors=["xbrown","xgrey","pink"])
+
+Text("XX18Game: Functions", common=footer)
 
 # ---- XX18Game: zzz
 PageBreak()
@@ -382,7 +398,7 @@ xgzz = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('A5', 'fill', None, 'black'),
+        ('A5', 'hex_fill', None, 'black'),
     ]
 )
 XX18State(board=xgzz)
@@ -412,6 +428,7 @@ Save(
         'xx18_tracktoedge',
         'xx18_miscellaneous',
         'xx18_json',
+        'xx18_functions',
         'xx18_zz',
     ]
 )

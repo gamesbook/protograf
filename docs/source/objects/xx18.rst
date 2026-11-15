@@ -32,7 +32,7 @@ how an 18xx game board is created and used.
     - `XX18Game AdHoc Drawing`_
 
 - `XX18State Command`_
-- `18xx Advanced Tips and Options`_
+- `XX18 Style Settings`_
 - `18xx Resources`_
 
 
@@ -548,8 +548,9 @@ and must follow the sequence below.
 
 
 This general pattern of feature specification is changed somewhat for the
-following features: fill, private railroads, ???.  See the specifif feature
-example and description below for details of the changes.
+following features: *hex_fill*, *highlight*, *private railroads*, and
+*track_edge*.  See the specific feature examples and description below for
+details of these changes.
 
 
 Construction of Examples
@@ -606,12 +607,20 @@ Feature #1. Town and Mountain
       A town is typically depicted by a small, solid black circle.
 
       A town is by default drawn at the centre of the hexagon, or hexagons,
-      in which it is located (``A1`` in this example).
+      in which it is located (``A1`` in this example).  To shift the position,
+      set values for ``(direction, distance)`` offset; for example, in ``B4``.
+      The town name and the relative label position can also be set, as shown
+      for ``B4``.
 
       A mountain is typically depicted by a small, solid black triangle.
 
       A mountain is by default drawn at the centre of the hexagon, or hexagons,
-      in which it is located (``C1`` in this example).
+      in which it is located (``C1`` in this example). To shift the position,
+      set values for ``(direction, distance)`` offset; for example, the ones in
+      ``C3 D2 D4``.
+
+      A pair of mountains can be shown using the ``mountains`` symbol |dash|
+      note the plural form!
 
 ===== ======
 
@@ -660,6 +669,27 @@ Feature #2. City
 
       A city is depicted by large circle, usually white, with a black border.
 
+      A city is by default drawn at the centre of the hexagon, or hexagons,
+      in which it is located (``A1`` in this example).  To shift the position,
+      set values for ``(direction, distance)`` offset; for example, in ``A5``.
+
+      The city label and the relative label position can also be set, as shown
+      for ``A3`` and ``A5``.
+
+      A city can also be comprised of multiple circles; the feature name for
+      this includes and ``x`` and the number of circles; for example, the
+      cities in ``B2``, ``B4`` and ``B6``.  An additional option for a size
+      "2" city is to display it vertically, as can be seen in ``D2``, by
+      adding a ``v`` at the end.
+
+      Adding shapes to be displayed inside the city's circle is also possible.
+      This is shown for ``C1``, ``C3`` and ``C5``, each of which have a
+      different :ref:`kind of shape <shape-index>` embedded.
+
+      Multiple shapes can be added to a city comprised of multiple circles;
+      the features should be in a list i.e. enclosed in square brackets
+      ``[ ... ]``, and will appear on the city circles in clockwise order.
+
 ===== ======
 
 
@@ -698,6 +728,18 @@ Feature #3. Train Track
       pairs of edges, separated by a comma.  Each pair should be separated
       by a space.
 
+      Note that for a board comprised of ``pointy`` hexagons, the available
+      compass location of edges are: ``ne``, ``nw``, ``se``, ``sw``, ``e``,
+      and ``w``; while for one comprised of ``dlat`` hexagons, the available
+      compass location of edges are: ``ne``, ``se``, ``nw``, ``sw``, ``n``,
+      and ``s``.  Using other values will trigger an error such as:
+
+      .. code::
+
+        WARNING:: The track start and end must be chosen from
+                  '['ne', 'e', 'se', 'sw', 'w', 'nw']'
+        FEEDBACK:: Could not continue with script.
+
 ===== ======
 
 
@@ -722,6 +764,9 @@ Feature #4. Train Track & Town
       The name of this feature is ``track_town``, and it should be followed by
       the track settings for a single piece of track that connects two hexagon
       edges (see `Feature #3. Train Track`_).
+
+      The town is drawn as a rectangular shape at the centre of the track
+      segment.
 
 ===== ======
 
@@ -757,7 +802,31 @@ Feature #5. Train track-to-edge
         ('C5', 'city', C3, 'Cron', "above"),
 
       This example shows how to add track to the board that extends from
-      a point to an edge.
+      a point location to an edge location, as well as the height of the
+      curve.
+
+      .. NOTE::
+
+        This feature changes the meaning of the fourth and fifth
+        specification values.
+
+      The point location is the third value in the specification set;
+      this is the starting point of the track.
+
+      The edge location is the fourth value in the specification set.
+      This is the hexagon edge |dash| see `Feature #3. Train Track`_
+      for details |dash| to which the track extends.
+
+      The fifth value in the specification set is the height of track'
+      curve.  This can either be curved positively in an anti-clockwise
+      direction, or negatively in an clockwise direction.
+
+      .. HINT::
+
+        Because multiple track ends do not align "neatly" at a point,
+        this feature is usually used in conjunction with a town or
+        city that is drawn over that point; this can be seen in the
+        example; compare ``A1`` to ``A2`` and ``A3`` to ``C5``.
 
 ===== ======
 
@@ -792,6 +861,11 @@ Feature #6. Symbols
 
       This example shows how to add different symbols to the board.
 
+      As with towns and cities, the symbols are drawn by default in the
+      centre of the hexagon, but can be offset from the centre by setting
+      the values for ``(direction, distance)``.
+
+      The feature label and the relative label position can also be set.
 
 ===== ======
 
@@ -808,20 +882,35 @@ Feature #7. Colored Hexagon
 
       .. code:: python
 
-        ('A1', 'fill', None, 'xyellow'),
-        ('A3', 'fill', None, 'xred'),
-        ('A5', 'fill', None, 'xbrown'),
-        ('B2', 'fill', None, 'xgrey'),
-        ('B4', 'fill', None, 'xgray'),
-        ('C1', 'fill', None, 'xwater'),
-        ('C3', 'fill', None, 'xplain'),
-        ('C5', 'fill', None, 'pink'),
-        ('D2', 'fill', None, 'xoffboard'),
-        ('D4', 'highlight', None, 'yellow'),
+        ('A1', 'hex_fill', None, 'xyellow'),
+        ('A3', 'hex_fill', None, 'xred'),
+        ('A5', 'hex_fill', None, 'xbrown'),
+        ('B2', 'hex_fill', None, 'xgrey'),
+        ('B4', 'hex_fill', None, 'xgray'),
+        ('C1', 'hex_fill', None, 'xwater'),
+        ('C3', 'hex_fill', None, 'xplain'),
+        ('C5', 'hex_fill', None, 'pink'),
+        ('D2', 'hex_fill', None, 'xoffboard'),
+        ('D4', 'hex_fill', None, 'XX18_TILE_YELLOW'),
+        ('D6', 'highlight', None, 'yellow'),
 
       This example shows how to add hexagons filled with, or highlighted
       by, a color to the board.
 
+      The ``hex_fill`` feature name causes the whole hexagon to be filled with
+      the color supplied.
+
+      The ``highlight`` feature name causes a thick line to be drawn just
+      inside the edges of the hexagon.
+
+      For these features, the fourth value in the feature specification
+      set is **not** a label, but a :ref:`color <basic-color>`.
+
+      The normal association of colors can be changed to match those an 18xx
+      style by appending an ``x`` in front of the name.  Special colors, such
+      as ``xplain``, ``xwater`` and ``xoffboard`` (a shade of red) are also
+      available. There are also a range of tile colors with the ``XX18_TILE_``
+      prefix.
 
 ===== ======
 
@@ -838,18 +927,47 @@ Feature #8. Private Railroad
 
       .. code:: python
 
-        ('A1', 'private', None, ""),
+        ('A1', 'private', None, ''),
         ('A1', 'private'),
-        ('A3', 'private', None, "L&L", "A3",  None, "left"),
-        ('B2', 'private', ( 15, .7), "R&R", "B2", (140, .4), "above"),
-        ('B4', 'private', ( 15, .6), "D&D", "B6", (140, .5), "below"),
-        ('C1', 'private', (210, .4), "DD", "C3", ( 15, .7), "left"),
-        ('C5', 'private', (140, .5), "RR", "C5", ( 15, .6),"right"),
-        ('D2', 'private', (180, .7), "RD", "D2", (0, .4), "above"),
-        ('D4', 'private', (270, .7), "D&R", "D4", (90, .4), "above"),
-        ('D6', 'private', (270, .7), "R&D", "D6", (90, .4), "below"),
+        ('A3', 'private', None, 'L&L', 'A3',  None, 'left'),
+        ('B2', 'private', ( 15, .7), 'R&R', 'B2', (140, .4), 'above'),
+        ('B4', 'private', ( 15, .6), 'D&D', 'B6', (140, .5), 'below'),
+        ('C1', 'private', (210, .4), 'LL', 'C3', ( 15, .7), 'left'),
+        ('C5', 'private', (140, .5), 'RR', 'C5', ( 15, .6), 'right'),
+        ('D2', 'private', (180, .7), 'RD', 'D2', (0, .4), 'above'),
+        ('D4', 'private', (270, .7), 'D&R', 'D4', (90, .4), 'above'),
+        ('D6', 'private', (270, .7), 'R&D', 'D6', (90, .4), 'below'),
 
       This example shows how to add a private railroad to the board.
+
+      A private railroad is depicted in an 18xx game as two small circles
+      joined by a line.  The railroad is often named for reference.
+
+      .. NOTE::
+
+        This feature changes the meaning of the fifth specification
+        values and adds two more optional values.
+
+      For a private railroad, the specification values, in the order they
+      must appear, are as follows:
+
+      1. Start **location**: this is a grid reference of single hexagon,
+         representing the hexagon where one end (circle) of the private
+         railroad is drawn
+      2. The feature **name** ``private`` is used here
+      3. The **offset**, if any, of the start (circle) of the private
+         railroad is set here; if ``None`` then it will drawn at the centre
+         of the start location's hexagon
+      4. The **name** of the private railroad is set here
+      5. End **location**: this is a grid reference of single hexagon,
+         representing the hexagon where the other end (circle) of the
+         private railroad is drawn
+      6. The **offset**, if any, of the end (circle) of the private
+         railroad is set here; if ``None`` then it will drawn at the centre
+         of the end location's hexagon
+      7. The relative location of the private railroad's name; left and right
+         draw this next to the start or end circles; and above and below
+         draw it next to the centre of the connecting line
 
 ===== ======
 
@@ -867,19 +985,36 @@ Feature #9. Offboard Income: Pointy
       .. code:: python
 
         # offboard color fills
-        ('A5', 'fill', None, 'xoffboard'),
-        ('C1', 'fill', None, 'xoffboard'),
-        ('D4', 'fill', None, 'xoffboard'),
+        ('A5', 'hex_fill', None, 'xoffboard'),
+        ('C1', 'hex_fill', None, 'xoffboard'),
+        ('D4', 'hex_fill', None, 'xoffboard'),
         # offboard tracks
         ('A5', 'spike', 'w se', "short",),
         ('D4', 'spike', 'nw ne', "long",),
         ('C1', 'spike', 'ne se', "medium",),
         # offboard phase revenue
         ('C1', 'phase_revenue', (180, .3), '10 20 30 40'),
-        ('A5', 'phase_revenue', None, '20 50'),
+        ('A5', 'phase_revenue', None, '20 40', ['xbrown', 'pink']),
 
       This example shows how to add and annotate an offboard hex, to the
-      board, as well as to define its income.
+      board, as well as to define its income in tabular form.
+
+      Offboard locations are normally shown as "end points" for track connected
+      to them by the use of a *spike* or pointed triangle.  A spike extends
+      from the edge of its hexagon towards the centre.  Three different lengths
+      of spike can be used: ``short``, ``medium``, and ``long``.
+
+      Offboard locations often offer income to the company whose track connects
+      to them.  This is shown in a table, colored to match the hase of the
+      game for which the income applies, as defined by the *phase_revenue*
+      feature.  The income itself appears as space-separated values in the
+      "labels" part of the specification list.  A fifth item in the
+      specifications can be added to define a custom set of colors to be
+      used that differ from the normal "yellow, green, red, grey" sequence.
+      There must be a matching color for each value in the income "label".
+
+      For a board grid with "pointy" orientation of the hexagons, the income
+      table is drawn vertically.
 
 ===== ======
 
@@ -897,10 +1032,10 @@ Feature #10. Offboard Income: Flat
       .. code:: python
 
         # offboard color fills
-        ('A5', 'fill', None, 'xoffboard'),
-        ('C1', 'fill', None, 'xoffboard'),
-        ('C5', 'fill', None, 'xoffboard'),
-        ('B8', 'fill', None, 'xoffboard'),
+        ('A5', 'hex_fill', None, 'xoffboard'),
+        ('C1', 'hex_fill', None, 'xoffboard'),
+        ('C5', 'hex_fill', None, 'xoffboard'),
+        ('B8', 'hex_fill', None, 'xoffboard'),
         # offboard tracks
         ('A5', 'spike', '"n se', "short",),
         ('B8', 'spike', 'nw ne', "long",),
@@ -908,11 +1043,27 @@ Feature #10. Offboard Income: Flat
         ('C5', 'spike', 'sw', "long",),
         # offboard phase revenue
         ('C1', 'phase_revenue', (180, .1), '10 20 30 40'),
-        ('A5', 'phase_revenue', None, '20 50'),
-
+        ('A5', 'phase_revenue', None, '30 50', ['xgrey', 'pink']),
 
       This example shows how to add and annotate an offboard hex, to a
-      board with flat hexes, as well as to define its income.
+      board with flat hexes, as well as to define its income in tabular form.
+
+      Offboard locations are normally shown as "end points" for track connected
+      to them by the use of a *spike* or pointed triangle.  A spike extends
+      from the edge of its hexagon towards the centre.  Three different lengths
+      of spike can be used: ``short``, ``medium``, and ``long``.
+
+      Offboard locations often offer income to the company whose track connects
+      to them.  This is shown in a table, colored to match the hase of the
+      game for which the income applies, as defined by the *phase_revenue*
+      feature.  The income itself appears as space-separated values in the
+      "labels" part of the specification list.  A fifth item in the
+      specifications can be added to define a custom set of colors to be
+      used that differ from the normal "yellow, green, red, grey" sequence.
+      There must be a matching color for each value in the income "label".
+
+      For a board grid with "flat" orientation of the hexagons, the income
+      table is drawn horizontally.
 
 ===== ======
 
@@ -929,18 +1080,43 @@ Feature #11. Miscellaneous
 
       .. code:: python
 
-        ('B2', 'river_line', 'sw ne e ne', 'aqua'),
+        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne', 'aqua'),
         ('A1', 'tile-letter', (330, 0.6), "Y"),
         ('A5', 'track', 'e,w'),
         ('A5', 'town_border', None),
         ('B4', 'block', "w nw ne"),
-        ('C1', 'river_line', 'nw se e se'),
-        ('C5', 'block', "nw", "xred"),
-        ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
+        ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
 
 
       This example shows how to add various kinds of special, or more unusual,
-      features to the board.
+      features to the board. These are:
+
+      * A **tile_letter** is a single large character drawn either at the centre
+        of the hexagon, or at an offset, by setting the values for
+        ``(direction, distance)``. See the example in ``A1``.
+      * A **town_border** depicts a town with a white line drawn around it;
+        the other specifications for a town can be used as normal.
+        See the example in ``A5``.
+      * A **block** is a single thick line drawn at one or more hexagon edges;
+        an edge can be identified by ``ne``, ``nw``, ``se``, ``sw``, ``e``,
+        ``w``, ``n` or ``s`` depending if the grid orientation is ``flat`` or
+        ``pointy``.  The block in ``B4`` extends over multiple edges and uses
+        the default color; whereas the block in ``C5`` is at a single edge and
+        uses a custom color, which is set as the fourth specification value.
+      * A normal **protograf** :doc:`shape <../core_shapes>` can be displayed
+        in one or more hexagons, by providing the shape's name, in lowercase,
+        along with all the usual construction details; it will be drawn either,
+        by default, at the centre of the hexagon(s), or at an offset, by
+        setting the values for ``(direction, distance)``.  The ``polygon``
+        shown in ``D2`` and ``D4`` is an example of this.
+      * A **river_line** is a wavy line drawn between hexagon edges/vertices.
+        The locations for the points along the river are given by pairs of
+        ``Hexagon,Edge`` location values; for example ``C1,se`` to indicate
+        the south-east vertex of hexagon ``C1`` in the grid.  The color of
+        the line can also be set as the fourth specification value. It should
+        be noted that the ``river_line`` not really a recommended feature; but
+        rather to be used as a "placeholder" until proper representation of
+        a river can be created by a regular drawing tool.
 
 ===== ======
 
@@ -966,6 +1142,7 @@ The JSON file is a simple text file that follows common conventions.
 3. **Exception** the second-last line must **NOT** end in a comma.
 4. The last line must contain a single ``}`` curly close bracket.
 
+The full list of settings is provided in `XX18 Style Settings`_.
 
 .. |gfj| image:: ../images/objects/xx18_json.png
    :width: 330
@@ -1020,6 +1197,36 @@ The ``XX18Game()`` command comes with functions that allow creation of
 features without using the ``features`` property itself.  These functions,
 in some cases, allow further customisation than is otherwise possible.
 
+.. |xgn| image:: ../images/objects/xx18_functions.png
+   :width: 330
+
+===== ======
+|xgn| This example shows using feature functions for an ``XX18Game``:
+
+      .. code:: python
+
+        xgffn = XX18Game(
+            rows=4, cols=3,
+            fill='berylgreen',
+            label=True,
+            label_size=18,
+            orientation='flat',
+        )
+        XX18State(board=xgffn)
+
+        xgffn.hex_fill('C5', 'xoffboard')
+        xgffn.phase_revenue(
+            "C5", "30 40 50", 0, 0.3, "vertical",
+            colors=["xbrown","xgrey","pink"])
+
+      The way to reference the functions is by appending their name to the
+      name assigned to the `` XX18Game()`` command; so, for example,
+      ``xgffn.hex_fill()``.  The properties for that function are then
+      supplied between the ``()`` brackets.
+
+===== ======
+
+
 
 .. _xx18GameAdHocDrawing:
 
@@ -1056,20 +1263,63 @@ to the name assigned to the ``XX18Game()``.
 
 
 
-.. _xx18-advanced-tips:
+.. _xx18StyleSettings:
 
-18xx Advanced Tips and Options
-==============================
+XX18 Style Settings
+===================
 `↑ <xx18Index_>`_
 
+The following are the "internal" settings for styles and sizes used by
+the ``XX18State()`` command, that be changed in a JSON file.
 
+* "XX18_HEX_SIDE" - default is 2.3864 cm; length of standard hexagon edge
+* "XX18_CITY_DIAMETER" - default is 1.45 cm; city circle size
+* "XX18_CITY_BACKGROUND_FILL" - default is "white"; city fill color
+* "XX18_TOWN_DIAMETER" - default is 0.45 cm; inner-circle size
+* "XX18_TOWN_BORDER_DIAMETER" - default is 0.55 cm; outer-circle size
+* "XX18_TOWN_HEIGHT" - default is 0.7 cm; rectangular town size (inner)
+* "XX18_TOWN_HEIGHT_OUTER" - default is 0.8 cm; rectangular town size (outer)
+* "XX18_TOWN_WIDTH" - default is 0.4 cm; rectangular town size (inner)
+* "XX18_TOWN_WIDTH_OUTER" - default is 0.5 cm; rectangular town size (outer)
+* "XX18_TOWN_BORDER_STROKE" - default is "white"; rectangular town color (outer)
+* "XX18_PRIVATE_DIAMETER" - default is 0.4 cm; private railroad circle size
+* "XX18_REVENUE_DIAMETER" - default is 0.8 cm; in-hex revenue circle size
+* "XX18_REVENUE_FILL" - default is None; in-hex revenue circle fill color
+* "XX18_REVENUE_STROKE" - default is "black"; in-hex revenue circle stroke color
+* "XX18_TRACK_INNER_WIDTH" - default is 0.4 cm; width of outer, white track
+* "XX18_TRACK_OUTER_WIDTH" - default is 0.5 cm; width of black track
+* "XX18_TRACK_OUTER_FILL" - default is "white"; edge color
+* "XX18_MOUNTAIN_SIDE" - default is 0.6 cm; side of the triangle
+* "XX18_MOUNTAIN_FILL" - default is "black"; color inside the triangle
+* "XX18_SPIKE_FRACTION_SHORT" - default is 0.1 fraction of hex for short spike
+* "XX18_SPIKE_FRACTION_MEDIUM" - default is 0.25 fraction of hex for medium spike
+* "XX18_SPIKE_FRACTION_LONG" - default is 0.45; fraction of hex for long spike
+* "XX18_PHASE_REVENUE_BOX" - default is 0.7 cm; default width of single cell
+* "XX18_HEX_RIVER_WAVE_HEIGHT" - default is 0.15 cm; wave height in feature river_line
+* "XX18_DEBUG_FONT_FRACTION" - default is 0.75; relative size of debug font
+* "XX18_DEBUG_FONT_OFFSET_X" - default is 0.0; x-offset for debug lettering
+* "XX18_DEBUG_FONT_OFFSET_Y" - default is 0.0; y-offset for debug lettering
+* "XX18_DEBUG_FONT_NAME" - default is "Helvetica"; name of debug font
+* "XX18_STROKE_WIDTH" - default is 1 point; all lines are drawn this thickness
+* "XX18_STROKE_WIDTH_BLOCK" - default is 7 points; width of block feature line
+* "XX18_STROKE_WIDTH_HIGHLIGHT" - default is 8 points; width of highlight feature line
+* "XX18_TEXT_XXS" - default is 7 points; extra-extra small text
+* "XX18_TEXT_XS" - default is 9 points; extra small text
+* "XX18_TEXT_SMALL" - default is 11 points; small text
+* "XX18_TEXT_MEDIUM" - default is 13 points; medium text
+* "XX18_TEXT_LARGE" - default is 16 points; large text
+* "XX18_TEXT_XL" - default is 20 points; extra large text
+* "XX18_TEXT_XXL" - default is 24 points; extra-extra large text
+* "XX18_TEXT_XXXL" - default is 28 points; super-size text
+* "XX18_TEXT_FONT" - default is "Times-Roman"; font name used throughout
+* "XX18_TEXT_FONT_BOLD" - default is "Times-Bold"; font name for tile_letter
 
 
 .. _xx18-resources:
 
 18xx Resources
 ==============
-`↑ <abstractIndex_>`_
+`↑ <xx18Index_>`_
 
 An overview of what 18xx games are about can be found at Board Game Geek:
 https://boardgamegeek.com/boardgamefamily/19/series-18xx
