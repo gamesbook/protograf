@@ -1131,9 +1131,9 @@ As mentioned at the start, the ``XX18Game()`` command adopts a set of styles
 modeled after those from *1830*.
 
 To alter these styles requires that you define and load a file containing the
-names of the styles you want to chamges along with there new values.
+names of the styles you want to change, along with their new values.
 
-The JSON file is a simple text file that follows common conventions.
+The JSON file is a simple text file that follows some common conventions.
 
 1. The first line must contain a single ``{`` curly open bracket.
 2. Each line must contain the name of a style, wrapped in ``""`` inverted
@@ -1169,8 +1169,8 @@ The full list of settings is provided in `XX18 Style Settings`_.
         XX18State(board=xgzz)
 
       This example shows how to reference a JSON file using the *settings*
-      property.  The JSON file used here contains the following styles
-      and values:
+      property.  The JSON file used here, named ``xx18.json``, contains the
+      following styles and values:
 
       .. code:: json
 
@@ -1240,6 +1240,89 @@ exceptions.  For these cases, you need to fall back to using
 :doc:`protograf's <../index>` more general purpose drawing functionality.
 
 
+.. |xgm| image:: ../images/objects/xx18_map.png
+   :width: 330
+
+===== ======
+|xgm| This example shows drawing combined with an ``XX18Game``:
+
+      .. code:: python
+
+        Create(
+            filename="xx18_map.pdf",
+            paper="A4",
+            margin=1.25,
+            fill='skyblue')
+
+        Rectangle(
+            x=-1.25, y=-1.25,
+            height=22, width=21,
+            fill_stroke="limegreen")
+        Rectangle(
+            x=-1.25, y=19.5,
+            height=6, width=4,
+            fill_stroke="limegreen")
+
+        Image(
+            "images/gh.svg",
+            height=30, width=20,
+            y=-2, x=-1)
+
+        map_pattern ="""
+        O O O O
+         O O O .
+        O O O O
+         O O O O
+        O O O O
+         O O O O
+        O O O .
+        """
+
+        xgh = XX18Game(
+            rows=7,
+            cols=4,
+            fill=None,
+            pattern=map_pattern
+        )
+        XX18State(board=xgh)
+
+        Polyshape(
+            fill_stroke="xred",
+            points=[
+              xgh.A7.se,
+              xgh.A7.s,
+              xgh.B8.sw,
+              xgh.B8.s,
+              xgh.D8.n,
+              xgh.D8.ne,
+              (21, xgh.D8.ne.y),
+              (21, xgh.A7.se.y)
+            ]
+        )
+
+        xgf = XX18Game(
+            rows=7,
+            cols=4,
+            label=True,
+            fill=None,
+            pattern=map_pattern,
+            features=[
+                ('B8', 'spike', 'w sw', "medium",),
+            ]
+        )
+        XX18State(board=xgf)
+
+      This example shows the use of other shapes provided by **protograf**,
+      together with the use of layering, to supplement the `XX18Game()``
+      command for creation of map-enhanced board.
+
+      The SVG for the map of Ghana shown here is sourced from
+      https://simplemaps.com/svg/country/gh#all - a very useful resource
+      for simple, scalable country outlines.
+
+
+===== ======
+
 
 .. _xx18state-command:
 
@@ -1270,49 +1353,51 @@ XX18 Style Settings
 `↑ <xx18Index_>`_
 
 The following are the "internal" settings for styles and sizes used by
-the ``XX18State()`` command, that be changed in a JSON file.
+the ``XX18State()`` command, that be changed in a JSON file; see
+`XX18Game JSON Styles`_.
 
-* "XX18_HEX_SIDE" - default is 2.3864 cm; length of standard hexagon edge
-* "XX18_CITY_DIAMETER" - default is 1.45 cm; city circle size
-* "XX18_CITY_BACKGROUND_FILL" - default is "white"; city fill color
-* "XX18_TOWN_DIAMETER" - default is 0.45 cm; inner-circle size
-* "XX18_TOWN_BORDER_DIAMETER" - default is 0.55 cm; outer-circle size
-* "XX18_TOWN_HEIGHT" - default is 0.7 cm; rectangular town size (inner)
-* "XX18_TOWN_HEIGHT_OUTER" - default is 0.8 cm; rectangular town size (outer)
-* "XX18_TOWN_WIDTH" - default is 0.4 cm; rectangular town size (inner)
-* "XX18_TOWN_WIDTH_OUTER" - default is 0.5 cm; rectangular town size (outer)
-* "XX18_TOWN_BORDER_STROKE" - default is "white"; rectangular town color (outer)
-* "XX18_PRIVATE_DIAMETER" - default is 0.4 cm; private railroad circle size
-* "XX18_REVENUE_DIAMETER" - default is 0.8 cm; in-hex revenue circle size
-* "XX18_REVENUE_FILL" - default is None; in-hex revenue circle fill color
-* "XX18_REVENUE_STROKE" - default is "black"; in-hex revenue circle stroke color
-* "XX18_TRACK_INNER_WIDTH" - default is 0.4 cm; width of outer, white track
-* "XX18_TRACK_OUTER_WIDTH" - default is 0.5 cm; width of black track
-* "XX18_TRACK_OUTER_FILL" - default is "white"; edge color
-* "XX18_MOUNTAIN_SIDE" - default is 0.6 cm; side of the triangle
-* "XX18_MOUNTAIN_FILL" - default is "black"; color inside the triangle
-* "XX18_SPIKE_FRACTION_SHORT" - default is 0.1 fraction of hex for short spike
-* "XX18_SPIKE_FRACTION_MEDIUM" - default is 0.25 fraction of hex for medium spike
-* "XX18_SPIKE_FRACTION_LONG" - default is 0.45; fraction of hex for long spike
-* "XX18_PHASE_REVENUE_BOX" - default is 0.7 cm; default width of single cell
-* "XX18_HEX_RIVER_WAVE_HEIGHT" - default is 0.15 cm; wave height in feature river_line
-* "XX18_DEBUG_FONT_FRACTION" - default is 0.75; relative size of debug font
-* "XX18_DEBUG_FONT_OFFSET_X" - default is 0.0; x-offset for debug lettering
-* "XX18_DEBUG_FONT_OFFSET_Y" - default is 0.0; y-offset for debug lettering
-* "XX18_DEBUG_FONT_NAME" - default is "Helvetica"; name of debug font
-* "XX18_STROKE_WIDTH" - default is 1 point; all lines are drawn this thickness
-* "XX18_STROKE_WIDTH_BLOCK" - default is 7 points; width of block feature line
-* "XX18_STROKE_WIDTH_HIGHLIGHT" - default is 8 points; width of highlight feature line
-* "XX18_TEXT_XXS" - default is 7 points; extra-extra small text
-* "XX18_TEXT_XS" - default is 9 points; extra small text
-* "XX18_TEXT_SMALL" - default is 11 points; small text
-* "XX18_TEXT_MEDIUM" - default is 13 points; medium text
-* "XX18_TEXT_LARGE" - default is 16 points; large text
-* "XX18_TEXT_XL" - default is 20 points; extra large text
-* "XX18_TEXT_XXL" - default is 24 points; extra-extra large text
-* "XX18_TEXT_XXXL" - default is 28 points; super-size text
-* "XX18_TEXT_FONT" - default is "Times-Roman"; font name used throughout
-* "XX18_TEXT_FONT_BOLD" - default is "Times-Bold"; font name for tile_letter
+* ``"XX18_HEX_SIDE"`` - default is ``2.3864`` cm; length of standard hexagon edge
+* ``"XX18_CITY_DIAMETER"`` - default is ``1.45`` cm; city circle size
+* ``"XX18_CITY_BACKGROUND_FILL"`` - default is ``white``; city fill color
+* ``"XX18_TOWN_DIAMETER"`` - default is ``0.45`` cm; inner-circle size
+* ``"XX18_TOWN_BORDER_DIAMETER"`` - default is ``0.55`` cm; outer-circle size
+* ``"XX18_TOWN_HEIGHT"`` - default is ``0.7`` cm; rectangular town size (inner)
+* ``"XX18_TOWN_HEIGHT_OUTER"`` - default is ``0.8`` cm; rectangular town size (outer)
+* ``"XX18_TOWN_WIDTH"`` - default is ``0.4`` cm; rectangular town size (inner)
+* ``"XX18_TOWN_WIDTH_OUTER"`` - default is ``0.5`` cm; rectangular town size (outer)
+* ``"XX18_TOWN_BORDER_STROKE"`` - default is ``white``; rectangular town color (outer)
+* ``"XX18_PRIVATE_DIAMETER"`` - default is ``0.4`` cm; private railroad circle size
+* ``"XX18_REVENUE_DIAMETER"`` - default is ``0.8`` cm; in-hex revenue circle size
+* ``"XX18_REVENUE_FILL"`` - default is ``None``; in-hex revenue circle fill color
+* ``"XX18_REVENUE_STROKE"`` - default is ``black"``; in-hex revenue circle stroke color
+* ``"XX18_TRACK_INNER_WIDTH"`` - default is ``0.4`` cm; width of outer, white track
+* ``"XX18_TRACK_OUTER_WIDTH"`` - default is ``0.5`` cm; width of black track
+* ``"XX18_TRACK_OUTER_FILL"`` - default is ```white``; edge color
+* ``"XX18_MOUNTAIN_SIDE"`` - default is ``0.6`` cm; side of the triangle
+* ``"XX18_MOUNTAIN_FILL"`` - default is ``black``; color inside the triangle
+* ``"XX18_SPIKE_FRACTION_SHORT"`` - default is ``0.1``; fraction of hex for short spike
+* ``"XX18_SPIKE_FRACTION_MEDIUM"`` - default is ``0.25``; fraction of hex for medium spike
+* ``"XX18_SPIKE_FRACTION_LONG"`` - default is ``0.45``; fraction of hex for long spike
+* ``"XX18_PHASE_REVENUE_BOX"`` - default is ``0.7`` cm; default width of single cell
+* ``"XX18_HEX_RIVER_WAVE_HEIGHT"`` - default is ``0.15`` cm; wave height in feature river_line
+* ``"XX18_DEBUG_FONT_FRACTION"`` - default is ``0.75``; relative size of debug font
+* ``"XX18_DEBUG_FONT_OFFSET_X"`` - default is ``0.0``; x-offset for debug lettering
+* ``"XX18_DEBUG_FONT_OFFSET_Y"`` - default is ``0.0``; y-offset for debug lettering
+* ``"XX18_DEBUG_FONT_NAME"`` - default is ``Helvetica``; name of debug font
+* ``"XX18_STROKE_WIDTH"`` - default is ``1`` point; all lines are drawn this thickness
+* ``"XX18_STROKE_WIDTH_BLOCK"`` - default is ``7`` points; width of block feature line
+* ``"XX18_STROKE_WIDTH_HIGHLIGHT"`` - default is ``8`` points; width of highlight feature line
+* ``"XX18_STROKE_TRANSPARENCY_HIGHLIGHT"`` - default is ``50`` (%); transparency of highlight feature line
+* ``"XX18_TEXT_XXS"`` - default is ``7`` points; extra-extra small text
+* ``"XX18_TEXT_XS"`` - default is ``9`` points; extra small text
+* ``"XX18_TEXT_SMALL"`` - default is ``11`` points; small text
+* ``"XX18_TEXT_MEDIUM"`` - default is ``13`` points; medium text
+* ``"XX18_TEXT_LARGE"`` - default is ``16`` points; large text
+* ``"XX18_TEXT_XL"`` - default is ``20`` points; extra large text
+* ``"XX18_TEXT_XXL"`` - default is ``24`` points; extra-extra large text
+* ``"XX18_TEXT_XXXL"`` - default is ``28`` points; super-size text
+* ``"XX18_TEXT_FONT"`` - default is ``Times-Roman``; font name used throughout
+* ``"XX18_TEXT_FONT_BOLD"`` - default is ``Times-Bold``; font name for tile_letter
 
 
 .. _xx18-resources:

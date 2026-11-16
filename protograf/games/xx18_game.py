@@ -159,6 +159,7 @@ DEFAULT_SETTINGS = {
     "XX18_STROKE_WIDTH": 1,  # points
     "XX18_STROKE_WIDTH_BLOCK": 7,  # points
     "XX18_STROKE_WIDTH_HIGHLIGHT": 8,  # points
+    "XX18_STROKE_TRANSPARENCY_HIGHLIGHT": 50,  # percent
     "XX18_TEXT_XXS": 7,  # points
     "XX18_TEXT_XS": 9,  # points
     "XX18_TEXT_SMALL": 11,  # points
@@ -2021,8 +2022,9 @@ class XX18GameObject(CoreGameObject):
                 cxy=geo.centre,
                 height=self.hex_height,
                 fill=None,
-                stroke="black",
+                stroke="white",
                 stroke_width=0.1,
+                stroke_transparency=100,
                 orientation=self.orientation,
                 spikes=_positions,
                 spikes_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
@@ -2034,8 +2036,9 @@ class XX18GameObject(CoreGameObject):
                 cxy=geo.centre,
                 height=self.hex_height,
                 fill=None,
-                stroke="black",
+                stroke="white",
                 stroke_width=0.1,
+                stroke_transparency=100,
                 orientation=self.orientation,
                 spikes=_positions,
                 spikes_stroke="black",
@@ -2233,6 +2236,7 @@ class XX18GameObject(CoreGameObject):
                 fill=None,
                 stroke=the_color,
                 stroke_width=self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"],
+                stroke_transparency=self.xxs["XX18_STROKE_TRANSPARENCY_HIGHLIGHT"],
                 orientation=self.orientation,
             )
 
