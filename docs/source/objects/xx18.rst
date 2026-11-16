@@ -62,7 +62,7 @@ Overview
 ========
 `↑ <xx18Index_>`_
 
-The aim of the ``XX18Game`` and ``XX18Game`` commands is to allow
+The aim of the ``XX18Game`` and ``XX18State`` commands is to allow
 diagrams for many of the 18Xx series of games to be easily created.
 
 The ``XX18Game`` command allows for the details of the board and features
@@ -70,9 +70,8 @@ for such a game to be specified.  However, an ``XX18Game`` is **not**
 designed to be drawn |dash| it can be thought of as the game being
 "still in the box".
 
-The ``XX18Game`` command will, when supplied with a previously defined
-``XX18Game``, to show the board, along with any other components, such
-as tiles, and, optionally, annotated or marked.
+The ``XX18State`` command will, when supplied with a previously defined
+``XX18Game``, draw the board, along with all its features.
 
 .. _xx18game-features:
 
@@ -115,13 +114,13 @@ The command also provides:
   from a settings file
 * simple labelling for use with icons, symbols, towns or cities
 
-In-hexagon features, for example, cities, towns, icons, symbols or lettering will,
-by default, appear at the centre of a hexagon. These can be repositioned using a
-combination of direction (in degrees clockwise from east) and distance (as a
-fraction of the hexagon radius).
+In-hexagon features, for example, cities, towns, icons, symbols or lettering
+will, by default, appear at the centre of a hexagon. These can be repositioned
+using a combination of direction |dash| in degrees clockwise from east |dash|
+and distance |dash| as a fraction of the hexagon radius.
 
-Positioning of features, such as lines, spikes, bumps or numbered circles, on
-hexagon edges will be done using standard compass directions; "ne" for northeast,
+Positioning of features, such as lines, spikes, bumps or numbered circles on
+hexagon edges, will be done using standard compass directions; "ne" for northeast,
 "s" for south, etc., and will be centred on that edge.
 
 Drawing of features is done following the order in which they are provided.
@@ -143,13 +142,6 @@ XX18Game Command
 The ``XX18Game()`` command defines the parts of an 18xx game; primarily
 the construction and styling, of the board and features.
 
-The overall **size** of the board is set by a combination of rows and
-columns.
-
-.. NOTE::
-
-  The hexagonal locations on the board are termed **cells** in this guide.
-
 Topics covered are:
 
 - `XX18Game Properties`_
@@ -168,18 +160,18 @@ XX18Game Properties
 
 The key properties that can be set for an ``XX18Game()`` command are:
 
-* *cols*: this is the number of cells in the horizontal direction, for a
-  regular layout; a default of ``8`` is used
-* *rows*: then this is the number of cells, in the vertical direction,
-  for a regular layout; a default of ``8`` is used
+* *cols*: this is the number of hexagons in the horizontal direction, for a
+  board's layout; a default of ``8`` is used
+* *rows*: then this is the number of hexagons, in the vertical direction,
+  for a board's layout; a default of ``8`` is used
 * *fill*: the default color with which most of the hexagons will be filled;
   by default this is white, but many maps use a light brown or light green.
 * *features*: the "things" that need to be drawn on the board; there are
   :ref:`many possible features <xx18GameFeatures>`
 * *orientation*: whether the edges of the hexagons are parallel to the top of
-  the mapbard ("flat") or pointing at it ("pointy"); the default of "pointy"
+  the mapboard ("flat") or pointing at it ("pointy"); the default of "pointy"
   matches that of *1830*
-* *pattern*: an on/off design showing which cells should be used and which
+* *pattern*: an on/off design showing which hexagons should be used and which
   should be blank i.e. unused
 
 .. IMPORTANT::
@@ -189,17 +181,17 @@ The key properties that can be set for an ``XX18Game()`` command are:
     of the board itself |dash| this being derived from the combination of
     the number of rows and columns as well the hexagon *height*.
 
-Other useful properties that can be set for an XX18Game are:
+Other useful properties that can be set for an ``XX18Game()`` command are:
 
 * *side*: sets the length of the side of a single hexagon; by default this is
   slighly less than 1 inch (2.3864 cm)
 * *label*: if ``True``, draw labels around the board's edges; use the
   normal styling options for a label; *label_font*, *label_size*,
   *label_stroke* etc.
-* *label_position*: the sides of the board along which the labelling runs; this
-  can be: *top-left* (``TL``) |dash| the default |dash| *bottom-left* (``BL``),
-  *bottom-right* (``BR``) or *top-right* (``TR``).
-* *label_offset*: how far away label are drawn from the board edge(s); if not
+* *label_locations*: the sides of the board along which the labelling runs; this
+  can be: *above-left* (``AL``) |dash| the default |dash| *below-left* (``BL``),
+  *below-right* (``BR``) or *above-right* (``AR``).
+* *label_offset*: how far away labels are drawn from the board edge(s); if not
   set, this is calculated based on the label's font size
 * *settings*: this is the name of JSON file, including its path, that can be
   used to override some of the default sizes and style of features
@@ -218,6 +210,9 @@ Other useful properties that can be set for an XX18Game are:
 XX18Game Board Grid
 -------------------
 `^ <xx18game-command_>`_
+
+The overall **size** of the board is set by a combination of number of
+rows and columns of hexagons.
 
 Below are some examples of how to set the basic parameters to configure the
 hexagonal grid that is used for all 18xx game boards:
@@ -281,6 +276,9 @@ Example 2. Default Board - Flat Hexagons
       Because a small page size is being used, the full extent of the grid
       i.e. all 64 hexagons, is not visible.
 
+      The board is drawn when it is referenced by the *board*
+      property of an ``XX18Game`` command.
+
 ===== ======
 
 
@@ -305,6 +303,9 @@ Example 3. Default Board - Pointy Hexagons - Offset
 
       Because a small page size is being used, the full extent of the grid
       i.e. all 64 hexagons, is not visible.
+
+      The board is drawn when it is referenced by the *board*
+      property of an ``XX18Game`` command.
 
 ===== ======
 
@@ -332,6 +333,9 @@ Example 4. Default Board - Flat Hexagons - Offset
 
       Because a small page size is being used, the full extent of the grid
       i.e. all 64 hexagons, is not visible.
+
+      The board is drawn when it is referenced by the *board*
+      property of an ``XX18Game`` command.
 
 ===== ======
 
@@ -407,15 +411,12 @@ Example 6. Styled Board
       - *x* and *y* - set the offset of the top-left of the grid from
         the page margins
       - *label* - if ``True``, the labels will be drawn
-      - *label_locations* - where the labels are drawn at the grid edges
+      - *label_locations* - where the labels are drawn at the grid edges;
+        in this case below (``B``) and to the left (``L``)
       - *label_size* - the point height of the labels
       - *fill* - the default color of the hexagons
       - *stroke* - the default color for lines and labels
       - *stroke_width* - the default width of lines
-
-      Unlike in .., here the location of the grid labels is changed by
-      setting ``label_locations="BL"`` i.e. to appear below and to the
-      left of the grid.
 
 ===== ======
 
@@ -443,7 +444,7 @@ The best way to represent multi-line list of characters such as this is by
 starting and ending the pattern definition with triple quotes |dash| ``"""``.
 
 Note that empty lines and "whitespace" at the start and end of a pattern will
-be ignored; as is any whitespace on a line.
+be ignored; as is any whitespace within a line.
 
 If a row on the board contains only hexagons, this can be shown with a
 single ``O`` (capital "oh").
@@ -513,11 +514,11 @@ Summary
 
 An 18xx game board can display numerous features that each have different
 effects on game play, inclduing cities, towns, tracks, railroads and the
-labels and income associated with these, as well as host of other symbols
-that help characterise hexagons.
+labels and income associated with these, as well as host of other symbols,
+text and styling that help characterise the board's hexagons.
 
 Features are set in a list i.e. enclosed in square brackets ``[ ... ]``
-and set via the *features* property.
+and asssigned to the *features* property.
 
 General Feature Specification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -528,18 +529,21 @@ enclosed in round brackets ``( ... )``. The **order of these items is vital**
 and must follow the sequence below.
 
 1. Feature **location**: this is a grid reference of one or more hexagons,
-   with each reference separated by a space; for example ``A1 B4```.  In
+   with each reference separated by a space; for example ``A1 B4```.  In a
    pointy hexagons grid, the letter is the row identifier, and in a grid
    with flat hexagons, the letter is the column identifier.
 2. Feature **name**: the lowercase name of the feature, such as town, city,
    track etc.
 3. Feature **offset**: by default, a feature is drawn in the centre of the
-   hexagon.  By specifying an offset, the feature can be moved elsewhere in
-   the hexagon. The offset is defined by a pair of values enclosed in round
-   brackets ``( ... )``: direction |dash| in degrees clockwise from the east
-   |dash| and distance |dash| a fraction of the hexagon's radius from the
-   location's centre. For example, ``(90, 0.5)`` is point in the "south"
-   direction, half-way along the radius.
+   hexagon.  By specifying an offset, the feature can be drawn elsewhere in
+   the hexagon. The offset is defined by a pair of comma-separated numbers
+   enclosed in round brackets ``( ... )``:
+
+   * the first number is *direction* |dash| degrees clockwise from the east
+   * the second number is *distance* |dash| a fraction of the hexagon's
+     radius from the location's centre
+   For example, ``(90, 0.5)`` is a point in the "south" direction, half-way
+   along the radius.
 4. Feature **label**:  the name or text associated with a feature; for example,
    the name of a city, or the cost associated with a mountain.
 5. Feature **label location**: the place where the label is drawn relative
@@ -597,9 +601,9 @@ Feature #1. Town and Mountain
       .. code:: python
 
         ('A1', 'town'),
-        ('B4', 'town', (90, .3), 'Burham', 'above'),
+        ('B4', 'town', (90, 0.3), 'Burham', 'above'),
         ('C1', 'mountain'),
-        ('C3 D2 D4', 'mountain', (270, .5), '$40'),
+        ('C3 D2 D4', 'mountain', (270, 0.5), '$40'),
         ('C5', 'mountains', None, "mountains"),
 
       This example shows how to add a town or a mountain to the board.
@@ -639,7 +643,7 @@ Feature #2. City
 
         ('A1', 'city'),
         ('A3', 'city', None, 'Arkwright', 'above'),
-        ('A5', 'city', (180, .4), 'Aylish', 'right'),
+        ('A5', 'city', (180, 0.4), 'Aylish', 'right'),
 
         ('B2', 'cityx2', None, 'Baroque'),
         ('B4', 'cityx3', None, 'Blau'),
@@ -663,7 +667,7 @@ Feature #2. City
         ),
 
         ('D6', 'city', None, 'Domrus'),
-        ('D6', 'revenue',  (240, .6), '20'),
+        ('D6', 'revenue',  (240, 0.6), '20'),
 
       This example shows how to add cities of different sizes to the board.
 
@@ -677,10 +681,10 @@ Feature #2. City
       for ``A3`` and ``A5``.
 
       A city can also be comprised of multiple circles; the feature name for
-      this includes and ``x`` and the number of circles; for example, the
-      cities in ``B2``, ``B4`` and ``B6``.  An additional option for a size
-      "2" city is to display it vertically, as can be seen in ``D2``, by
-      adding a ``v`` at the end.
+      this includes an ``x`` followed by the number of circles; for example,
+      the cities in ``B2``, ``B4`` and ``B6``.  An additional option for a
+      size "2" city is to display it vertically, as can be seen in ``D2``,
+      by adding a ``v`` at the end.
 
       Adding shapes to be displayed inside the city's circle is also possible.
       This is shown for ``C1``, ``C3`` and ``C5``, each of which have a
@@ -783,16 +787,16 @@ Feature #5. Train track-to-edge
 
       .. code:: python
 
-        C3 = (270, .4)
+        C3 = (270, 0.4)
 
-        ('A1', 'track_edge', (210, .3), 'ne', -0.1),
-        ('A1', 'track_edge', (210, .3), 'sw', 0.2),
-        ('A1', 'city', (210, .3), 'Archide', "above"),
+        ('A1', 'track_edge', (210, 0.3), 'ne', -0.1),
+        ('A1', 'track_edge', (210, 0.3), 'sw', 0.2),
+        ('A1', 'city', (210, 0.3), 'Archide', "above"),
 
-        ('A3', 'track_edge', (210, .3), 'ne', -0.1),
-        ('A3', 'track_edge', (210, .3), 'sw', 0.2),
+        ('A3', 'track_edge', (210, 0.3), 'ne', -0.1),
+        ('A3', 'track_edge', (210, 0.3), 'sw', 0.2),
 
-        ('B2', 'track_edge', (180, .3), 'w', 0),
+        ('B2', 'track_edge', (180, 0.3), 'w', 0),
 
         ('C3', 'track_edge', C3, 'w', 0.25),
         ('C3', 'track_edge', C3, 'se', -0.1),
@@ -927,16 +931,15 @@ Feature #8. Private Railroad
 
       .. code:: python
 
-        ('A1', 'private', None, ''),
         ('A1', 'private'),
         ('A3', 'private', None, 'L&L', 'A3',  None, 'left'),
-        ('B2', 'private', ( 15, .7), 'R&R', 'B2', (140, .4), 'above'),
-        ('B4', 'private', ( 15, .6), 'D&D', 'B6', (140, .5), 'below'),
-        ('C1', 'private', (210, .4), 'LL', 'C3', ( 15, .7), 'left'),
-        ('C5', 'private', (140, .5), 'RR', 'C5', ( 15, .6), 'right'),
-        ('D2', 'private', (180, .7), 'RD', 'D2', (0, .4), 'above'),
-        ('D4', 'private', (270, .7), 'D&R', 'D4', (90, .4), 'above'),
-        ('D6', 'private', (270, .7), 'R&D', 'D6', (90, .4), 'below'),
+        ('B2', 'private', ( 15, 0.7), 'R&R', 'B2', (140, 0.4), 'above'),
+        ('B4', 'private', ( 15, 0.6), 'D&D', 'B6', (140, 0.5), 'below'),
+        ('C1', 'private', (210, 0.4), 'LL', 'C3', ( 15, 0.7), 'left'),
+        ('C5', 'private', (140, 0.5), 'RR', 'C5', ( 15, 0.6), 'right'),
+        ('D2', 'private', (180, 0.7), 'RD', 'D2', (0, 0.4), 'above'),
+        ('D4', 'private', (270, 0.7), 'D&R', 'D4', (90, 0.4), 'above'),
+        ('D6', 'private', (270, 0.7), 'R&D', 'D6', (90, 0.4), 'below'),
 
       This example shows how to add a private railroad to the board.
 
@@ -965,9 +968,10 @@ Feature #8. Private Railroad
       6. The **offset**, if any, of the end (circle) of the private
          railroad is set here; if ``None`` then it will drawn at the centre
          of the end location's hexagon
-      7. The relative location of the private railroad's name; left and right
-         draw this next to the start or end circles; and above and below
-         draw it next to the centre of the connecting line
+      7. The relative location of the private railroad's **label**; ``left``
+         or ``right`` draw this next to the start or end circles; while
+         ``above`` or ``below`` draw it next to the centre of the connecting
+         line
 
 ===== ======
 
@@ -993,7 +997,7 @@ Feature #9. Offboard Income: Pointy
         ('D4', 'spike', 'nw ne', "long",),
         ('C1', 'spike', 'ne se', "medium",),
         # offboard phase revenue
-        ('C1', 'phase_revenue', (180, .3), '10 20 30 40'),
+        ('C1', 'phase_revenue', (180, 0.3), '10 20 30 40'),
         ('A5', 'phase_revenue', None, '20 40', ['xbrown', 'pink']),
 
       This example shows how to add and annotate an offboard hex, to the
@@ -1002,7 +1006,7 @@ Feature #9. Offboard Income: Pointy
       Offboard locations are normally shown as "end points" for track connected
       to them by the use of a *spike* or pointed triangle.  A spike extends
       from the edge of its hexagon towards the centre.  Three different lengths
-      of spike can be used: ``short``, ``medium``, and ``long``.
+      of spike can be used: ``short``, ``medium``, or``long``.
 
       Offboard locations often offer income to the company whose track connects
       to them.  This is shown in a table, colored to match the hase of the
@@ -1042,7 +1046,7 @@ Feature #10. Offboard Income: Flat
         ('C1', 'spike', 'ne se', "medium",),
         ('C5', 'spike', 'sw', "long",),
         # offboard phase revenue
-        ('C1', 'phase_revenue', (180, .1), '10 20 30 40'),
+        ('C1', 'phase_revenue', (180, 0.1), '10 20 30 40'),
         ('A5', 'phase_revenue', None, '30 50', ['xgrey', 'pink']),
 
       This example shows how to add and annotate an offboard hex, to a
@@ -1051,7 +1055,7 @@ Feature #10. Offboard Income: Flat
       Offboard locations are normally shown as "end points" for track connected
       to them by the use of a *spike* or pointed triangle.  A spike extends
       from the edge of its hexagon towards the centre.  Three different lengths
-      of spike can be used: ``short``, ``medium``, and ``long``.
+      of spike can be used: ``short``, ``medium``, or ``long``.
 
       Offboard locations often offer income to the company whose track connects
       to them.  This is shown in a table, colored to match the hase of the
@@ -1081,12 +1085,13 @@ Feature #11. Miscellaneous
       .. code:: python
 
         ('B2', 'river_line', 'sw B2,ne A3,e A5,ne', 'aqua'),
-        ('A1', 'tile-letter', (330, 0.6), "Y"),
+        ('A1', 'tile-letter', (330, 0.6), 'Y'),
         ('A5', 'track', 'e,w'),
         ('A5', 'town_border', None),
-        ('B4', 'block', "w nw ne"),
+        ('B4', 'block', 'w nw ne'),
         ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
-
+        ('C5', 'block', "nw", 'xred'),
+        ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
 
       This example shows how to add various kinds of special, or more unusual,
       features to the board. These are:
@@ -1107,11 +1112,11 @@ Feature #11. Miscellaneous
         in one or more hexagons, by providing the shape's name, in lowercase,
         along with all the usual construction details; it will be drawn either,
         by default, at the centre of the hexagon(s), or at an offset, by
-        setting the values for ``(direction, distance)``.  The ``polygon``
-        shown in ``D2`` and ``D4`` is an example of this.
+        setting the values for ``(direction, distance)``.  The olive-colored
+        ``polygon`` shown in ``D2`` and ``D4`` is an example of this.
       * A **river_line** is a wavy line drawn between hexagon edges/vertices.
         The locations for the points along the river are given by pairs of
-        ``Hexagon,Edge`` location values; for example ``C1,se`` to indicate
+        ``Hexagon,Vertex`` location values; for example ``C1,se`` to indicate
         the south-east vertex of hexagon ``C1`` in the grid.  The color of
         the line can also be set as the fourth specification value. It should
         be noted that the ``river_line`` not really a recommended feature; but
@@ -1161,9 +1166,9 @@ The full list of settings is provided in `XX18 Style Settings`_.
             features=[
                 ('A1', 'mountain', None, '$20'),
                 ('A3', 'track', 'e,w'),
-                ('A3', 'town_border', None, 'St. Agnes', "below"),
+                ('A3', 'town_border', None, 'St. Agnes', 'below'),
                 ('B2', 'city', None, 'Brodie'),
-                ('B2', 'revenue',  (240, .6), '30'),
+                ('B2', 'revenue',  (240, 0.6), '30'),
             ]
         )
         XX18State(board=xgzz)
@@ -1220,7 +1225,7 @@ in some cases, allow further customisation than is otherwise possible.
             colors=["xbrown","xgrey","pink"])
 
       The way to reference the functions is by appending their name to the
-      name assigned to the `` XX18Game()`` command; so, for example,
+      name assigned to the ``XX18Game()`` command; so, for example,
       ``xgffn.hex_fill()``.  The properties for that function are then
       supplied between the ``()`` brackets.
 
@@ -1313,13 +1318,39 @@ exceptions.  For these cases, you need to fall back to using
         XX18State(board=xgf)
 
       This example shows the use of other shapes provided by **protograf**,
-      together with the use of layering, to supplement the `XX18Game()``
+      together with the use of layering, to supplement the ``XX18Game()``
       command for creation of map-enhanced board.
 
-      The SVG for the map of Ghana shown here is sourced from
+      There are effectively six main layers in the board creation process:
+
+      1. The primary blue color is set when the page is created, using *fill*
+      2. The green land area is then drawn in the form of Rectangles.
+      3. The map itself is loaded as an Image.
+      4. The hexagonal grid is drawn for the first time; ``xgh``
+      5. The red offboard area is drawn as a filled Polyshape
+      6. The hexagonal grid is drawn for the second time ; ``xgf`` and
+         its features are created.
+
+      The creation of the map grid happens twice in order to allow the red,
+      offboard Polyshape to make use of the grid coordinates for its drawing
+      routine. The second time the map grid is drawn, it then overlays that
+      same area, and adds the labels and features.
+
+      It can be seen from the :ref:`Polyshape <polyshape-command>` example that
+      every hexagon in the map can be referenced by the ``MAPNAME.ZZ`` method;
+      where ``MAPNAME`` is the name assigned to the map grid (in the above
+      example it is ``xgh``), followed by a dot, followed by a reference to a
+      hexagon (the ``ZZ``) using the grid notation e.g. ``A7`` or ``D8``. It
+      is also possible to append to the reference, the compass direction for
+      a vertex of that hexagon and, if needed, further append a reference to
+      the ``x`` or ``y`` value of that vertex.  So, for example, the position
+      ``xgh.D8.ne.y`` is the distance from the top of the page |dash| "y"
+      |dash| of the north-east vertex of the hexagon at grid location ``D8``
+      of the XX18 grid named ``xgh``.
+
+      Note that the SVG for the map of Ghana shown here is sourced from
       https://simplemaps.com/svg/country/gh#all - a very useful resource
       for simple, scalable country outlines.
-
 
 ===== ======
 
@@ -1406,7 +1437,7 @@ the ``XX18State()`` command, that be changed in a JSON file; see
 ==============
 `↑ <xx18Index_>`_
 
-An overview of what 18xx games are about can be found at Board Game Geek:
+An overview of what 18xx games are all about can be found at Board Game Geek:
 https://boardgamegeek.com/boardgamefamily/19/series-18xx
 
 The primary resource for working with 18xx games is the online tool
