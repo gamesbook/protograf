@@ -156,10 +156,12 @@ DEFAULT_SETTINGS = {
     "XX18_DEBUG_FONT_OFFSET_X": 0.0,
     "XX18_DEBUG_FONT_OFFSET_Y": 0.0,
     "XX18_DEBUG_FONT_NAME": "Helvetica",
+    "XX18_STROKE": "black",
     "XX18_STROKE_WIDTH": 1,  # points
     "XX18_STROKE_WIDTH_BLOCK": 7,  # points
     "XX18_STROKE_WIDTH_HIGHLIGHT": 8,  # points
     "XX18_STROKE_TRANSPARENCY_HIGHLIGHT": 50,  # percent
+    "XX18_TEXT_STROKE": "black",
     "XX18_TEXT_XXS": 7,  # points
     "XX18_TEXT_XS": 9,  # points
     "XX18_TEXT_SMALL": 11,  # points
@@ -1169,19 +1171,19 @@ class XX18GameObject(CoreGameObject):
         kwargs["heading"] = heading
         kwargs["heading_size"] = font_size
         kwargs["heading_font"] = self.xxs["XX18_TEXT_FONT"]
-        kwargs["heading_stroke"] = "black"
+        kwargs["heading_stroke"] = self.xxs["XX18_TEXT_STROKE"]
 
         kwargs["title"] = title
         kwargs["title_size"] = font_size
         kwargs["title_font"] = self.xxs["XX18_TEXT_FONT"]
-        kwargs["title_stroke"] = "black"
+        kwargs["title_stroke"] = self.xxs["XX18_TEXT_STROKE"]
 
         kwargs["label"] = _label
         kwargs["label_mx"] = label_mx
         kwargs["label_align"] = label_align
         kwargs["label_size"] = font_size
         kwargs["label_font"] = self.xxs["XX18_TEXT_FONT"]
-        kwargs["label_stroke"] = "black"
+        kwargs["label_stroke"] = self.xxs["XX18_TEXT_STROKE"]
         return kwargs
 
     def process_track_town_position(
@@ -1390,7 +1392,7 @@ class XX18GameObject(CoreGameObject):
                         cxy=geo.centre,
                         height=self.hex_height,
                         fill=None,
-                        stroke="black",
+                        stroke=self.xxs["XX18_TEXT_STROKE"],
                         stroke_width=0.1,
                         orientation=self.orientation,
                         paths_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
@@ -2163,7 +2165,7 @@ class XX18GameObject(CoreGameObject):
             Text(
                 text=letter,
                 xy=ccentre,
-                stroke="black",
+                stroke=self.xxs["XX18_TEXT_STROKE"],
                 stroke_width=self.stroke_width_xx,
                 font_size=self.xxs["XX18_TEXT_XXL"],
                 font_name=self.xxs["XX18_TEXT_FONT_BOLD"],
@@ -2389,7 +2391,7 @@ class XX18GameObject(CoreGameObject):
                     fill_stroke=_colors[key],
                     label=inc,
                     label_font=self.xxs["XX18_TEXT_FONT"],
-                    label_stroke="black",
+                    label_stroke=self.xxs["XX18_TEXT_STROKE"],
                     **kwargs,
                 )
                 x = x + box_width if table_orientation == "H" else x
@@ -2457,13 +2459,13 @@ class XX18GameObject(CoreGameObject):
                 lwargs = {}
                 lwargs["font_name"] = self.xxs["XX18_TEXT_FONT"]
                 lwargs["font_size"] = self.xxs["XX18_TEXT_SMALL"]
-                kwargs["stroke"] = "black"
+                kwargs["stroke"] = self.xxs["XX18_TEXT_STROKE"]
                 lwargs["heading_font"] = self.xxs["XX18_TEXT_FONT"]
                 lwargs["heading_size"] = self.xxs["XX18_TEXT_SMALL"]
-                kwargs["heading_stroke"] = "black"
+                kwargs["heading_stroke"] = self.xxs["XX18_TEXT_STROKE"]
                 lwargs["title_font"] = self.xxs["XX18_TEXT_FONT"]
                 lwargs["title_size"] = self.xxs["XX18_TEXT_SMALL"]
-                kwargs["title_stroke"] = "black"
+                kwargs["title_stroke"] = self.xxs["XX18_TEXT_STROKE"]
 
                 label_location = kwargs.get("label_location", "below")
                 relative_location = self.relative_location(label_location)
@@ -2538,14 +2540,14 @@ class XX18GameObject(CoreGameObject):
                         delta_y = self.xxs["XX18_TEXT_SMALL"] / self.units
 
                     if c_e.x > c_s.x and c_e.y < c_s.y:
-                        talign = "left"
+                        talign = "right" if labove else "left"
                     if c_e.x < c_s.x and c_e.y > c_s.y:
                         talign = "right" if labove else "left"
 
                     if c_e.x > c_s.x and c_e.y > c_s.y:
                         talign = "left" if labove else "right"
                     if c_e.x < c_s.x and c_e.y < c_s.y:
-                        talign = "right"
+                        talign = "left" if labove else "right"
 
                     if c_e.x == c_s.x:
                         # vertically rotate text

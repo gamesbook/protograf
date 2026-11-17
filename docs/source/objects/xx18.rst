@@ -1419,6 +1419,7 @@ the ``XX18State()`` command, that be changed in a JSON file; see
 * ``"XX18_STROKE_WIDTH_BLOCK"`` - default is ``7`` points; width of block feature line
 * ``"XX18_STROKE_WIDTH_HIGHLIGHT"`` - default is ``8`` points; width of highlight feature line
 * ``"XX18_STROKE_TRANSPARENCY_HIGHLIGHT"`` - default is ``50`` (%); transparency of highlight feature line
+* ``"XX18_TEXT_STROKE"`` - default is ``black"``; text is drawn this color
 * ``"XX18_TEXT_XXS"`` - default is ``7`` points; extra-extra small text
 * ``"XX18_TEXT_XS"`` - default is ``9`` points; extra small text
 * ``"XX18_TEXT_SMALL"`` - default is ``11`` points; small text
