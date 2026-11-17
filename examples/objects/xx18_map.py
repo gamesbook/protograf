@@ -18,22 +18,22 @@ Create(
 
 Rectangle(
     x=-1.25, y=-1.25,
-    height=22, width=21,
+    height=22.5, width=21,
     fill_stroke="limegreen")
 Rectangle(
     x=-1.25, y=19.5,
-    height=6, width=4,
+    height=6.2, width=4,
     fill_stroke="limegreen")
 
 Image(
     "images/gh.svg",
     height=30, width=20,
-    y=-2, x=-1)
+    y=-1.7, x=-0.5)
 
 map_pattern ="""
 O O O O
  O O O .
-O O O O
+. O O O
  O O O O
 O O O O
  O O O O
@@ -60,6 +60,15 @@ Polyshape(
       (21, xgh.A7.se.y)
     ]
 )
+Polyshape(
+    fill_stroke="xgray",
+    points=[
+      xgh.G7.n,
+      xgh.G7.nw,
+      xgh.G7.sw,
+      xgh.G7.ne
+    ]
+)
 
 xgf = XX18Game(
     rows=7,
@@ -68,7 +77,8 @@ xgf = XX18Game(
     fill=None,
     pattern=map_pattern,
     features=[
-        ('B8', 'spike', 'w sw', "medium",),
+        ('B8', 'spike', 'w sw', 'medium',),
+        ('G7', 'track', 'w,ne', ),
     ]
     )
 XX18State(board=xgf)

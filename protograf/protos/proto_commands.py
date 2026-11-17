@@ -319,6 +319,14 @@ def Create(**kwargs):
     if kwargs.get("paper_width") or kwargs.get("paper_height"):
         _page_width = tools.as_float(kwargs.get("paper_width", 0), "paper_width")
         _page_height = tools.as_float(kwargs.get("paper_height", 0), "paper_height")
+        if _page_height <= 0 and _page_width <= 0:
+            feedback(
+                "Cannot set both paper_width and paper_height less than or equal to zero.",
+                True,
+                True,
+            )
+        _page_width = _page_width if _page_width > 0 else _page_height
+        _page_height = _page_height if _page_height > 0 else _page_width
         _page_width_pt = (
             _page_width * globals.units if _page_width > 0 else globals.paper[0]
         )

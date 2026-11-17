@@ -97,7 +97,7 @@ The ``XX18Game()`` command can depict:
   (two sizes), hills, and rivers
 * symbols for special features such as: coal, desert, factory, fish,
   flag, forest, hills, lock, mine, noentry, oil, pennant, port,
-  swamp, train, tree, tunnel
+  swamp, swamps, train, tree, tunnel
 * a river; as "wavy line"; running through a hexagon
 * a custom shape in a hexagon
 * a single piece of text
@@ -1261,22 +1261,22 @@ exceptions.  For these cases, you need to fall back to using
 
         Rectangle(
             x=-1.25, y=-1.25,
-            height=22, width=21,
+            height=22.5, width=21,
             fill_stroke="limegreen")
         Rectangle(
             x=-1.25, y=19.5,
-            height=6, width=4,
+            height=6.2, width=4,
             fill_stroke="limegreen")
 
         Image(
             "images/gh.svg",
             height=30, width=20,
-            y=-2, x=-1)
+            y=-1.7, x=-0.5)
 
         map_pattern ="""
         O O O O
          O O O .
-        O O O O
+        . O O O
          O O O O
         O O O O
          O O O O
@@ -1287,8 +1287,7 @@ exceptions.  For these cases, you need to fall back to using
             rows=7,
             cols=4,
             fill=None,
-            pattern=map_pattern
-        )
+            pattern=map_pattern)
         XX18State(board=xgh)
 
         Polyshape(
@@ -1304,6 +1303,15 @@ exceptions.  For these cases, you need to fall back to using
               (21, xgh.A7.se.y)
             ]
         )
+        Polyshape(
+            fill_stroke="xgray",
+            points=[
+              xgh.G7.n,
+              xgh.G7.nw,
+              xgh.G7.sw,
+              xgh.G7.ne
+            ]
+        )
 
         xgf = XX18Game(
             rows=7,
@@ -1312,31 +1320,34 @@ exceptions.  For these cases, you need to fall back to using
             fill=None,
             pattern=map_pattern,
             features=[
-                ('B8', 'spike', 'w sw', "medium",),
+                ('B8', 'spike', 'w sw', 'medium'),
+                ('G7', 'track', 'w,ne'),
             ]
-        )
+            )
+
         XX18State(board=xgf)
 
       This example shows the use of other shapes provided by **protograf**,
       together with the use of layering, to supplement the ``XX18Game()``
-      command for creation of map-enhanced board.
+      command for the creation of a map-enhanced board.
 
-      There are effectively six main layers in the board creation process:
+      There are effectively six main layers in this board creation process:
 
       1. The primary blue color is set when the page is created, using *fill*
-      2. The green land area is then drawn in the form of Rectangles.
+      2. The green land areas are then drawn in the form of Rectangles.
       3. The map itself is loaded as an Image.
-      4. The hexagonal grid is drawn for the first time; ``xgh``
-      5. The red offboard area is drawn as a filled Polyshape
-      6. The hexagonal grid is drawn for the second time ; ``xgf`` and
+      4. The hexagonal grid is drawn for the first time, named ``xgh``.
+      5. The red offboard area is drawn as a filled Polyshape; and the grey
+         half-hexagon is drawn as a filled Polyshape.
+      6. The hexagonal grid is drawn for the second time as ``xgf`` and
          its features are created.
 
-      The creation of the map grid happens twice in order to allow the red,
-      offboard Polyshape to make use of the grid coordinates for its drawing
+      The creation of the map grid happens twice in order to allow the two
+      Polyshapes to make use of the grid coordinates for their drawing
       routine. The second time the map grid is drawn, it then overlays that
       same area, and adds the labels and features.
 
-      It can be seen from the :ref:`Polyshape <polyshape-command>` example that
+      It can be seen from the :ref:`Polyshapes <polyshape-command>` that
       every hexagon in the map can be referenced by the ``MAPNAME.ZZ`` method;
       where ``MAPNAME`` is the name assigned to the map grid (in the above
       example it is ``xgh``), followed by a dot, followed by a reference to a
@@ -1384,7 +1395,7 @@ XX18 Style Settings
 `↑ <xx18Index_>`_
 
 The following are the "internal" settings for styles and sizes used by
-the ``XX18State()`` command, that be changed in a JSON file; see
+the ``XX18Game()`` command, that be changed in a JSON file; see
 `XX18Game JSON Styles`_.
 
 * ``"XX18_HEX_SIDE"`` - default is ``2.3864`` cm; length of standard hexagon edge

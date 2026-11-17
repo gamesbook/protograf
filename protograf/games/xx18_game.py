@@ -27,7 +27,7 @@ The 18xx map "blueprint" feature covers depiction of:
   (two sizes), hills, and rivers
 * symbols for special features such as: coal, desert, factory, fish,
   flag, forest, hills, lock, mine, noentry, oil, pennant, port,
-  swamp, train, tree, tunnel
+  swamp, swamps, train, tree, tunnel
 * a river; as "wavy line"; running through a hex
 * a custom shape in a hex
 * a single piece of text
@@ -224,6 +224,7 @@ XX18_SYMBOL_SET = [
     "port",
     "river",
     "swamp",
+    "swamps",
     "train",
     "tree",
     "tunnel",
@@ -1392,8 +1393,9 @@ class XX18GameObject(CoreGameObject):
                         cxy=geo.centre,
                         height=self.hex_height,
                         fill=None,
-                        stroke=self.xxs["XX18_TEXT_STROKE"],
+                        stroke="white",
                         stroke_width=0.1,
+                        stroke_transparency=100,
                         orientation=self.orientation,
                         paths_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
                         paths_stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"]
@@ -1431,8 +1433,9 @@ class XX18GameObject(CoreGameObject):
                         cxy=geo.centre,
                         height=self.hex_height,
                         fill=None,
-                        stroke="black",
+                        stroke="white",
                         stroke_width=0.1,
+                        stroke_transparency=100,
                         orientation=self.orientation,
                         paths_stroke="black",
                         paths_stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"]
@@ -1603,17 +1606,6 @@ class XX18GameObject(CoreGameObject):
                 wave_height=0.15,
             )
             start_point = current_point
-            # GridLine(
-            #     self.board_layout,
-            #     start=_loc,
-            #     point=point,
-            #     edges=edges,
-            #     stroke=river_stroke,
-            #     stroke_width=_river_width,
-            #     stroke_ends="rounded",
-            #     wave_style="wave",
-            #     wave_height=0.15,
-            # )
 
     def town(
         self,
@@ -2615,6 +2607,8 @@ class XX18GameObject(CoreGameObject):
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/river.svg")
             case "swamp":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/swamp.svg")
+            case "swamps":
+                _file = files("protograf").joinpath(f"{XX18_RESOURCES}/swamps.svg")
             case "factory":
                 _file = files("protograf").joinpath(f"{XX18_RESOURCES}/factory.svg")
             case "fish":
