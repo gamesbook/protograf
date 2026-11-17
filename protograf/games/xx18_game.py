@@ -2218,7 +2218,18 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Hexagon
 
         _locations = self.process_locations(location, "highlight")
-        _color = color if color else self.xxs["XX18_HEX_YELLOW"]
+        if "XX18_" in color:
+            try:
+                _color = self.xxs[color]
+            except KeyError:
+                feedback(
+                    f"{color} is not a defined XX18 color usable for a fill.",
+                    False,
+                    True,
+                )
+        else:
+            _color = color if color else self.xxs["XX18_HEX_YELLOW"]
+
         the_color = colrs.get_color(_color)
         _height = self.hex_height - self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"] / self.units
         for _loc in _locations:
@@ -2277,6 +2288,7 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         orientation: str = None,
+        colors: list = None,
         **kwargs,
     ):
         """Draw a Phase Revenue table at hex location(s).
@@ -2288,27 +2300,24 @@ class XX18GameObject(CoreGameObject):
             distance (float): distance from hex centre
             orientation (str):
                 the table layout; either vertical (v) or horizontal (h)
-
-        Kwargs:
             colors (list): the colors to use for the different incomes
         """
         from protograf.protos import Rectangle
 
         _locations = self.process_locations(location, "phase_revenue")
-        if kwargs.get("colors"):
-            _colors = kwargs.get("colors")
-            if not isinstance(_colors, (tuple, list)):
+        if colors:
+            if not isinstance(colors, (tuple, list)):
                 feedback(
-                    f"The phase_revenue setting '{_colors}' for {location}"
-                    f' must be a list, not "{_colors}"',
+                    f"The phase_revenue setting '{colors}' for {location}"
+                    f' must be a list, not "{colors}"',
                     True,
                     True,
                 )
-            for _colr in _colors:
+            for _colr in colors:
                 colrs.get_color(_colr)
             colors_default = False
         else:
-            _colors = [
+            colors = [
                 self.xxs["XX18_HEX_YELLOW"],
                 self.xxs["XX18_HEX_GREEN"],
                 self.xxs["XX18_HEX_BROWN"],
@@ -2343,14 +2352,14 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
-        if len(incomes) > len(_colors):
+        if len(incomes) > len(colors):
             feedback(
                 f"Each phase_revenue income for {_locations} must have a matching color",
                 True,
                 True,
             )
         if len(incomes) == 2 and colors_default:
-            _colors = [self.xxs["XX18_HEX_YELLOW"], self.xxs["XX18_HEX_BROWN"]]
+            colors = [self.xxs["XX18_HEX_YELLOW"], self.xxs["XX18_HEX_BROWN"]]
         # ---- table sizes
         box_width = self.xxs["XX18_PHASE_REVENUE_BOX"]
         box_height = self.xxs["XX18_PHASE_REVENUE_BOX"] * 0.8
@@ -2380,7 +2389,7 @@ class XX18GameObject(CoreGameObject):
                     y=y,
                     height=box_height,
                     width=box_width,
-                    fill_stroke=_colors[key],
+                    fill_stroke=colors[key],
                     label=inc,
                     label_font=self.xxs["XX18_TEXT_FONT"],
                     label_stroke=self.xxs["XX18_TEXT_STROKE"],

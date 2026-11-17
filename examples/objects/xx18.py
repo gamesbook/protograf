@@ -211,7 +211,7 @@ xgfs = XX18Game(
     features=[
         ('A1', 'oil', None, 'oil'),
         ('A3', 'coal', None, 'coal'),
-        ('A5', 'factory', None, 'factory'),
+        ('A5', 'mine', None, 'mine'),
         ('B2', 'river', None, 'river'),
         ('B4', 'swamp', None, 'swamp',),
         ('B6', 'desert', None, 'desert'),
@@ -220,10 +220,10 @@ xgfs = XX18Game(
         ('C5', 'tree', None, 'tree'),
         ('D2', 'port', None, 'port'),
         ('D4', 'tunnel', None, 'tunnel'),
-        ('D6', 'hills', None, 'hills'),
+        ('D6', 'factory', None, 'factory'),
         ('E1', 'flag', None, 'flag'),
         ('E3', 'pennant', None, 'pennant'),
-        ('E5', 'noentry', None, 'noentry'),
+        ('E5', 'hills', None, 'hills'),
     ]
 )
 XX18State(board=xgfs)
@@ -246,8 +246,9 @@ xgfi = XX18Game(
         ('D4', 'spike', 'nw ne', "long",),
         ('C1', 'spike', 'ne se', "medium",),
         # offboard phase revenue
-        ('C1', 'phase_revenue', (180, .3), '10 20 30 40'),
         ('A5', 'phase_revenue', None, '20 40', ['xbrown', 'pink']),
+        ('C1', 'phase_revenue', (180, .3), '10 20 30 40'),
+        ('D4', 'phase_revenue', (90, .2), '20 30'),
 
     ]
 )
@@ -268,12 +269,13 @@ xgfif = XX18Game(
         ('C1', 'hex_fill', None, 'xoffboard'),
         ('B8', 'hex_fill', None, 'xoffboard'),
         # offboard tracks
-        ('A5', 'spike', '"n se', "short",),
+        ('A5', 'spike', '"n se', "medium",),
         ('B8', 'spike', 'nw ne', "long",),
-        ('C1', 'spike', 'ne se', "medium",),
+        ('C1', 'spike', 'ne se', "short",),
         # offboard phase revenue
-        ('C1', 'phase_revenue', (180, .1), '10 20 30 40'),
-        ('A5', 'phase_revenue', None, '30 50', ['xgrey', 'pink']),
+        ('C1', 'phase_revenue', (180, 0.1), '10 20 30 40'),
+        ('B8', 'phase_revenue', (90, 0.2), '30 50'),
+        ('A5', 'phase_revenue', None, '30 50 60', ['xgrey', 'pink', 'purple']),
     ]
 )
 XX18State(board=xgfif)
@@ -386,7 +388,11 @@ XX18State(board=xgffn)
 xgffn.hex_fill('C5', 'xoffboard')
 xgffn.phase_revenue(
     "C5", "30 40 50", 0, 0.3, "vertical",
-    colors=["xbrown","xgrey","pink"])
+    ["xbrown","xgrey","pink"])
+xgffn.block(
+    'B4', 'ne n nw',
+    dotted=True)
+
 
 Text("XX18Game: Functions", common=footer)
 

@@ -542,6 +542,7 @@ and must follow the sequence below.
    * the first number is *direction* |dash| degrees clockwise from the east
    * the second number is *distance* |dash| a fraction of the hexagon's
      radius from the location's centre
+
    For example, ``(90, 0.5)`` is a point in the "south" direction, half-way
    along the radius.
 4. Feature **label**:  the name or text associated with a feature; for example,
@@ -849,7 +850,7 @@ Feature #6. Symbols
 
         ('A1', 'oil', None, 'oil'),
         ('A3', 'coal', None, 'coal'),
-        ('A5', 'factory', None, 'factory'),
+        ('A5', 'mine', None, 'mine'),
         ('B2', 'river', None, 'river'),
         ('B4', 'swamp', None, 'swamp',),
         ('B6', 'desert', None, 'desert'),
@@ -858,10 +859,10 @@ Feature #6. Symbols
         ('C5', 'tree', None, 'tree'),
         ('D2', 'port', None, 'port'),
         ('D4', 'tunnel', None, 'tunnel'),
-        ('D6', 'hills', None, 'hills'),
+        ('D6', 'factory', None, 'factory'),
         ('E1', 'flag', None, 'flag'),
         ('E3', 'pennant', None, 'pennant'),
-        ('E5', 'noentry', None, 'noentry'),
+        ('E5', 'hills', None, 'hills'),
 
       This example shows how to add different symbols to the board.
 
@@ -994,11 +995,12 @@ Feature #9. Offboard Income: Pointy
         ('D4', 'hex_fill', None, 'xoffboard'),
         # offboard tracks
         ('A5', 'spike', 'w se', "short",),
-        ('D4', 'spike', 'nw ne', "long",),
         ('C1', 'spike', 'ne se', "medium",),
+        ('D4', 'spike', 'nw ne', "long",),
         # offboard phase revenue
-        ('C1', 'phase_revenue', (180, 0.3), '10 20 30 40'),
         ('A5', 'phase_revenue', None, '20 40', ['xbrown', 'pink']),
+        ('C1', 'phase_revenue', (180, .3), '10 20 30 40'),
+        ('D4', 'phase_revenue', (90, .2), '20 30'),
 
       This example shows how to add and annotate an offboard hex, to the
       board, as well as to define its income in tabular form.
@@ -1011,11 +1013,16 @@ Feature #9. Offboard Income: Pointy
       Offboard locations often offer income to the company whose track connects
       to them.  This is shown in a table, colored to match the hase of the
       game for which the income applies, as defined by the *phase_revenue*
-      feature.  The income itself appears as space-separated values in the
-      "labels" part of the specification list.  A fifth item in the
-      specifications can be added to define a custom set of colors to be
-      used that differ from the normal "yellow, green, red, grey" sequence.
-      There must be a matching color for each value in the income "label".
+      feature.
+
+      The colors for the table cells are from a "yellow, green, brown, grey"
+      sequence or, for the case of two income values, a "yellow, brown"
+      sequence. This can be seen for hexagons ``C1`` and ``D4`` respectively.
+
+      A fifth item in the specifications can be added to define a custom set
+      of different colors to be used, as can be seen for hexagon ``A5``.
+      Note that there must be a matching color for each value in the income
+      "label".
 
       For a board grid with "pointy" orientation of the hexagons, the income
       table is drawn vertically.
@@ -1038,16 +1045,15 @@ Feature #10. Offboard Income: Flat
         # offboard color fills
         ('A5', 'hex_fill', None, 'xoffboard'),
         ('C1', 'hex_fill', None, 'xoffboard'),
-        ('C5', 'hex_fill', None, 'xoffboard'),
         ('B8', 'hex_fill', None, 'xoffboard'),
         # offboard tracks
-        ('A5', 'spike', '"n se', "short",),
+        ('A5', 'spike', '"n se', "medium",),
         ('B8', 'spike', 'nw ne', "long",),
-        ('C1', 'spike', 'ne se', "medium",),
-        ('C5', 'spike', 'sw', "long",),
+        ('C1', 'spike', 'ne se', "short",),
         # offboard phase revenue
         ('C1', 'phase_revenue', (180, 0.1), '10 20 30 40'),
-        ('A5', 'phase_revenue', None, '30 50', ['xgrey', 'pink']),
+        ('B8', 'phase_revenue', (90, 0.2), '30 50'),
+        ('A5', 'phase_revenue', None, '30 50 60', ['xgrey', 'pink', 'purple']),
 
       This example shows how to add and annotate an offboard hex, to a
       board with flat hexes, as well as to define its income in tabular form.
@@ -1061,10 +1067,16 @@ Feature #10. Offboard Income: Flat
       to them.  This is shown in a table, colored to match the hase of the
       game for which the income applies, as defined by the *phase_revenue*
       feature.  The income itself appears as space-separated values in the
-      "labels" part of the specification list.  A fifth item in the
-      specifications can be added to define a custom set of colors to be
-      used that differ from the normal "yellow, green, red, grey" sequence.
-      There must be a matching color for each value in the income "label".
+      "labels" part of the specification list.
+
+      The colors for the table cells are from a "yellow, green, brown, grey"
+      sequence or, for the case of two income values, a "yellow, brown"
+      sequence. This can be seen for hexagons ``C1`` and ``B8`` respectively.
+
+      A fifth item in the specifications can be added to define a custom set
+      of different colors to be used, as can be seen for hexagon ``A5``.
+      Note that there must be a matching color for each value in the income
+      "label".
 
       For a board grid with "flat" orientation of the hexagons, the income
       table is drawn horizontally.
@@ -1223,11 +1235,19 @@ in some cases, allow further customisation than is otherwise possible.
         xgffn.phase_revenue(
             "C5", "30 40 50", 0, 0.3, "vertical",
             colors=["xbrown","xgrey","pink"])
+        xgffn.block(
+            'B4', 'ne n nw',
+            dotted=True)
 
       The way to reference the functions is by appending their name to the
       name assigned to the ``XX18Game()`` command; so, for example,
       ``xgffn.hex_fill()``.  The properties for that function are then
       supplied between the ``()`` brackets.
+
+      Functions should also support additional properties that could normally
+      be assigned to their "underlying" shape. For example, the *block* in
+      ``B4`` is a just a :ref:`line <line-command>` and so its style can be
+      changed |dash| in this case to dotted.
 
 ===== ======
 
