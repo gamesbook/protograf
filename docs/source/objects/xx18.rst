@@ -493,8 +493,8 @@ XX18Game Features
 - `Summary`_
 - `General Feature Specification`_
 - `Construction of Examples`_
-- `Feature #1. Town and Mountain`_
-- `Feature #2. City`_
+- `Feature #1. City`_
+- `Feature #2. Town and Mountain`_
 - `Feature #3. Train Track`_
 - `Feature #4. Train Track & Town`_
 - `Feature #5. Train track-to-edge`_
@@ -589,48 +589,7 @@ features for that board; this is the part that differs for each example.
     XX18State(board=xgfc)
 
 
-Feature #1. Town and Mountain
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xx18GameFeatures_>`_
-
-.. |gft| image:: ../images/objects/xx18_features_town.png
-   :width: 330
-
-===== ======
-|gft| This example shows setting of *features* of an ``XX18Game``:
-
-      .. code:: python
-
-        ('A1', 'town'),
-        ('B4', 'town', (90, 0.3), 'Burham', 'above'),
-        ('C1', 'mountain'),
-        ('C3 D2 D4', 'mountain', (270, 0.5), '$40'),
-        ('C5', 'mountains', None, "mountains"),
-
-      This example shows how to add a town or a mountain to the board.
-
-      A town is typically depicted by a small, solid black circle.
-
-      A town is by default drawn at the centre of the hexagon, or hexagons,
-      in which it is located (``A1`` in this example).  To shift the position,
-      set values for ``(direction, distance)`` offset; for example, in ``B4``.
-      The town name and the relative label position can also be set, as shown
-      for ``B4``.
-
-      A mountain is typically depicted by a small, solid black triangle.
-
-      A mountain is by default drawn at the centre of the hexagon, or hexagons,
-      in which it is located (``C1`` in this example). To shift the position,
-      set values for ``(direction, distance)`` offset; for example, the ones in
-      ``C3 D2 D4``.
-
-      A pair of mountains can be shown using the ``mountains`` symbol |dash|
-      note the plural form!
-
-===== ======
-
-
-Feature #2. City
+Feature #1. City
 ~~~~~~~~~~~~~~~~
 `^ <xx18GameFeatures_>`_
 
@@ -694,6 +653,58 @@ Feature #2. City
       Multiple shapes can be added to a city comprised of multiple circles;
       the features should be in a list i.e. enclosed in square brackets
       ``[ ... ]``, and will appear on the city circles in clockwise order.
+
+===== ======
+
+
+Feature #2. Town and Mountain
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18GameFeatures_>`_
+
+.. |gft| image:: ../images/objects/xx18_features_town.png
+   :width: 330
+
+===== ======
+|gft| This example shows setting of *features* of an ``XX18Game``:
+
+      .. code:: python
+
+        ('A1', 'town'),
+        ('A3', 'town', (90, .3), 'Arkham', 'above'),
+        ('A5', circle(fill=None, radius=0.8)),
+        ('A5', 'town',),
+        ('B2', 'mountain'),
+        ('B4 C1 C3', 'mountain', (270, .5), '$40'),
+        ('B6', 'mountains', None, "mountains"),
+        ('D2', triangle(side=1.5, fill=None, stroke_width=2, label="$20")),
+        ('D4', triangle(side=1.5, fill="tan", stroke_width=1, title="$20")),
+
+      This example shows how to add a town or a mountain to the board.
+
+      A town is typically depicted by a small, solid black circle.
+
+      A town is by default drawn at the centre of the hexagon, or hexagons,
+      in which it is located (``A1`` in this example).  To shift the position,
+      set values for ``(direction, distance)`` offset; for example, in ``B4``.
+      The town name and the relative label position can also be set, as shown
+      for ``A3``.  A town can be depicted along with other shapes; in this
+      example, a large, empty circle is drawn first at ``A5``, and then the
+      town is drawn "on top" of it.
+
+      A mountain is typically depicted by a small, solid black triangle,
+      drawn at the centre of the hexagon; see the example in ``B2``.
+
+      To shift the position of the mountain, set values for the offset
+      as ``(direction, distance)``; for example, the ones in ``B4 C1 C3``.
+
+      A pair of mountains can be shown using the ``mountains`` symbol |dash|
+      note the plural form of the name for ``B6``.
+
+      It could be that mountains need to be represented a little differently.
+      The simplest way to do this is via a ``triangle()`` shape, whose various
+      properties can be set to provide a custom look, as shown in ``D2`` and
+      ``D4``.  For more details see the
+      :ref:`Triangle command <triangle-command>` documentation.
 
 ===== ======
 
@@ -1343,7 +1354,11 @@ exceptions.  For these cases, you need to fall back to using
                 ('B8', 'spike', 'w sw', 'medium'),
                 ('G7', 'track', 'w,ne'),
             ]
-            )
+        )
+        Text(
+          "Togo",
+          xy=xgf.B8.c,
+          stroke="white", font_size=18)
 
         XX18State(board=xgf)
 
@@ -1378,6 +1393,10 @@ exceptions.  For these cases, you need to fall back to using
       ``xgh.D8.ne.y`` is the distance from the top of the page |dash| "y"
       |dash| of the north-east vertex of the hexagon at grid location ``D8``
       of the XX18 grid named ``xgh``.
+
+      The text added to grid location ``D8`` also makes uses of the geometry
+      available for that hexagon; in this case its using the ``.c`` (short
+      for ``centre``) property to locate where the text is displayed.
 
       Note that the SVG for the map of Ghana shown here is sourced from
       https://simplemaps.com/svg/country/gh#all - a very useful resource
@@ -1427,7 +1446,8 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
 * ``"XX18_TOWN_HEIGHT_OUTER"`` - default is ``0.8`` cm; rectangular town size (outer)
 * ``"XX18_TOWN_WIDTH"`` - default is ``0.4`` cm; rectangular town size (inner)
 * ``"XX18_TOWN_WIDTH_OUTER"`` - default is ``0.5`` cm; rectangular town size (outer)
-* ``"XX18_TOWN_BORDER_STROKE"`` - default is ``white``; rectangular town color (outer)
+* ``"XX18_TOWN_STROKE"`` - default is ``white``; circular town color (outer line)
+* ``"XX18_TOWN_FILL"`` - default is ``black``; circular town color (fill)
 * ``"XX18_PRIVATE_DIAMETER"`` - default is ``0.4`` cm; private railroad circle size
 * ``"XX18_REVENUE_DIAMETER"`` - default is ``0.8`` cm; in-hex revenue circle size
 * ``"XX18_REVENUE_FILL"`` - default is ``None``; in-hex revenue circle fill color

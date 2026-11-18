@@ -137,13 +137,15 @@ DEFAULT_SETTINGS = {
     "XX18_TOWN_HEIGHT_OUTER": 0.8,  # cm
     "XX18_TOWN_WIDTH": 0.4,  # cm
     "XX18_TOWN_WIDTH_OUTER": 0.5,  # cm
-    "XX18_TOWN_BORDER_STROKE": "white",
+    "XX18_TOWN_STROKE": "black",
+    "XX18_TOWN_FILL": "black",
     "XX18_PRIVATE_DIAMETER": 0.4,  # cm
     "XX18_REVENUE_DIAMETER": 0.8,  # cm
     "XX18_REVENUE_FILL": None,  # no color
     "XX18_REVENUE_STROKE": "black",
     "XX18_TRACK_INNER_WIDTH": 0.4,  # cm
     "XX18_TRACK_OUTER_WIDTH": 0.5,  # cm
+    "XX18_TRACK_INNER_FILL": "black",
     "XX18_TRACK_OUTER_FILL": "white",
     "XX18_MOUNTAIN_SIDE": 0.6,  # cm; side of triangle
     "XX18_MOUNTAIN_FILL": "black",  # inside triangle
@@ -1122,6 +1124,25 @@ class XX18GameObject(CoreGameObject):
                     True,
                 )
 
+    def process_color(self, color: str = None, default: str = None) -> str:
+        """Get a normal or XX18 color string."""
+        _color = None
+        if color and "XX18_" in color:
+            try:
+                _color = self.xxs[color]
+            except KeyError:
+                feedback(
+                    f"{color} is not a defined XX18 color usable for a fill.",
+                    False,
+                    True,
+                )
+        else:
+            _color = color if color else default
+        if _color:
+            the_color = colrs.get_color(_color)
+            return the_color
+        return None
+
     def process_label(
         self,
         label: str,
@@ -1339,6 +1360,8 @@ class XX18GameObject(CoreGameObject):
         position: str = None,
         label: str = None,
         town: str = None,
+        color: str = None,
+        stroke: str = None,
         **kwargs,
     ):
         """Draw track between hexsides at hex location(s).
@@ -1349,6 +1372,7 @@ class XX18GameObject(CoreGameObject):
             stroke: the name of a color (defaults to self.barrier)
             label (str): the text to be drawn above/below the line
             town (str): position of a town "block" on the track; middle, start or end
+            color (str): the name of color to use for the track
         """
         from protograf.protos import Hexagon, Rectangle
 
@@ -1356,6 +1380,9 @@ class XX18GameObject(CoreGameObject):
         if position is None:
             position = []
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
+        # breakpoint()
+        track_outer_fill = self.process_color(color, self.xxs["XX18_TRACK_OUTER_FILL"])
+        track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
         paths = []
         perbii = ""
 
@@ -1397,12 +1424,12 @@ class XX18GameObject(CoreGameObject):
                         stroke_width=0.1,
                         stroke_transparency=100,
                         orientation=self.orientation,
-                        paths_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
+                        paths_stroke=track_outer_fill,
                         paths_stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"]
                         * self.units,
                         paths=paths,
                         perbii=perbii,
-                        perbii_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
+                        perbii_stroke=track_outer_fill,
                         perbii_stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"]
                         * self.units,
                         **kwargs,
@@ -1424,7 +1451,7 @@ class XX18GameObject(CoreGameObject):
                             cxy=ccentre,
                             height=self.xxs["XX18_TOWN_HEIGHT_OUTER"],
                             width=self.xxs["XX18_TOWN_WIDTH_OUTER"],
-                            fill_stroke="white",
+                            fill_stroke=track_outer_fill,
                             stroke_width=self.stroke_width_xx,
                             rotation=rotation,
                             **{**kwargs, **lwargs},
@@ -1437,12 +1464,12 @@ class XX18GameObject(CoreGameObject):
                         stroke_width=0.1,
                         stroke_transparency=100,
                         orientation=self.orientation,
-                        paths_stroke="black",
+                        paths_stroke=track_inner_fill,
                         paths_stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"]
                         * self.units,
                         paths=paths,
                         perbii=perbii,
-                        perbii_stroke="black",
+                        perbii_stroke=track_inner_fill,
                         perbii_stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"]
                         * self.units,
                         **kwargs,
@@ -1452,7 +1479,7 @@ class XX18GameObject(CoreGameObject):
                             cxy=ccentre,  # as set for white above
                             height=self.xxs["XX18_TOWN_HEIGHT"],
                             width=self.xxs["XX18_TOWN_WIDTH"],
-                            fill_stroke="black",
+                            fill_stroke=track_inner_fill,
                             stroke_width=self.stroke_width_xx,
                             rotation=rotation,  # as set for white above
                             **kwargs,
@@ -1472,6 +1499,7 @@ class XX18GameObject(CoreGameObject):
         direction: float = None,
         distance: float = None,
         height: float = None,
+        color: str = None,
         **kwargs,
     ):
         """Draw track between a hexside and a point at a hex location(s).
@@ -1482,6 +1510,7 @@ class XX18GameObject(CoreGameObject):
             direction (float): degrees clockwise from East to end point
             distance (float): distance from hex centre to end point
             height (float): height of the curve above the baseline joining its points
+            color (str): the name of color to use for the track
         """
         from protograf.protos import Line
 
@@ -1489,6 +1518,8 @@ class XX18GameObject(CoreGameObject):
         if position is None:
             position = []
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
+        track_outer_fill = self.process_color(color, self.xxs["XX18_TRACK_OUTER_FILL"])
+        track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
         # ---- validate allowed track position
         for pos in _positions:
             self.validate_edge("track_edge", location, pos)
@@ -1513,7 +1544,7 @@ class XX18GameObject(CoreGameObject):
                 Line(  # underlying white
                     xy=start,
                     xy1=end,
-                    stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
+                    stroke=track_inner_fill,
                     stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units,
                     curve=height,
                     **kwargs,
@@ -1521,7 +1552,7 @@ class XX18GameObject(CoreGameObject):
                 Line(  # overlying black
                     xy=start,
                     xy1=end,
-                    stroke="black",
+                    stroke=track_outer_fill,
                     stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units,
                     curve=height,
                     **kwargs,
@@ -1613,9 +1644,10 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         direction: float = None,
         distance: float = None,
-        border: bool = False,
         style: str = "circle",  # or rectangle
         rotation: float = 0.0,
+        color: str = None,
+        stroke: str = None,
         **kwargs,
     ):
         """Draw Town shape at hex location(s).
@@ -1627,10 +1659,14 @@ class XX18GameObject(CoreGameObject):
             distance (float): distance from hex centre
             style (str): circle or rectangle
             rotation (float): degrees of rotation of rectangular town
+            color (str): the name of color to use for the town fill
+            stroke (str): the name of color to use for the town border
         """
         from protograf.protos import Circle, Rectangle
 
         _locations = self.process_locations(location, "town")
+        town_fill = self.process_color(color, self.xxs["XX18_TOWN_FILL"])
+        town_stroke = self.process_color(stroke, self.xxs["XX18_TOWN_STROKE"])
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
@@ -1650,13 +1686,6 @@ class XX18GameObject(CoreGameObject):
             match _lower(style):
                 case "c" | "circle" | "circular" | "round":
                     # ---- * circle
-                    if border:
-                        Circle(
-                            cxy=ccentre,
-                            radius=self.xxs["XX18_TOWN_BORDER_DIAMETER"] / 2.0,
-                            fill_stroke=self.xxs["XX18_TOWN_BORDER_STROKE"],
-                            stroke_width=self.stroke_width_xx,
-                        )
                     Circle(
                         cxy=ccentre,
                         radius=self.xxs["XX18_TOWN_DIAMETER"] / 2.0,
@@ -1666,20 +1695,12 @@ class XX18GameObject(CoreGameObject):
                     )
                 case "r" | "rectangle" | "rectangular" | "flat":
                     # ---- * rectangle
-                    if border:
-                        Rectangle(
-                            cxy=ccentre,
-                            height=self.xxs["XX18_TOWN_HEIGHT_OUTER"],
-                            width=self.xxs["XX18_TOWN_WIDTH_OUTER"],
-                            fill_stroke="white",
-                            stroke_width=self.stroke_width_xx,
-                            rotation=rotation,
-                        )
                     Rectangle(
                         cxy=ccentre,
                         height=self.xxs["XX18_TOWN_HEIGHT"],
                         width=self.xxs["XX18_TOWN_WIDTH"],
-                        fill_stroke="black",
+                        fill=town_fill,
+                        stroke=town_stroke,
                         stroke_width=self.stroke_width_xx,
                         rotation=rotation,
                     )
@@ -1924,7 +1945,7 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         direction: float = None,
         distance: float = None,
-        colors: list = None,
+        color: str = None,
         **kwargs,
     ):
         """Draw Revenue shape at hex location(s).
@@ -1934,6 +1955,7 @@ class XX18GameObject(CoreGameObject):
             label (str): the value of the revenue
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
+            color (str): the fill color for the revenue circle
         """
         from protograf.protos import Circle
 
@@ -2218,19 +2240,8 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Hexagon
 
         _locations = self.process_locations(location, "highlight")
-        if "XX18_" in color:
-            try:
-                _color = self.xxs[color]
-            except KeyError:
-                feedback(
-                    f"{color} is not a defined XX18 color usable for a fill.",
-                    False,
-                    True,
-                )
-        else:
-            _color = color if color else self.xxs["XX18_HEX_YELLOW"]
-
-        the_color = colrs.get_color(_color)
+        the_color = self.process_color(color, self.xxs["XX18_HEX_YELLOW"])
+        # breakpoint()
         _height = self.hex_height - self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"] / self.units
         for _loc in _locations:
             geo = self.cells.get(_loc)
@@ -2427,6 +2438,7 @@ class XX18GameObject(CoreGameObject):
         location1: str = None,
         direction1: float = None,
         distance1: float = None,
+        color: str = None,
         **kwargs,
     ):
         """Draw Private Railroad at hex location(s).
@@ -2439,6 +2451,7 @@ class XX18GameObject(CoreGameObject):
             location1 (str): grid reference or references for end cell
             direction1 (float): degrees clockwise from East in end cell
             distance1 (float): distance from hex centre in end cell
+            color (str): the name of color to use for the private circle fills
         """
         from protograf.protos import Circle, Line, Text
 

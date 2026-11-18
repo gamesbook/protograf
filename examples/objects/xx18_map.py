@@ -83,6 +83,8 @@ xgf = XX18Game(
     )
 XX18State(board=xgf)
 
+Text("Togo", xy=xgf.B8.c, stroke="white", font_size=18)
+
 Save(
     output='png',
     dpi=300,

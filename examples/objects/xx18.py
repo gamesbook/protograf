@@ -127,10 +127,14 @@ xgft = XX18Game(
     label_size=18,
     features=[
         ('A1', 'town'),
-        ('B4', 'town', (90, .3), 'Burham', 'above'),
-        ('C1', 'mountain'),
-        ('C3 D2 D4', 'mountain', (270, .5), '$40'),
-        ('C5', 'mountains', None, "mountains"),
+        ('A3', 'town', (90, .3), 'Arkham', 'above'),
+        ('A5', circle(fill=None, radius=0.8)),
+        ('A5', 'town',),
+        ('B2', 'mountain'),
+        ('B4 C1 C3', 'mountain', (270, .5), '$40'),
+        ('B6', 'mountains', None, "mountains"),
+        ('D2', triangle(side=1.5, fill=None, stroke_width=2, label="$20")),
+        ('D4', triangle(side=1.5, fill="tan", stroke_width=1, title="$20")),
     ]
 )
 XX18State(board=xgft)
