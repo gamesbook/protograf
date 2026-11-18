@@ -827,7 +827,11 @@ class XX18GameObject(CoreGameObject):
         # ---- feature property values
         kwargs = {}
         ftype = feature[1]
-        if ftype not in XX18_FEATURE_SET and not isinstance(ftype, BaseShape):
+        if (
+            ftype not in XX18_FEATURE_SET
+            and not isinstance(ftype, BaseShape)
+            and not callable(ftype)
+        ):
             feedback(
                 f"The feature '{ftype}' is not available; "
                 f"choose from: \n{XX18_FEATURE_SET} or supply a shape.",
@@ -1030,6 +1034,7 @@ class XX18GameObject(CoreGameObject):
                     position=fdirection,
                     **kwargs,
                 )
+            # ---- built-in symbols
             case "SYMBOL":
                 self.symbol(
                     location=fhexagon,
@@ -1039,6 +1044,7 @@ class XX18GameObject(CoreGameObject):
                     name=ftype,
                     **kwargs,
                 )
+            # ---- custom shape
             case "SHAPE":
                 self.figure(
                     location=fhexagon,
@@ -1049,12 +1055,23 @@ class XX18GameObject(CoreGameObject):
                     **kwargs,
                 )
             case _:
-                feedback(
-                    f"The feature '{ftype}' is not available; "
-                    f"choose from: \n{XX18_FEATURE_SET} or supply a shape.",
-                    True,
-                    True,
-                )
+                # ---- custom function
+                if callable(ftype):
+                    fkwargs = {}
+                    locs = self.process_locations(fhexagon, ftype.__name__)
+                    fkwargs["hexes"] = [self.cells.get(_loc) for _loc in locs]
+                    fkwargs["locations"] = locs
+                    fkwargs["label"] = flabel
+                    fkwargs["direction"] = fdirection
+                    fkwargs["distance"] = fdistance
+                    ftype(**fkwargs)
+                else:
+                    feedback(
+                        f"The feature '{ftype}' is not available; "
+                        f"choose from: \n{XX18_FEATURE_SET} or supply a shape.",
+                        True,
+                        True,
+                    )
 
     def feature_location(
         self, geo: ShapeGeometry, direction: float = None, distance: float = None
@@ -1544,7 +1561,7 @@ class XX18GameObject(CoreGameObject):
                 Line(  # underlying white
                     xy=start,
                     xy1=end,
-                    stroke=track_inner_fill,
+                    stroke=track_outer_fill,
                     stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units,
                     curve=height,
                     **kwargs,
@@ -1552,7 +1569,7 @@ class XX18GameObject(CoreGameObject):
                 Line(  # overlying black
                     xy=start,
                     xy1=end,
-                    stroke=track_outer_fill,
+                    stroke=track_inner_fill,
                     stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units,
                     curve=height,
                     **kwargs,

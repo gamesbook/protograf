@@ -1344,6 +1344,11 @@ exceptions.  For these cases, you need to fall back to using
             ]
         )
 
+        def plot(**kwargs):
+            for loc in kwargs['hexes']:
+                Circle(cxy=loc.e, radius=0.5, fill="blue")
+                Circle(cxy=loc.ssw, radius=0.5, fill="red")
+
         xgf = XX18Game(
             rows=7,
             cols=4,
@@ -1353,6 +1358,8 @@ exceptions.  For these cases, you need to fall back to using
             features=[
                 ('B8', 'spike', 'w sw', 'medium'),
                 ('G7', 'track', 'w,ne'),
+                ('C3', plot),
+                ('D4', plot),
             ]
         )
         Text(
@@ -1379,11 +1386,11 @@ exceptions.  For these cases, you need to fall back to using
 
       The creation of the map grid happens twice in order to allow the two
       Polyshapes to make use of the grid coordinates for their drawing
-      routine. The second time the map grid is drawn, it then overlays that
+      routine. The second time the board grid is drawn, it then overlays that
       same area, and adds the labels and features.
 
       It can be seen from the :ref:`Polyshapes <polyshape-command>` that
-      every hexagon in the map can be referenced by the ``MAPNAME.ZZ`` method;
+      every hexagon on the board can be referenced by the ``MAPNAME.ZZ`` method;
       where ``MAPNAME`` is the name assigned to the map grid (in the above
       example it is ``xgh``), followed by a dot, followed by a reference to a
       hexagon (the ``ZZ``) using the grid notation e.g. ``A7`` or ``D8``. It
@@ -1398,7 +1405,25 @@ exceptions.  For these cases, you need to fall back to using
       available for that hexagon; in this case its using the ``.c`` (short
       for ``centre``) property to locate where the text is displayed.
 
-      Note that the SVG for the map of Ghana shown here is sourced from
+      The features at ``C3`` and ``D4`` are drawn by a custom Python function.
+      A function is defined as normal, but it **must** support ``**kwargs``
+      otherwise the call to it will trigger an error such as :
+
+      .. code:: python
+
+          TypeError: func() got an unexpected keyword argument 'locations'
+
+      The keyword args (``kwargs``) passed to such a function include:
+      list of location grid *locations*; list of *hexes* geometries; the
+      *label*, *direction* and *distance*. Note that just because these
+      values are passed to the function does not mean they have to be
+      used.
+
+      Use of Python functions is provided for those with the skill to
+      create them; however, for a brief introduction, see
+      :doc:`using Python Commands <../python_commands>`.
+
+      **NOTE**: the SVG for the map of Ghana shown here is sourced from
       https://simplemaps.com/svg/country/gh#all - a very useful resource
       for simple, scalable country outlines.
 

@@ -70,6 +70,13 @@ Polyshape(
     ]
 )
 
+
+def plot(**kwargs):
+    for loc in kwargs['hexes']:
+        Circle(cxy=loc.e, radius=0.5, fill="blue")
+        Circle(cxy=loc.ssw, radius=0.5, fill="red")
+
+
 xgf = XX18Game(
     rows=7,
     cols=4,
@@ -79,8 +86,10 @@ xgf = XX18Game(
     features=[
         ('B8', 'spike', 'w sw', 'medium',),
         ('G7', 'track', 'w,ne', ),
+        ('C3', plot),
+        ('D4', plot),
     ]
-    )
+)
 XX18State(board=xgf)
 
 Text("Togo", xy=xgf.B8.c, stroke="white", font_size=18)
