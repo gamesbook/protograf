@@ -1869,7 +1869,7 @@ class XX18GameObject(CoreGameObject):
                     )
                     Rectangle(
                         height=city_diameter,
-                        width=city_diameter,
+                        width=2 * city_diameter,
                         cx=ccentre.centre.x,
                         cy=ccentre.centre.y,
                         **{**kwargs, **rwargs},
