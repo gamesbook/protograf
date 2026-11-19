@@ -194,12 +194,12 @@ xgff = XX18Game(
         ('A5', 'hex_fill', None, 'xbrown'),
         ('B2', 'hex_fill', None, 'xgrey'),
         ('B4', 'hex_fill', None, 'xgray'),
-        ('C1', 'hex_fill', None, 'xwater'),
-        ('C3', 'hex_fill', None, 'xplain'),
-        ('C5', 'hex_fill', None, 'pink'),
-        ('D2', 'hex_fill', None, 'xoffboard'),
-        ('D4', 'hex_fill', None, 'XX18_TILE_YELLOW'),
-        ('D6', 'highlight', None, 'yellow'),
+        ('B6', 'hex_fill', None, 'xwater'),
+        ('C1', 'hex_fill', None, 'xplain'),
+        ('C3', 'hex_fill', None, 'pink'),
+        ('C5', 'hex_fill', None, 'xoffboard'),
+        ('D2 D6', 'hex_fill', None, 'XX18_TILE_YELLOW'),
+        ('D4', 'highlight', None, 'yellow'),
     ]
 )
 XX18State(board=xgff)
@@ -396,7 +396,12 @@ xgffn.phase_revenue(
 xgffn.block(
     'B4', 'ne n nw',
     dotted=True)
-
+xgffn.track(
+    'A5 B6', 'nw,se',
+    color="red")
+xgffn.track_edge(
+    'A3', 'nw', 30, .3, 0,
+    color="purple"),
 
 Text("XX18Game: Functions", common=footer)
 

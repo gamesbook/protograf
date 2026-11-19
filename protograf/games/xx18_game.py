@@ -140,9 +140,11 @@ DEFAULT_SETTINGS = {
     "XX18_TOWN_STROKE": "black",
     "XX18_TOWN_FILL": "black",
     "XX18_PRIVATE_DIAMETER": 0.4,  # cm
+    "XX18_PRIVATE_STROKE": "black",
+    "XX18_PRIVATE_FILL": None,
     "XX18_REVENUE_DIAMETER": 0.8,  # cm
-    "XX18_REVENUE_FILL": None,  # no color
     "XX18_REVENUE_STROKE": "black",
+    "XX18_REVENUE_FILL": None,  # no color
     "XX18_TRACK_INNER_WIDTH": 0.4,  # cm
     "XX18_TRACK_OUTER_WIDTH": 0.5,  # cm
     "XX18_TRACK_INNER_FILL": "black",
@@ -848,10 +850,8 @@ class XX18GameObject(CoreGameObject):
                 fdirection = feature[2]  # mix of cells and edges
         if len(feature) >= 4:
             flabel = str(feature[3])
-        if len(feature) >= 5 and ftype in [
-            "phase_revenue",
-            "phase-revenue",
-        ]:  # see below; phase_revenue overloads
+        if len(feature) >= 5 and ftype in ["phase_revenue", "phase-revenue"]:
+            # see below; phase_revenue overloads
             kwargs["colors"] = feature[4]
         if len(feature) >= 5 and ftype != "private":  # see below; private overloads
             kwargs["label_location"] = feature[4]
@@ -1397,8 +1397,7 @@ class XX18GameObject(CoreGameObject):
         if position is None:
             position = []
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
-        # breakpoint()
-        track_outer_fill = self.process_color(color, self.xxs["XX18_TRACK_OUTER_FILL"])
+        track_outer_fill = self.process_color(None, self.xxs["XX18_TRACK_OUTER_FILL"])
         track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
         paths = []
         perbii = ""
@@ -1535,7 +1534,7 @@ class XX18GameObject(CoreGameObject):
         if position is None:
             position = []
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
-        track_outer_fill = self.process_color(color, self.xxs["XX18_TRACK_OUTER_FILL"])
+        track_outer_fill = self.process_color(None, self.xxs["XX18_TRACK_OUTER_FILL"])
         track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
         # ---- validate allowed track position
         for pos in _positions:
@@ -1581,6 +1580,7 @@ class XX18GameObject(CoreGameObject):
         position: str = None,
         stroke: str = None,
         breadth: str = None,
+        color: str = None,
         **kwargs,
     ):
         """Draw river path along/between hexsides starting at hex location(s).
@@ -1605,13 +1605,13 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
+        river_stroke = self.process_color(color, self.xxs["XX18_HEX_RIVER"])
         # start point
         self.validate_edge("river_line", _locations[0], _positions[0], True)
         _geo = self.cells.get(_locations[0])
         start_point = getattr(_geo, _positions[0])
 
         # set styles
-        river_stroke = stroke or self.xxs["XX18_HEX_RIVER"]
         match breadth:
             case "narrow" | "n":
                 _river_width = 2
@@ -1706,7 +1706,8 @@ class XX18GameObject(CoreGameObject):
                     Circle(
                         cxy=ccentre,
                         radius=self.xxs["XX18_TOWN_DIAMETER"] / 2.0,
-                        fill_stroke="black",
+                        fill=town_fill,
+                        stroke=town_stroke,
                         stroke_width=self.stroke_width_xx,
                         **{**kwargs, **lwargs},
                     )
@@ -1716,8 +1717,8 @@ class XX18GameObject(CoreGameObject):
                         cxy=ccentre,
                         height=self.xxs["XX18_TOWN_HEIGHT"],
                         width=self.xxs["XX18_TOWN_WIDTH"],
-                        fill=town_fill,
-                        stroke=town_stroke,
+                        fill=self.xxs["XX18_TRACK_INNER_FILL"],
+                        stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
                         stroke_width=self.stroke_width_xx,
                         rotation=rotation,
                     )
@@ -1731,6 +1732,7 @@ class XX18GameObject(CoreGameObject):
         count: str | int = None,
         rotation: float = None,
         shapes: list = None,  # list of BaseShapes
+        color: str = None,
         **kwargs,
     ):
         """Draw City shape at hex location(s).
@@ -1977,13 +1979,14 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Circle
 
         _locations = self.process_locations(location, "revenue")
+        revenue_fill = self.process_color(color, self.xxs["XX18_REVENUE_FILL"])
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             Circle(
                 cxy=ccentre,
                 radius=self.xxs["XX18_REVENUE_DIAMETER"] / 2.0,
-                fill=self.xxs["XX18_REVENUE_FILL"],
+                fill=revenue_fill,
                 stroke=self.xxs["XX18_REVENUE_STROKE"],
                 stroke_width=self.stroke_width_xx,
                 label=label if label else "",
@@ -2103,7 +2106,8 @@ class XX18GameObject(CoreGameObject):
             elif self.orientation == HexOrientationName.FLAT.value:
                 position = ["n", "ne", "se", "s", "sw", "nw"]
         _positions = tools.split(position, separator=" ", clean=True)
-        edge_color = colrs.get_color(stroke) if stroke else self.barrier_hex
+
+        block_stroke = self.process_color(stroke, self.xxs["XX18_HEX_BARRIER"])
         for _loc in _locations:
             geo = self.cells.get(_loc)
             for edge in _positions:
@@ -2165,7 +2169,7 @@ class XX18GameObject(CoreGameObject):
                     Line(
                         xy=start,
                         xy1=end,
-                        stroke=edge_color,
+                        stroke=block_stroke,
                         stroke_width=self.xxs["XX18_STROKE_WIDTH_BLOCK"],
                         **kwargs,
                     )
@@ -2474,6 +2478,8 @@ class XX18GameObject(CoreGameObject):
 
         _locations_s = self.process_locations(location, "private-start")
         _locations_e = self.process_locations(location1, "private-end")
+        private_fill = self.process_color(color, self.xxs["XX18_PRIVATE_FILL"])
+
         if _locations_s and _locations_e:
             _loc_s = _locations_s[0]
             _loc_e = _locations_e[0]
@@ -2534,8 +2540,8 @@ class XX18GameObject(CoreGameObject):
             pcs = Circle(
                 cxy=c_s,
                 radius=self.xxs["XX18_PRIVATE_DIAMETER"] / 2.0,
-                fill=None,
-                stroke="black",
+                fill=private_fill,
+                stroke=self.xxs["XX18_PRIVATE_STROKE"],
                 stroke_width=self.stroke_width_xx,
                 title=pcs_title,
                 heading=pcs_heading,
@@ -2544,8 +2550,8 @@ class XX18GameObject(CoreGameObject):
             pce = Circle(
                 cxy=c_e,
                 radius=self.xxs["XX18_PRIVATE_DIAMETER"] / 2.0,
-                fill=None,
-                stroke="black",
+                fill=private_fill,
+                stroke=self.xxs["XX18_PRIVATE_STROKE"],
                 stroke_width=self.stroke_width_xx,
                 title=pce_title,
                 heading=pce_heading,

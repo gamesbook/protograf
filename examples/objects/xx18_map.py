@@ -86,8 +86,7 @@ xgf = XX18Game(
     features=[
         ('B8', 'spike', 'w sw', 'medium',),
         ('G7', 'track', 'w,ne', ),
-        ('C3', plot),
-        ('D4', plot),
+        ('C3 D4', plot),
     ]
 )
 XX18State(board=xgf)
