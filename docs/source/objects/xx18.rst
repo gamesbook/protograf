@@ -30,11 +30,12 @@ will also help with understanding how an 18xx game board is created and used.
     - `XX18Game AdHoc Drawing with a Map`_
 
 - `XX18State Command`_
-- `XX18 Style Settings`_
+- `XX18Game Style Settings`_
+- `XX18Game Function Options`_
 - `18xx Resources`_
 
 
-.. _xx18Backround:
+.. _xx18Background:
 
 Background
 ==========
@@ -1161,7 +1162,7 @@ The JSON file is a simple text file that follows some common conventions.
 3. **Exception** the second-last line must **NOT** end in a comma.
 4. The last line must contain a single ``}`` curly close bracket.
 
-The full list of settings is provided in `XX18 Style Settings`_.
+The full list of settings is provided in `XX18Game Style Settings`_.
 
 .. |gfj| image:: ../images/objects/xx18_json.png
    :width: 330
@@ -1246,6 +1247,12 @@ in some cases, allow further customisation than is otherwise possible.
         xgffn.track_edge(
             'A3', 'nw', 30, .3, 0,
             color="purple"),
+        xgffn.private(
+            'B2', 15, 0.7,  'B2', 140, 0.4, 'R&R', 'left',
+            color="orange")
+        xgffn.private(
+            'B2', 15, 0.7, 'C3', 280, 0.6,
+            color="orange")
 
 ===== ======
 
@@ -1268,7 +1275,10 @@ changed |dash| in this case to ``dotted``.
 
 For the ``track`` and ``track_edge`` functions, use of the color property
 allows the track's default color |dash| usually ``black`` |dash| to be
-overridden.
+overridden. This is also possible for ``private`` railroads, as shown.
+
+The full list of functions, and their allowed properties, are supplied in
+`XX18Game Function Options`_
 
 
 .. _xx18GameAdHocDrawing:
@@ -1475,8 +1485,8 @@ to the name assigned to the ``XX18Game()``.
 
 .. _xx18StyleSettings:
 
-XX18 Style Settings
-===================
+XX18Game Style Settings
+=======================
 `↑ <xx18Index_>`_
 
 The following are the "internal" settings for styles and sizes used by
@@ -1529,6 +1539,98 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
 * ``"XX18_TEXT_XXXL"`` - default is ``28`` points; super-size text
 * ``"XX18_TEXT_FONT"`` - default is ``Times-Roman``; font name used throughout
 * ``"XX18_TEXT_FONT_BOLD"`` - default is ``Times-Bold``; font name for tile_letter
+
+
+.. _xx18FunctionOptions:
+
+XX18Game Function Options
+=========================
+`↑ <xx18Index_>`_
+
+The section on `XX18Game Functions`_ illustrates example of how to use
+the built-in function of the ``XX18Game()`` command. Below are the details
+of all available properties and which function(s) use them.
+
+Available Properties
+--------------------
+
+The following are the properties that can be used when making use of the
+built-in functions.
+
+* *breadth* - the "thickness" of a line or shape e.g. a river in ``points``
+  or a spike in ``cm``
+* *color* - a color name
+* *colors* - a list of color names
+* *count* - how many of the feature to draw e.g. number of cities in a group
+* *direction* - the ``degrees`` clockwise from East of the feature offset
+* *distance* - the ``fraction`` of the hexagon radius of the feature offset
+* *height* - the height of the curve of a track in ``cm``
+* *label* - a string used to annonate or name a feature; any combination of
+  letters or numbers or symbols
+* *label_location* - where a label is drawn, relative to the feature; this can
+  be ``left``, ``right``, ``above``, ``below``
+* *location* - the hexagon grid reference where a feature is to be drawn;
+  usually multiple references can be used unless not appropriate
+* *position* - a hexagon edge ``compass`` reference or references; for example
+  ``ne sw`` - the allowed values depend on grid orientation and feature type
+* *rotation* - the direction, in ``degrees`` anti-clockwise from East,
+  by which a feature is rotated around its centre
+* *shapes* - a list of **protograf** :doc:`shapes <../core_shapes>`
+* *size* - the length of a spike; this can be ``short``, ``medium`` (default)
+  or ``long``
+* *stroke* - the color name for a line
+* *style* - the shape used to draw a town; this can be ``circle`` (default)
+  or ``rectangle``
+* *thing* - a **protograf** :doc:`shape <../core_shapes>`
+* *town* - where a town "block" should appear on a track; this can
+  be ``middle``, ``start`` or ``end``
+* *width* - stroke width in ``points``
+
+Function Properties
+-------------------
+
+The following list shows which properties are available for which functions.
+
+Note that if you omit the property name when using the function, you **MUST**
+supply properties in the exact order shown. So for example, you can use:
+
+.. code:: python
+
+    highlight(location="A1", width=5)
+
+and omit the ``color`` property without causing a problem, but if you
+want to avoid using the property names then all values, up to the last
+one you want to set, must be supplied:
+
+.. code:: python
+
+    highlight("A1", None, 5)
+
+Its usually safe to use ``None`` as a default, because **protograf** will
+then switch that out with a substitute /fallback value.
+
+.. NOTE::
+
+    Some features may not display, or trigger unusual errors, if the
+    correct values are not supplied to the needed properties!
+
+* ``block(location, position, stroke)``
+* ``city(location, label, direction, distance, count, rotation, shapes, color)``
+* ``figure(location, direction, distance, thing)``
+* ``hex_fill(location, color)``
+* ``highlight(location, color, width)``
+* ``mountain(location, label, direction, distance)``
+* ``phase_revenue(location, income, direction, distance, orientation, colors)``
+* ``private(location, direction, distance, location1,
+  direction1, distance1, label, label_location, color)``
+* ``revenue(location, label, direction, distance, color)``
+* ``river_line(location, position, stroke, breadth, color)``
+* ``spike(location, position, stroke, size, breadth, color)``
+* ``symbol(location, label, direction, distance, name)``
+* ``tile_letter(location, label, direction, distance, stroke)``
+* ``town(location, label, direction, distance, style, rotation, color, stroke)``
+* ``track(location, label, position, town, color)``
+* ``track_edge(location, position, direction, distance, height, color)``
 
 
 .. _xx18-resources:

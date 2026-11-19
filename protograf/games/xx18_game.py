@@ -987,13 +987,13 @@ class XX18GameObject(CoreGameObject):
                     kwargs["label_location"] = feature[6]
                 # print(f"&&& private {flocation1=} {fdirection1=} {fdistance1=}")
                 self.private(
-                    label=flabel,
                     location=fhexagon,
                     direction=fdirection,
                     distance=fdistance,
                     location1=flocation1,
                     direction1=fdirection1,
                     distance1=fdistance1,
+                    label=flabel,
                     **kwargs,
                 )
             case "revenue":
@@ -1374,11 +1374,10 @@ class XX18GameObject(CoreGameObject):
     def track(
         self,
         location: str = None,
-        position: str = None,
         label: str = None,
+        position: str = None,
         town: str = None,
         color: str = None,
-        stroke: str = None,
         **kwargs,
     ):
         """Draw track between hexsides at hex location(s).
@@ -1386,7 +1385,6 @@ class XX18GameObject(CoreGameObject):
         Args:
             location (str): grid reference or references for one or more cells
             position (str): hex edge compass reference or references
-            stroke: the name of a color (defaults to self.barrier)
             label (str): the text to be drawn above/below the line
             town (str): position of a town "block" on the track; middle, start or end
             color (str): the name of color to use for the track
@@ -1588,7 +1586,7 @@ class XX18GameObject(CoreGameObject):
         Args:
             location (str): grid reference or references for the start cell
             position (str): cell and hex compass reference(s) for the path
-            stroke: the name of a color (defaults to self.river)
+            stroke (str): the name of a color (defaults to self.river)
             breadth (str): thickness of the river line; medium/m; narrow/n; wide/w
         """
         from protograf.protos import Line
@@ -1999,6 +1997,8 @@ class XX18GameObject(CoreGameObject):
         position: str = None,
         stroke: object = None,
         size: str = None,
+        breadth: float = None,  # TODO - set this
+        color: str = None,  # TODO - set this
         **kwargs,
     ):
         """Draw thin inset triangle(s) on hexside(s) at hex location(s).
@@ -2006,8 +2006,9 @@ class XX18GameObject(CoreGameObject):
         Args:
             location (str): grid reference or references for one or more cells
             position (str): hex edge compass reference or references
-            stroke: the name of a color (defaults to white)
+            stroke (str): the name of a color (defaults to white)
             size (str): short, medium or long (defaults to medium)
+            breadth (float): the base width of the spike (in cm)
         """
         from protograf.protos import Hexagon
 
@@ -2180,6 +2181,7 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         direction: float = None,
         distance: float = None,
+        stroke: str = None,
         **kwargs,
     ):
         """Draw Tile Letter at hex location(s).
@@ -2189,10 +2191,13 @@ class XX18GameObject(CoreGameObject):
             label (str): the character for the tile letter
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
+            stroke (str): the name of a color (defaults to black)
         """
         from protograf.protos import Text
 
         _locations = self.process_locations(location, "tile_letter")
+        letter_stroke = self.process_color(stroke, self.xxs["XX18_TEXT_STROKE"])
+
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
@@ -2200,7 +2205,7 @@ class XX18GameObject(CoreGameObject):
             Text(
                 text=letter,
                 xy=ccentre,
-                stroke=self.xxs["XX18_TEXT_STROKE"],
+                stroke=letter_stroke,
                 stroke_width=self.stroke_width_xx,
                 font_size=self.xxs["XX18_TEXT_XXL"],
                 font_name=self.xxs["XX18_TEXT_FONT_BOLD"],
@@ -2250,6 +2255,7 @@ class XX18GameObject(CoreGameObject):
         self,
         location: str = None,
         color: object = None,
+        width: float = None,
         **kwargs,
     ):
         """Draw an inner outline hexagon in color at hex location(s).
@@ -2257,13 +2263,18 @@ class XX18GameObject(CoreGameObject):
         Args:
             location (str): grid reference or references for one or more cells
             color (color): a color reference (default to 18XX yellow)
+            width (float): stroke width in points
         """
         from protograf.protos import Hexagon
 
         _locations = self.process_locations(location, "highlight")
         the_color = self.process_color(color, self.xxs["XX18_HEX_YELLOW"])
-        # breakpoint()
+        if width:
+            highlight_width = tools.as_float(width, "width")
+        else:
+            highlight_width = self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"]
         _height = self.hex_height - self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"] / self.units
+
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = geo.centre
@@ -2272,7 +2283,7 @@ class XX18GameObject(CoreGameObject):
                 height=_height,
                 fill=None,
                 stroke=the_color,
-                stroke_width=self.xxs["XX18_STROKE_WIDTH_HIGHLIGHT"],
+                stroke_width=highlight_width,
                 stroke_transparency=self.xxs["XX18_STROKE_TRANSPARENCY_HIGHLIGHT"],
                 orientation=self.orientation,
             )
@@ -2452,27 +2463,29 @@ class XX18GameObject(CoreGameObject):
 
     def private(
         self,
-        label: str = None,
         location: str = None,
         direction: float = None,
         distance: float = None,
         location1: str = None,
         direction1: float = None,
         distance1: float = None,
+        label: str = None,
+        label_location: str = None,
         color: str = None,
         **kwargs,
     ):
-        """Draw Private Railroad at hex location(s).
+        """Draw a Private Railroad at hex location(s).
 
         Args:
-            label (str): the name of the Private Railroad
             location (str): grid reference or references for start cell
             direction (float): degrees clockwise from East in start cell
             distance (float): distance from hex centre in start cell
             location1 (str): grid reference or references for end cell
             direction1 (float): degrees clockwise from East in end cell
             distance1 (float): distance from hex centre in end cell
-            color (str): the name of color to use for the private circle fills
+            label (str): the name of the Private Railroad
+            label_location (str): the relative location of the label
+            color (str): fill color name for the Private Railroad circles
         """
         from protograf.protos import Circle, Line, Text
 
@@ -2492,8 +2505,8 @@ class XX18GameObject(CoreGameObject):
             # left: above line; right: below line;
             pce_heading, pce_title, pcs_heading, pcs_title = "", "", "", ""
             lheading, ltitle, labove = "", "", False
+            lwargs = {}
             if label:
-                lwargs = {}
                 lwargs["font_name"] = self.xxs["XX18_TEXT_FONT"]
                 lwargs["font_size"] = self.xxs["XX18_TEXT_SMALL"]
                 kwargs["stroke"] = self.xxs["XX18_TEXT_STROKE"]

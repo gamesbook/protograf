@@ -402,6 +402,12 @@ xgffn.track(
 xgffn.track_edge(
     'A3', 'nw', 30, .3, 0,
     color="purple"),
+xgffn.private(
+    'B2', 15, 0.7,  'B2', 140, 0.4, 'R&R', 'left',
+    color="orange")
+xgffn.private(
+    'B2', 15, 0.7, 'C3', 280, 0.6,
+    color="orange")
 
 Text("XX18Game: Functions", common=footer)
 
