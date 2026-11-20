@@ -275,7 +275,7 @@ xgfif = XX18Game(
         # offboard tracks
         ('A5', 'spike', '"n se', "medium",),
         ('B8', 'spike', 'nw ne', "long",),
-        ('C1', 'spike', 'ne se', "short",),
+        ('C1', 'spike', 'sw s', "short",),
         # offboard phase revenue
         ('C1', 'phase_revenue', (180, 0.1), '10 20 30 40'),
         ('B8', 'phase_revenue', (90, 0.2), '30 50'),
@@ -299,7 +299,7 @@ xgprv = XX18Game(
         ('B2', 'private', ( 15, .7), 'R&R', 'B2', (140, .4), 'below'),
         ('B4', 'private', ( 15, .6), 'D&D', 'B6', (140, .5), 'above'),
         ('C1', 'private', (210, .4), 'LL', 'C3', ( 15, .7), 'left'),
-        ('C5', 'private', (140, .5), 'RR', 'C5', ( 15, .6), 'right'),
+        ('C5', 'private', (140, .5), 'RR', 'C5', ( 15, .6), 'above'),
         ('D2', 'private', (180, .7), 'RD ', 'D2', (0, .4), 'above'),
         ('D4', 'private', (270, .7), 'D&R', 'D4', (90, .4), 'above'),
         ('D6', 'private', (270, .7), 'R&D', 'D6', (90, .4), 'below'),
@@ -374,6 +374,8 @@ xgzz = XX18Game(
         ('A3', 'town_border', None, 'St. Agnes', 'below'),
         ('B2', 'city', None, 'Brodie'),
         ('B2', 'revenue',  (240, .6), '30'),
+        ('D4', 'hex_fill', None, 'xoffboard'),
+        ('D4', 'spike', 'ne nw', "short",),
     ]
 )
 XX18State(board=xgzz)

@@ -2069,8 +2069,22 @@ class LineShape(BaseShape):
             # ---- * centre shapes (with offsets)
             if self.centre_shapes:
                 _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))
+                if self.centre_shapes_offset:
+                    # recalculate offset centre
+                    edge = "top" if self.centre_shapes_offset > 0 else "bottom"
+                    result = geoms.rectangle_vertices(
+                        p1=Point(x, y),
+                        p2=Point(x_1, y_1),
+                        height=abs(self.centre_shapes_offset),
+                        angle_deg=_angle,
+                        given_edge=edge,
+                    )
+                    l2s, l2e = result[0], result[1]
+                    _cx, _cy = (l2s.x + l2e.x) / 2.0, (l2s.y + l2e.y) / 2.0
+                else:
+                    _cx, _cy = cx, cy
                 self.draw_centred_shapes(
-                    self.centre_shapes, cx, cy, rotation=180 - _angle
+                    self.centre_shapes, _cx, _cy, rotation=180 - _angle
                 )
             # ---- * dot
             self.draw_dot(cnv, cx, cy)

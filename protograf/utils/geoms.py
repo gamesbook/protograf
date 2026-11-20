@@ -1684,6 +1684,61 @@ def rectangles_overlap(rect1: tuple, rect2: tuple) -> bool:
     return True
 
 
+def rectangle_vertices(
+    p1: Point,
+    p2: Point,
+    height: float,
+    angle_deg: float,
+    given_edge: str = "top",
+) -> tuple[Point, Point]:
+    """Calculates the two opposite vertices of a rotated rectangle.
+
+    Coordinate system: (0, 0) is at the top-left (+x is right, +y is down).
+
+    Args:
+        p1: left vertex of the given edge (top-left or bottom-left).
+        p2: right vertex of the given edge (top-right or bottom-right).
+        height: height of the rectangle.
+        angle_deg: rotation angle in degrees, anti-clockwise from East (+x).
+        given_edge: either "top" (p1=TL, p2=TR) or "bottom" (p1=BL, p2=BR).
+
+    Returns:
+        A tuple containing the two calculated Points:
+        - If given_edge == "top": returns (bottom_left, bottom_right)
+        - If given_edge == "bottom": returns (top_left, top_right)
+
+    Doc Test:
+
+    >>> bl, br = rectangle_vertices(Point(10, 20), Point(60, 20), 30, 0, "top")
+    >>> print(f"Bottom-Left: {bl}, Bottom-Right: {br}")
+    Bottom-Left: (10.0, 50.0), Bottom-Right: (60.0, 50.0)
+    >>> bl, br = rectangle_vertices((50, 100), (50, 50), 30, 90, "top")
+    >>> print(f"Bottom-Left: ({bl[0]:.1f}, {bl[1]:.1f}), Bottom-Right: ({br[0]:.1f}, {br[1]:.1f})")
+    Bottom-Left: (80.0, 100.0), Bottom-Right: (80.0, 50.0)
+    """
+    if given_edge not in ("top", "bottom"):
+        raise ValueError("given_edge must be either 'top' or 'bottom'")
+
+    # Convert angle to radians
+    theta = math.radians(angle_deg)
+
+    # In a top-left (0,0) coordinate system (+x right, +y down):
+    # Moving anti-clockwise by theta from East (+x) means the "top" edge vector
+    # points along (cos(theta), -sin(theta)).
+
+    dx = height * math.sin(theta)
+    dy = height * math.cos(theta)
+    # If we are given the bottom edge, we need to move "up" (opposite to downward)
+    if given_edge == "bottom":
+        dx = -dx
+        dy = -dy
+
+    new_p1 = Point(p1[0] + dx, p1[1] + dy)
+    new_p2 = Point(p2[0] + dx, p2[1] + dy)
+
+    return new_p1, new_p2
+
+
 def racetrack_rectangle_properties(ur: Point, lr: Point, width: float) -> tuple:
     """Calculate center point and anti-clockwise rotation of a Rectangle.
 

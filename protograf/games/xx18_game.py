@@ -154,6 +154,8 @@ DEFAULT_SETTINGS = {
     "XX18_SPIKE_FRACTION_SHORT": 0.1,  # fraction of hex
     "XX18_SPIKE_FRACTION_MEDIUM": 0.25,  # fraction of hex
     "XX18_SPIKE_FRACTION_LONG": 0.45,  # fraction of hex
+    "XX18_SPIKE_BASE_OUTER": 0.5,  # cm - match XX18_TRACK_OUTER_WIDTH
+    "XX18_SPIKE_BASE_INNER": 0.4,  # cm - match XX18_TRACK_INNER_WIDTH
     "XX18_HEX_RIVER_WAVE_HEIGHT": 0.15,  # cm
     "XX18_PHASE_REVENUE_BOX": 0.7,  # cm
     "XX18_DEBUG_FONT_FRACTION": 0.75,
@@ -2066,7 +2068,7 @@ class XX18GameObject(CoreGameObject):
                 spikes=_positions,
                 spikes_stroke=self.xxs["XX18_TRACK_OUTER_FILL"],
                 spikes_fill=self.xxs["XX18_TRACK_OUTER_FILL"],
-                spikes_width=self.xxs["XX18_TRACK_OUTER_WIDTH"],
+                spikes_width=self.xxs["XX18_SPIKE_BASE_OUTER"],
                 spikes_height=-height,
             )
             Hexagon(
@@ -2080,7 +2082,7 @@ class XX18GameObject(CoreGameObject):
                 spikes=_positions,
                 spikes_stroke="black",
                 spikes_fill="black",
-                spikes_width=self.xxs["XX18_TRACK_INNER_WIDTH"],
+                spikes_width=self.xxs["XX18_SPIKE_BASE_INNER"],
                 spikes_height=-(height - height_shrink),
             )
 
@@ -2570,9 +2572,12 @@ class XX18GameObject(CoreGameObject):
                 heading=pce_heading,
                 **lwargs,
             )
+            breakpoint()
             Line(
                 links=[pcs, pce],
                 stroke_width=self.stroke_width_xx,
+                heading=lheading,
+                title=ltitle,
                 **lwargs,
             )
             # ---- label - title or heading - for private line
@@ -2599,6 +2604,7 @@ class XX18GameObject(CoreGameObject):
                     if c_e.x < c_s.x and c_e.y < c_s.y:
                         talign = "left" if labove else "right"
 
+                    _, text_rot = geoms.angles_from_points(c_s, c_e)
                     if c_e.x == c_s.x:
                         # vertically rotate text
                         text_rotation = kwargs.get("rotation", 90)
@@ -2610,14 +2616,15 @@ class XX18GameObject(CoreGameObject):
                             align="centre",
                             **lwargs,
                         )  # centre
-                    else:
-                        Text(
-                            llabel,
-                            x=lcntr.x,
-                            y=lcntr.y + delta_y,
-                            align=talign,
-                            **lwargs,
-                        )
+                    # else:
+                    #     Text(
+                    #         llabel,
+                    #         x=lcntr.x,
+                    #         y=lcntr.y, # + delta_y,
+                    #         rotation=text_rot,
+                    #         # align=talign,
+                    #         **lwargs,
+                    #     )
                 else:
                     # centre text over/above the line
                     if labove:

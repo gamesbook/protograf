@@ -1189,6 +1189,8 @@ The full list of settings is provided in `XX18Game Style Settings`_.
                 ('A3', 'town_border', None, 'St. Agnes', 'below'),
                 ('B2', 'city', None, 'Brodie'),
                 ('B2', 'revenue',  (240, 0.6), '30'),
+                ('D4', 'hex_fill', None, 'xoffboard'),
+                ('D4', 'spike', 'ne nw', 'short',),
             ]
         )
         XX18State(board=xgzz)
@@ -1208,7 +1210,9 @@ following styles and values:
       "XX18_TOWN_STROKE": "tomato",
       "XX18_TOWN_FILL": "palegreen",
       "XX18_TRACK_OUTER_FILL": null,
-      "XX18_REVENUE_FILL": "white"
+      "XX18_REVENUE_FILL": "white",
+      "XX18_SPIKE_BASE_OUTER": 1.5,
+      "XX18_SPIKE_BASE_INNER": 1.35
   }
 
 
@@ -1527,6 +1531,8 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
     for a medium spike
 * ``"XX18_SPIKE_FRACTION_LONG"`` - default is ``0.45``; fraction of hexagon diameter
     for a long spike
+* ``"XX18_SPIKE_BASE_INNER"`` - default is ``0.4`` cm; matches width of black track
+* ``"XX18_SPIKE_BASE_OUTER"`` - default is ``0.5`` cm; matches width of black track
 * ``"XX18_PHASE_REVENUE_BOX"`` - default is ``0.7`` cm; default width of single cell
 * ``"XX18_HEX_RIVER_WAVE_HEIGHT"`` - default is ``0.15`` cm; wave height in feature river_line
 * ``"XX18_DEBUG_FONT_FRACTION"`` - default is ``0.75``; relative size of debug font

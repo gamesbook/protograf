@@ -644,6 +644,8 @@ class BaseCanvas:
         # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star, domino)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shapes_rotated = self.defaults.get("centre_shapes_rotated", False)
+        self.centre_shapes_offset = self.defaults.get("centre_shapes_offset", 0.0)
+        # ---- single centre shape
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0.0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0.0)
@@ -1479,10 +1481,16 @@ class BaseShape:
         self.centre_shapes = kwargs.get(
             "centre_shapes", kwargs.get("center_shapes", [])
         )
-
+        self.centre_shapes_offset = self.kw_float(
+            kwargs.get(
+                "centre_shapes_offset",
+                kwargs.get("center_shapes_offset", base.centre_shapes_offset),
+            )
+        )
         self.centre_shapes_rotated = self.kw_bool(
             kwargs.get("centre_shapes_rotated", base.centre_shapes_rotated)
         )
+        # ---- single centre shape
         self.centre_shape = kwargs.get("centre_shape", kwargs.get("center_shapes", ""))
         self.centre_shape_mx = self.kw_float(
             kwargs.get(
