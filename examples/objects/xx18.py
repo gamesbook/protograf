@@ -351,6 +351,7 @@ xgmis = XX18Game(
         ('A5', 'track', 'e,w'),
         ('A5', 'town_border', None),
         ('B4', 'block', "w nw ne"),
+        ('B6', image('images/Jinchu_Railway.svg', height=1.5, width=1.5)),
         ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
         ('C5', 'block', "nw", "xred"),
         ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),

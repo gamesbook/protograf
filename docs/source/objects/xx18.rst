@@ -1104,6 +1104,7 @@ Feature #11. Miscellaneous
         ('A5', 'track', 'e,w'),
         ('A5', 'town_border', None),
         ('B4', 'block', 'w nw ne'),
+        ('B6', image('images/Jinchu_Railway.svg', height=1.5, width=1.5)),
         ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
         ('C5', 'block', "nw", 'xred'),
         ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
@@ -1129,8 +1130,12 @@ features to the board. These are:
   in one or more hexagons, by providing the shape's name, in lowercase,
   along with all the usual construction details; it will be drawn either,
   by default, at the centre of the hexagon(s), or at an offset, by
-  setting the values for ``(direction, distance)``.  The olive-colored
-  ``polygon`` shown in ``D2`` and ``D4`` is an example of this.
+  setting the values for ``(direction, distance)``.
+
+  * The olive-colored ``polygon`` shown in ``D2`` and ``D4`` is one example
+    of adding a normal shape with an offset.
+  * The SVG ``image`` shown in ``B6`` is another example of adding a normal
+    shape; it has no offset so is drawn, by default, at the hexagon centre
 * A **river_line** is a wavy line drawn between hexagon edges/vertices.
   The locations for the points along the river are given by pairs of
   ``Hexagon,Vertex`` location values; for example ``C1,se`` to indicate
@@ -1457,7 +1462,8 @@ The keyword args (``kwargs``) passed to such a function include:
 list of location grid *locations*; list of *hexes* geometries; the
 *label*, *direction* and *distance*. Note that just because these
 values are passed to the function does not mean they have to be
-used.
+used, but it does mean the function itself should not directly
+define these properties in its own definition.
 
 
 
@@ -1515,9 +1521,12 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
 * ``"XX18_TRACK_OUTER_FILL"`` - default is ```white``; edge color
 * ``"XX18_MOUNTAIN_SIDE"`` - default is ``0.6`` cm; side of the triangle
 * ``"XX18_MOUNTAIN_FILL"`` - default is ``black``; color inside the triangle
-* ``"XX18_SPIKE_FRACTION_SHORT"`` - default is ``0.1``; fraction of hex for short spike
-* ``"XX18_SPIKE_FRACTION_MEDIUM"`` - default is ``0.25``; fraction of hex for medium spike
-* ``"XX18_SPIKE_FRACTION_LONG"`` - default is ``0.45``; fraction of hex for long spike
+* ``"XX18_SPIKE_FRACTION_SHORT"`` - default is ``0.1``; fraction of hexagon diameter
+    for a short spike
+* ``"XX18_SPIKE_FRACTION_MEDIUM"`` - default is ``0.25``; fraction of hexagon diameter
+    for a medium spike
+* ``"XX18_SPIKE_FRACTION_LONG"`` - default is ``0.45``; fraction of hexagon diameter
+    for a long spike
 * ``"XX18_PHASE_REVENUE_BOX"`` - default is ``0.7`` cm; default width of single cell
 * ``"XX18_HEX_RIVER_WAVE_HEIGHT"`` - default is ``0.15`` cm; wave height in feature river_line
 * ``"XX18_DEBUG_FONT_FRACTION"`` - default is ``0.75``; relative size of debug font
@@ -1548,8 +1557,8 @@ XX18Game Function Options
 `↑ <xx18Index_>`_
 
 The section on `XX18Game Functions`_ illustrates example of how to use
-the built-in function of the ``XX18Game()`` command. Below are the details
-of all available properties and which function(s) use them.
+the built-in functions of the ``XX18Game()`` command. Below are the details
+of all available properties and which function(s) make use of them.
 
 Available Properties
 --------------------
@@ -1589,7 +1598,8 @@ built-in functions.
 Function Properties
 -------------------
 
-The following list shows which properties are available for which functions.
+The following list shows which `Available Properties`_ are applicable for
+which functions.
 
 Note that if you omit the property name when using the function, you **MUST**
 supply properties in the exact order shown. So for example, you can use:
@@ -1598,7 +1608,7 @@ supply properties in the exact order shown. So for example, you can use:
 
     highlight(location="A1", width=5)
 
-and omit the ``color`` property without causing a problem, but if you
+and omit the ``color`` property without causing a problem but if you
 want to avoid using the property names then all values, up to the last
 one you want to set, must be supplied:
 
