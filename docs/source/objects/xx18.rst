@@ -240,18 +240,18 @@ Example 1. Default Board
          xx1 = XX18Game()
          XX18Game(board=xx1)
 
-      The default settings for an 18xx game's board are those of a 8x8
-      grid of ``pointy`` hexagons i.e. two flat sides of each hexagon are
-      parallel to the left and right of the board.
-
-      Because a small page size is being used, the full extent of the grid
-      i.e. all 64 hexagons, is not visible.
-
-      As can be seen, the board is drawn when it is referenced by the *board*
-      property of an ``XX18Game`` command.  In short: the ``XX18Game``
-      is assigned to ``xx1`` which in turn is referenced by ``board=xx1``.
-
 ===== ======
+
+The default settings for an 18xx game's board are those of a 8x8
+grid of ``pointy`` hexagons i.e. two flat sides of each hexagon are
+parallel to the left and right of the board.
+
+Because a small page size is being used, the full extent of the grid
+i.e. all 64 hexagons, is not visible.
+
+As can be seen, the board is drawn when it is referenced by the *board*
+property of an ``XX18Game`` command.  In short: the ``XX18Game``
+is assigned to ``xx1`` which in turn is referenced by ``board=xx1``.
 
 
 Example 2. Default Board - Flat Hexagons
@@ -269,17 +269,17 @@ Example 2. Default Board - Flat Hexagons
          xx1 = XX18Game(orientation="flat")
          XX18Game(board=xx1)
 
-      For this example, the *orientation* of the hexagons in the grid are
-      changed to ``flat`` i.e. two flat sides of each hexagon are parallel
-      to the top and bottom of the board.
-
-      Because a small page size is being used, the full extent of the grid
-      i.e. all 64 hexagons, is not visible.
-
-      The board is drawn when it is referenced by the *board*
-      property of an ``XX18Game`` command.
-
 ===== ======
+
+For this example, the *orientation* of the hexagons in the grid are
+changed to ``flat`` i.e. two flat sides of each hexagon are parallel
+to the top and bottom of the board.
+
+Because a small page size is being used, the full extent of the grid
+i.e. all 64 hexagons, is not visible.
+
+The board is drawn when it is referenced by the *board*
+property of an ``XX18Game`` command.
 
 
 Example 3. Default Board - Pointy Hexagons - Offset
@@ -297,17 +297,17 @@ Example 3. Default Board - Pointy Hexagons - Offset
          xx1 = XX18Game(hex_offset="odd")
          XX18Game(board=xx1)
 
-      For this example, the *orientation* of the hexagons in the grid are,
-      by default, already set to ``pointy``. In addition, the *hex_offset* is
-      set to ``odd``, thereby shifting down the top-left hexagon.
-
-      Because a small page size is being used, the full extent of the grid
-      i.e. all 64 hexagons, is not visible.
-
-      The board is drawn when it is referenced by the *board*
-      property of an ``XX18Game`` command.
-
 ===== ======
+
+For this example, the *orientation* of the hexagons in the grid are,
+by default, already set to ``pointy``. In addition, the *hex_offset* is
+set to ``odd``, thereby shifting down the top-left hexagon.
+
+Because a small page size is being used, the full extent of the grid
+i.e. all 64 hexagons, is not visible.
+
+The board is drawn when it is referenced by the *board*
+property of an ``XX18Game`` command.
 
 
 Example 4. Default Board - Flat Hexagons - Offset
@@ -327,17 +327,17 @@ Example 4. Default Board - Flat Hexagons - Offset
            hex_offset="odd")
          XX18Game(board=xx1)
 
-      For this example, the *orientation* of the hexagons in the grid are
-      set to ``flat``. In addition, the *hex_offset* is set to ``odd``,
-      thereby shifting down the top-left hexagon.
-
-      Because a small page size is being used, the full extent of the grid
-      i.e. all 64 hexagons, is not visible.
-
-      The board is drawn when it is referenced by the *board*
-      property of an ``XX18Game`` command.
-
 ===== ======
+
+For this example, the *orientation* of the hexagons in the grid are
+set to ``flat``. In addition, the *hex_offset* is set to ``odd``,
+thereby shifting down the top-left hexagon.
+
+Because a small page size is being used, the full extent of the grid
+i.e. all 64 hexagons, is not visible.
+
+The board is drawn when it is referenced by the *board*
+property of an ``XX18Game`` command.
 
 
 Example 5. Grid Labels & Debug
@@ -359,25 +359,25 @@ Example 5. Grid Labels & Debug
         )
         XX18State(board=xgld)
 
-      For this example, the default number of *rows* and *cols* have been
-      changed; the whole board is now displayed on this smaller page size.
-
-      Setting the *label* property to ``True`` enables labels to be placed
-      at the board edges. The labels defaults to the *above-left* (``AL``);
-      numbers for the columns increase from ``1``, starting at the top-left,
-      and the letters for the rows go from top to bottom along the left edge.
-
-      Note that the 18xx grid style of numbering means the column numbers for
-      odd rows start at 1 and increment by 2 i.e. all odd numbers, whereas
-      the column numbers for even rows start at 2 and increment by 2
-      i.e. they are all even numbers.
-
-      Setting the *debug* property to ``True`` activates the display of
-      large, in-hex grid reference labels that appear inside each hexagon.
-      This is useful when designing a layout but is obviously not something
-      that would be shown in a final version.
-
 ===== ======
+
+For this example, the default number of *rows* and *cols* have been
+changed; the whole board is now displayed on this smaller page size.
+
+Setting the *label* property to ``True`` enables labels to be placed
+at the board edges. The labels defaults to the *above-left* (``AL``);
+numbers for the columns increase from ``1``, starting at the top-left,
+and the letters for the rows go from top to bottom along the left edge.
+
+Note that the 18xx grid style of numbering means the column numbers for
+odd rows start at 1 and increment by 2 i.e. all odd numbers, whereas
+the column numbers for even rows start at 2 and increment by 2
+i.e. they are all even numbers.
+
+Setting the *debug* property to ``True`` activates the display of
+large, in-hex grid reference labels that appear inside each hexagon.
+This is useful when designing a layout but is obviously not something
+that would be shown in a final version.
 
 
 Example 6. Styled Board
@@ -404,21 +404,20 @@ Example 6. Styled Board
         )
         XX18Game(board=ags)
 
-      In this case, the 18xx board is further styled by setting:
-
-      - *rows* - the number of rows in the grid
-      - *cols* - the number of columns in the grid
-      - *x* and *y* - set the offset of the top-left of the grid from
-        the page margins
-      - *label* - if ``True``, the labels will be drawn
-      - *label_locations* - where the labels are drawn at the grid edges;
-        in this case below (``B``) and to the left (``L``)
-      - *label_size* - the point height of the labels
-      - *fill* - the default color of the hexagons
-      - *stroke* - the default color for lines and labels
-      - *stroke_width* - the default width of lines
-
 ===== ======
+
+In this case, the 18xx board is further styled by setting:
+
+- *rows* - the number of rows in the grid
+- *cols* - the number of columns in the grid
+- *x* and *y* - set the offset of the grid's top-left from the page margins
+- *label* - if ``True``, the labels will be drawn
+- *label_locations* - where the labels are drawn at the grid edges;
+  in this case below (``B``) and to the left (``L``)
+- *label_size* - the point height of the labels
+- *fill* - the default color of the hexagons
+- *stroke* - the default color for lines and labels
+- *stroke_width* - the default width of lines
 
 
 Example 7. Pattern Grid
@@ -461,7 +460,7 @@ single ``O`` (capital "oh").
         aghp = XX18Game(
             rows=5, cols=4,
             fill='berylgreen',
-            pattern = """
+            pattern="""
             . O O .
              O O O .
             O O O .
@@ -470,18 +469,24 @@ single ``O`` (capital "oh").
             """)
         XX18Game(board=aghp)
 
-      The *pattern* property shows, in string format, an arrangement of
-      available hexagons (``O``) and empty positions (``.``).
-
-      Note that any spaces in the pattern are ignored when constructing the
-      board; they are just used to help visualise the pattern being created.
-
-      .. NOTE::
-
-          It is important that the correct number of *rows* and *cols* are
-          set; the pattern has to fit **exactly** into these dimensions.
-
 ===== ======
+
+The *pattern* property shows, in string format, an arrangement of
+available hexagons (``O``) and empty positions (``.``).
+
+.. NOTE::
+
+    Empty positions can still be accessed and used as normal; but they
+    will not, by default, be drawn with an outline and fill as the rest.
+
+Note that any spaces in the pattern lines themselves are ignored when
+constructing the board; they can just be used to help you visualise the
+pattern that will be created.
+
+.. NOTE::
+
+    It is important that the correct number of *rows* and *cols* are
+    set; the pattern has to fit **exactly** into these dimensions.
 
 
 .. _xx18GameFeatures:
@@ -490,16 +495,23 @@ XX18Game Features
 -----------------
 `^ <xx18game-command_>`_
 
-- `Summary`_
+An 18xx game board can display numerous features that each have different
+effects on game play, including cities, towns, tracks, railroads and the
+labels and income associated with these, as well as host of other symbols,
+text and styling that help characterise the board's hexagons.
+
+Features are set in a list i.e. enclosed in square brackets ``[ ... ]``
+and asssigned to the *features* property.
+
 - `General Feature Specification`_
 - `Construction of Examples`_
 - `Feature #1. City`_
 - `Feature #2. Town and Mountain`_
 - `Feature #3. Train Track`_
-- `Feature #4. Train Track & Town`_
+- `Feature #4. Train Track & Town & Curve`_
 - `Feature #5. Train track-to-edge`_
 - `Feature #6. Symbols`_
-- `Feature #7. Colored Hexagon`_
+- `Feature #7. Colored Hexagons`_
 - `Feature #8. Private Railroad`_
 - `Feature #9. Offboard Income: Pointy`_
 - `Feature #10. Offboard Income: Flat`_
@@ -508,17 +520,6 @@ XX18Game Features
 - `XX18Game Functions`_
 - `XX18Game AdHoc Drawing with a Map`_
 
-Summary
-~~~~~~~
-`^ <xx18GameFeatures_>`_
-
-An 18xx game board can display numerous features that each have different
-effects on game play, inclduing cities, towns, tracks, railroads and the
-labels and income associated with these, as well as host of other symbols,
-text and styling that help characterise the board's hexagons.
-
-Features are set in a list i.e. enclosed in square brackets ``[ ... ]``
-and asssigned to the *features* property.
 
 General Feature Specification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -610,19 +611,19 @@ Feature #1. City
         ('B6', 'cityx4', None, 'Branth'),
 
         ('C1', 'city', None, 'Cantile', 'b',
-            [image("images/Panama_Canal_Railway.svg")]),
+            [image('images/Panama_Canal_Railway.svg')]),
         ('C3', 'city', None, 'Colwa', 'below',
-            [circle(fill="aqua", label="6", radius=0.7)]),
+            [circle(fill='aqua', label='6', radius=0.7)]),
         ('C5', 'city', None, 'Cuwate', 'above',
-            [text("8", font_name="Times-Bold", font_size=24)]),
+            [text('8', font_name='Times-Bold', font_size=24)]),
 
         ('D2', 'cityx2v', None, 'Darpa'),
 
-        ('D4', 'cityx3', None, 'Delroux', "b",
+        ('D4', 'cityx3', None, 'Delroux', 'b',
             [
-              image("images/Jinchu_Railway.svg"),
-              image("images/Panama_Canal_Railway.svg"),
-              circle(fill="orange", label="6")
+              image('images/Jinchu_Railway.svg'),
+              image('images/Panama_Canal_Railway.svg'),
+              circle(fill='orange', label='6')
             ]
         ),
 
@@ -676,8 +677,8 @@ Feature #2. Town and Mountain
         ('B2', 'mountain'),
         ('B4 C1 C3', 'mountain', (270, .5), '$40'),
         ('B6', 'mountains', None, "mountains"),
-        ('D2', triangle(side=1.5, fill=None, stroke_width=2, label="$20")),
-        ('D4', triangle(side=1.5, fill="tan", stroke_width=1, title="$20")),
+        ('D2', triangle(side=1.5, fill=None, stroke_width=2, label='$20')),
+        ('D4', triangle(side=1.5, fill="tan", stroke_width=1, title='$20')),
 
 ===== ======
 
@@ -759,8 +760,8 @@ and ``s``.  Using other values will trigger an error such as:
   FEEDBACK:: Could not continue with script.
 
 
-Feature #4. Train Track & Town
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Feature #4. Train Track & Town & Curve
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameFeatures_>`_
 
 .. |gfn| image:: ../images/objects/xx18_features_track_town.png
@@ -775,16 +776,27 @@ Feature #4. Train Track & Town
         ('B2', 'track_town', 'nw,sw'),
         ('C1', 'track_town', 'nw,w'),
 
+        ('D2', 'track_curve', (0, 0.6), 1.2),
+        ('D2', 'city'),
+        ('D4', 'track_curve', (0, 0.6), -1.2),
+        ('D4', 'track', 'e,w'),
+        ('D4', 'city'),
+
 ===== ======
 
-This example shows how to add track, with a town on it, to the board.
+This example shows how to add track, with a town on it, to the board,
+as well a curve inside a hexagon.
 
-The name of this feature is ``track_town``, and it should be followed by
-the track settings for a single piece of track that connects two hexagon
+The name of the first feature is ``track_town``, and it should be followed
+by the track settings for a single piece of track that connects two hexagon
 edges (see `Feature #3. Train Track`_).
 
 The town is drawn as a rectangular shape at the centre of the track segment.
 
+The name of the second feature is ``track_curve``, and it should be followed
+by the location of the curve's start.  The opposite end is automatically
+calculated.  The height of the curve can be set as the fourth option; if
+negative it will be drawn "downwards".
 
 Feature #5. Train track-to-edge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -884,8 +896,8 @@ the values for ``(direction, distance)``.
 The feature label and the relative label position can also be set.
 
 
-Feature #7. Colored Hexagon
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Feature #7. Colored Hexagons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <xx18GameFeatures_>`_
 
 .. |gff| image:: ../images/objects/xx18_fills.png
@@ -1019,10 +1031,10 @@ board, as well as to define its income in tabular form.
 Offboard locations are normally shown as "end points" for track connected
 to them by the use of a *spike* or pointed triangle.  A spike extends
 from the edge of its hexagon towards the centre.  Three different lengths
-of spike can be used: ``short``, ``medium``, or``long``.
+of spike can be used: ``short``, ``medium``, or ``long``.
 
 Offboard locations often offer income to the company whose track connects
-to them.  This is shown in a table, colored to match the hase of the game
+to them.  This is shown in a table, colored to match the phase of the game
 for which the income applies, as defined by the *phase_revenue* feature.
 
 The colors for the table cells are from a "yellow, green, brown, grey"
@@ -1073,7 +1085,7 @@ from the edge of its hexagon towards the centre.  Three different lengths
 of spike can be used: ``short``, ``medium``, or ``long``.
 
 Offboard locations often offer income to the company whose track connects
-to them.  This is shown in a table, colored to match the hase of the
+to them.  This is shown in a table, colored to match the phase of the
 game for which the income applies, as defined by the *phase_revenue*
 feature.  The income itself appears as space-separated values in the
 "labels" part of the specification list.
@@ -1103,7 +1115,7 @@ Feature #11. Miscellaneous
       .. code:: python
 
         ('A1', 'tile-letter', (330, 0.6), 'Y'),
-        ('A3', 'town_border', None),
+        ('A3', 'town_border'),
         ('B2', 'river_line', 'sw B2,ne A3,e A5,ne'),
         ('B4', 'block', 'w nw ne'),
         ('B6', image('images/Jinchu_Railway.svg', height=1.5, width=1.5)),
@@ -1120,8 +1132,8 @@ features to the board. These are:
 * A **tile_letter** is a single large character drawn either at the centre
   of the hexagon, or at an offset, by setting the values for
   ``(direction, distance)``. See the example in ``A1``.
-* A **town_border** depicts a town with a white line drawn around it;
-  the other specifications for a town can be used as normal.
+* A **town_border**, as shown in ``A13`` depicts a town with a white line
+  drawn around it; other specifications for a town can be used as normal.
 * A **block** is a single thick line drawn at one or more hexagon edges;
   an edge can be identified by ``ne``, ``nw``, ``se``, ``sw``, ``e``,
   ``w``, ``n` or ``s`` depending if the grid orientation is ``flat`` or
@@ -1134,13 +1146,13 @@ features to the board. These are:
   by default, at the centre of the hexagon(s), or at an offset |dash|
   either by setting the values for ``(direction, distance)`` or providing
   a string with one or more hexagon compass-located edges, separated by
-  spaces.
+  spaces. For example:
 
   * The olive-colored :ref:`polygon <polygon-command>` shown in ``D2``
     and ``D4`` is one example of adding a normal shape with an offset.
   * The SVG :ref:`image <image-command>` shown in ``B6`` is another example
-    of adding a normal shape; it has no offset so is drawn, by default, at
-    the hexagon centre
+    of adding a normal shape; because it has no offset it is drawn, by default,
+    at the hexagon centre.
   * The orange :ref:`circle <circle-command>` shapes shown in ``C5`` and
     ``D6`` are an example of adding a normal shape at the centre of a
     hexagon edge(s).
@@ -1193,11 +1205,15 @@ The full list of settings is provided in `XX18Game Style Settings`_.
             features=[
                 ('A1', 'mountain', None, '$20'),
                 ('A3', 'track', 'e,w'),
-                ('A3', 'town_border', None, 'St. Agnes', 'below'),
+                ('A3', 'town', None, 'St. Agnes', 'below'),
                 ('B2', 'city', None, 'Brodie'),
                 ('B2', 'revenue',  (240, 0.6), '30'),
-                ('C1', 'river_line', 'nw C1,n C1,ne C3,n C3,ne C5,n C5,ne'),
-                ('C1 C3 C5', circle(radius=0.5, fill="aqua", label="$20"), 'ne nw'),
+                ('C1',
+                 'river_line',
+                 'nw C1,n C1,ne C3,n C3,ne C5,n C5,ne'),
+                ('C1 C3 C5',
+                  circle(radius=0.5, fill='aqua', label='$20'),
+                  'ne nw'),
                 ('D4', 'hex_fill', None, 'xoffboard'),
                 ('D4', 'spike', 'ne nw', 'short'),
             ]
@@ -1265,23 +1281,24 @@ in some cases, allow further customisation than is otherwise possible.
 
         xgffn.hex_fill('C5', 'xoffboard')
         xgffn.phase_revenue(
-            "C5", "30 40 50", 0, 0.3, "vertical",
-            colors=["xbrown","xgrey","pink"])
+            'C5', '30 40 50', 0, 0.3, 'vertical',
+            colors=['xbrown','xgrey','pink'])
         xgffn.block(
             'B4', 'ne n nw',
             dotted=True)
         xgffn.track(
-            'A5 B6', 'ne,sw',
-            color="red")
+            'A5 B6',
+            position='ne,sw',
+            color='red')
         xgffn.track_edge(
             'A3', 'nw', 30, .3, 0,
-            color="purple"),
+            color='purple'),
         xgffn.private(
             'B2', 15, 0.7,  'B2', 140, 0.4, 'R&R', 'left',
-            color="orange")
+            color='orange')
         xgffn.private(
             'B2', 15, 0.7, 'C3', 280, 0.6,
-            color="orange")
+            color='orange')
 
 ===== ======
 
@@ -1304,7 +1321,8 @@ changed |dash| in this case to ``dotted``.
 
 For the ``track`` and ``track_edge`` functions, use of the color property
 allows the track's default color |dash| usually ``black`` |dash| to be
-overridden. This is also possible for ``private`` railroads, as shown.
+overridden. This is also possible to color the ``private`` railroads
+circles, as is shown in ``B2`` and ``C3``.
 
 The full list of functions, and their allowed properties, are supplied in
 `XX18Game Function Options`_
@@ -1337,26 +1355,26 @@ exceptions.  For these cases, you need to fall back to using
       .. code:: python
 
         Create(
-            filename="xx18_map.pdf",
-            paper="A4",
+            filename='xx18_map.pdf',
+            paper='A4',
             margin=1.25,
             fill='skyblue')
 
         Rectangle(
             x=-1.25, y=-1.25,
             height=22.5, width=21,
-            fill_stroke="limegreen")
+            fill_stroke='limegreen')
         Rectangle(
             x=-1.25, y=19.5,
             height=6.2, width=4,
-            fill_stroke="limegreen")
+            fill_stroke='limegreen')
 
         Image(
-            "images/gh.svg",
+            'images/gh.svg',
             height=30, width=20,
             y=-1.7, x=-0.5)
 
-        map_pattern ="""
+        map_pattern="""
         O O O O
          O O O .
         . O O O
@@ -1374,7 +1392,7 @@ exceptions.  For these cases, you need to fall back to using
         XX18State(board=xgh)
 
         Polyshape(
-            fill_stroke="xred",
+            fill_stroke='xred',
             points=[
               xgh.A7.se,
               xgh.A7.s,
@@ -1387,7 +1405,7 @@ exceptions.  For these cases, you need to fall back to using
             ]
         )
         Polyshape(
-            fill_stroke="xgray",
+            fill_stroke='xgray',
             points=[
               xgh.G7.n,
               xgh.G7.nw,
@@ -1398,8 +1416,8 @@ exceptions.  For these cases, you need to fall back to using
 
         def plot(**kwargs):
             for loc in kwargs['hexes']:
-                Circle(cxy=loc.e, radius=0.5, fill="blue")
-                Circle(cxy=loc.ssw, radius=0.5, fill="red")
+                Circle(cxy=loc.e, radius=0.5, fill='blue')
+                Circle(cxy=loc.ssw, radius=0.5, fill='red')
 
         xgf = XX18Game(
             rows=7,
@@ -1414,9 +1432,9 @@ exceptions.  For these cases, you need to fall back to using
             ]
         )
         Text(
-          "Togo",
+          'Togo',
           xy=xgf.B8.c,
-          stroke="white", font_size=18)
+          stroke='white', font_size=18)
 
         XX18State(board=xgf)
 
@@ -1667,6 +1685,7 @@ then switch that out with a substitute /fallback value.
 * ``tile_letter(location, label, direction, distance, stroke)``
 * ``town(location, label, direction, distance, style, rotation, color, stroke)``
 * ``track(location, label, position, town, color)``
+* ``track_curve(location, direction, distance, height, color)``
 * ``track_edge(location, position, direction, distance, height, color)``
 
 

@@ -262,6 +262,8 @@ XX18_FEATURE_SET = XX18_SYMBOL_SET + [
     "track-town",
     "track_edge",
     "track-edge",
+    "track_curve",
+    "track-curve",
     "river_line",
     "river-line",
 ]
@@ -946,6 +948,19 @@ class XX18GameObject(CoreGameObject):
                     town="middle",  # ALL POSITIONS NOT OPERATIONAL
                     **kwargs,
                 )
+            case "track_curve" | "track-curve":
+                if len(feature) >= 4:
+                    if feature[3] is not None:
+                        height = tools.as_float(feature[3], "height", default=0.0)
+                else:
+                    height = None
+                self.track_curve(
+                    location=fhexagon,
+                    direction=fdirection,
+                    distance=fdistance,
+                    height=height,
+                    **kwargs,
+                )
             case "track_edge" | "track-edge":
                 if len(feature) >= 5:
                     height = tools.as_float(feature[4], "height", default=0.0)
@@ -1591,6 +1606,61 @@ class XX18GameObject(CoreGameObject):
                         alert=True,
                     )
 
+    def track_curve(
+        self,
+        location: str = None,
+        direction: float = None,
+        distance: float = None,
+        height: float = None,
+        color: str = None,
+        **kwargs,
+    ):
+        """Draw curve track between at hex location(s).
+
+        Args:
+            location (str): grid reference or references for one or more cells
+            direction (float): degrees clockwise from East
+            distance (float): distance from hex centre
+            height (float): height of the curve above the baseline joining end points
+            color (str): the name of color to use for the track
+        """
+        from protograf.protos import Line
+
+        _locations = self.process_locations(location, "track_curve")
+        track_outer_fill = self.process_color(None, self.xxs["XX18_TRACK_OUTER_FILL"])
+        track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
+        if height is None:
+            height = 0.0
+        if not isinstance(height, float):
+            feedback(
+                f"The track_curve at {location} requires a floating number for height.",
+                True,
+                True,
+            )
+
+        for _loc in _locations:
+            geo = self.cells.get(_loc)
+            ccentre = self.feature_location(geo, direction, distance)
+            half_length = geoms.length_of_line(geo.centre, ccentre)
+            bcentre = geoms.point_beyond_line(ccentre, geo.centre, half_length)
+            # ---- draw curve track
+            Line(  # underlying white
+                xy=bcentre,
+                xy1=ccentre,
+                stroke=track_outer_fill,
+                stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units,
+                curve=height,
+                **kwargs,
+            )
+            Line(  # overlying black
+                xy=bcentre,
+                xy1=ccentre,
+                stroke=track_inner_fill,
+                stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units,
+                curve=height,
+                **kwargs,
+            )
+
     def track_edge(
         self,
         location: str = None,
@@ -1752,6 +1822,7 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         direction: float = None,
         distance: float = None,
+        border: bool = False,
         style: str = "circle",  # or rectangle
         rotation: float = 0.0,
         color: str = None,
@@ -1765,6 +1836,7 @@ class XX18GameObject(CoreGameObject):
             label (str): the name of the town
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
+            border (bool): if True, then outline the town
             style (str): circle or rectangle
             rotation (float): degrees of rotation of rectangular town
             color (str): the name of color to use for the town fill
@@ -1774,7 +1846,11 @@ class XX18GameObject(CoreGameObject):
 
         _locations = self.process_locations(location, "town")
         town_fill = self.process_color(color, self.xxs["XX18_TOWN_FILL"])
-        town_stroke = self.process_color(stroke, self.xxs["XX18_TOWN_STROKE"])
+        if border:
+            _stroke = "white"
+        else:
+            _stroke = self.xxs["XX18_TOWN_STROKE"]
+        town_stroke = self.process_color(stroke, _stroke)
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)

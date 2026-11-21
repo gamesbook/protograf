@@ -163,9 +163,9 @@ xgfk = XX18Game(
     ]
 )
 XX18State(board=xgfk)
-Text("XX18Game: Track", common=footer)
+Text("XX18Game: Regular Track", common=footer)
 
-# ---- XX18Game: Features: Track & Town
+# ---- XX18Game: Features: Track & Town & Curve
 PageBreak()
 xgfkt = XX18Game(
     rows=4, cols=3,
@@ -176,10 +176,15 @@ xgfkt = XX18Game(
         ('A1', 'track_town', 'e,w'),
         ('B2', 'track_town', 'nw,sw'),
         ('C1', 'track_town', 'nw,w'),
+        ('D2', 'track_curve', (0, 0.6), 1.2),
+        ('D2', 'city'),
+        ('D4', 'track_curve', (0, 0.6), -1.2),
+        ('D4', 'track', 'e,w'),
+        ('D4', 'city'),
     ]
 )
 XX18State(board=xgfkt)
-Text("XX18Game: Track & Town", common=footer)
+Text("XX18Game: Track & Town & Curve", common=footer)
 
 # ---- XX18Game: Fills
 PageBreak()
@@ -203,7 +208,7 @@ xgff = XX18Game(
     ]
 )
 XX18State(board=xgff)
-Text("XX18Game: Fill and Highlight", common=footer)
+Text("XX18Game: Hex Fill and Highlight", common=footer)
 
 # ---- XX18Game: Symbols
 PageBreak()
@@ -347,8 +352,8 @@ xgmis = XX18Game(
     label_size=18,
     features=[
         ('A1', 'tile-letter', (330, 0.6), "Y"),
-        ('A3', 'town_border', None),
-        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne', 'aqua'),
+        ('A3', 'town_border'),
+        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne'),
         ('B4', 'block', "w nw ne"),
         ('B6', image('images/Jinchu_Railway.svg', height=1.5, width=1.5)),
         ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
@@ -371,7 +376,7 @@ xgzz = XX18Game(
     features=[
         ('A1', 'mountain', None, '$20'),
         ('A3', 'track', 'e,w'),
-        ('A3', 'town_border', None, 'St. Agnes', 'below'),
+        ('A3', 'town', None, 'St. Agnes', 'below'),
         ('B2', 'city', None, 'Brodie'),
         ('B2', 'revenue',  (240, .6), '30'),
         ('C1', 'river_line', 'nw C1,n C1,ne C3,n C3,ne C5,n C5,ne'),
@@ -402,7 +407,8 @@ xgffn.block(
     'B4', 'ne n nw',
     dotted=True)
 xgffn.track(
-    'A5 B6', 'nw,se',
+    'A5 B6',
+    position='nw,se',
     color="red")
 xgffn.track_edge(
     'A3', 'nw', 30, .3, 0,
