@@ -346,15 +346,15 @@ xgmis = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne', 'aqua'),
         ('A1', 'tile-letter', (330, 0.6), "Y"),
-        ('A5', 'track', 'e,w'),
-        ('A5', 'town_border', None),
+        ('A3', 'town_border', None),
+        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne', 'aqua'),
         ('B4', 'block', "w nw ne"),
         ('B6', image('images/Jinchu_Railway.svg', height=1.5, width=1.5)),
         ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
         ('C5', 'block', "nw", "xred"),
         ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
+        ('D6 C5', circle(radius=0.3, fill_stroke="orange"), 'w se'),
     ]
 )
 XX18State(board=xgmis)
@@ -374,6 +374,8 @@ xgzz = XX18Game(
         ('A3', 'town_border', None, 'St. Agnes', 'below'),
         ('B2', 'city', None, 'Brodie'),
         ('B2', 'revenue',  (240, .6), '30'),
+        ('C1', 'river_line', 'nw C1,n C1,ne C3,n C3,ne C5,n C5,ne'),
+        ('C1 C3 C5', circle(radius=0.5, fill="aqua", label="$20"), 'ne nw'),
         ('D4', 'hex_fill', None, 'xoffboard'),
         ('D4', 'spike', 'ne nw', "short",),
     ]

@@ -1102,15 +1102,15 @@ Feature #11. Miscellaneous
 
       .. code:: python
 
-        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne', 'aqua'),
         ('A1', 'tile-letter', (330, 0.6), 'Y'),
-        ('A5', 'track', 'e,w'),
-        ('A5', 'town_border', None),
+        ('A3', 'town_border', None),
+        ('B2', 'river_line', 'sw B2,ne A3,e A5,ne'),
         ('B4', 'block', 'w nw ne'),
         ('B6', image('images/Jinchu_Railway.svg', height=1.5, width=1.5)),
         ('C1', 'river_line', 'nw C1,se C3,se D6,e'),
         ('C5', 'block', "nw", 'xred'),
         ('D2 D4', polygon(sides=5, side=0.5, fill_stroke="olive"), (210, 0.7)),
+        ('D6 C5', circle(radius=0.3, fill_stroke="orange"), 'w se'),
 
 ===== ======
 
@@ -1122,7 +1122,6 @@ features to the board. These are:
   ``(direction, distance)``. See the example in ``A1``.
 * A **town_border** depicts a town with a white line drawn around it;
   the other specifications for a town can be used as normal.
-  See the example in ``A5``.
 * A **block** is a single thick line drawn at one or more hexagon edges;
   an edge can be identified by ``ne``, ``nw``, ``se``, ``sw``, ``e``,
   ``w``, ``n` or ``s`` depending if the grid orientation is ``flat`` or
@@ -1132,18 +1131,23 @@ features to the board. These are:
 * A normal **protograf** :doc:`shape <../core_shapes>` can be displayed
   in one or more hexagons, by providing the shape's name, in lowercase,
   along with all the usual construction details; it will be drawn either,
-  by default, at the centre of the hexagon(s), or at an offset, by
-  setting the values for ``(direction, distance)``.
+  by default, at the centre of the hexagon(s), or at an offset |dash|
+  either by setting the values for ``(direction, distance)`` or providing
+  a string with one or more hexagon compass-located edges, separated by
+  spaces.
 
-  * The olive-colored ``polygon`` shown in ``D2`` and ``D4`` is one example
-    of adding a normal shape with an offset.
-  * The SVG ``image`` shown in ``B6`` is another example of adding a normal
-    shape; it has no offset so is drawn, by default, at the hexagon centre
+  * The olive-colored :ref:`polygon <polygon-command>` shown in ``D2``
+    and ``D4`` is one example of adding a normal shape with an offset.
+  * The SVG :ref:`image <image-command>` shown in ``B6`` is another example
+    of adding a normal shape; it has no offset so is drawn, by default, at
+    the hexagon centre
+  * The orange :ref:`circle <circle-command>` shapes shown in ``C5`` and
+    ``D6`` are an example of adding a normal shape at the centre of a
+    hexagon edge(s).
 * A **river_line** is a wavy line drawn between hexagon edges/vertices.
   The locations for the points along the river are given by pairs of
   ``Hexagon,Vertex`` location values; for example ``C1,se`` to indicate
-  the south-east vertex of hexagon ``C1`` in the grid.  The color of
-  the line can also be set as the fourth specification value. It should
+  the south-east vertex of hexagon ``C1`` in the grid.  It should
   be noted that the ``river_line`` not really a recommended feature; but
   rather to be used as a "placeholder" until proper representation of
   a river can be created by a regular drawing tool.
@@ -1192,16 +1196,21 @@ The full list of settings is provided in `XX18Game Style Settings`_.
                 ('A3', 'town_border', None, 'St. Agnes', 'below'),
                 ('B2', 'city', None, 'Brodie'),
                 ('B2', 'revenue',  (240, 0.6), '30'),
+                ('C1', 'river_line', 'nw C1,n C1,ne C3,n C3,ne C5,n C5,ne'),
+                ('C1 C3 C5', circle(radius=0.5, fill="aqua", label="$20"), 'ne nw'),
                 ('D4', 'hex_fill', None, 'xoffboard'),
-                ('D4', 'spike', 'ne nw', 'short',),
+                ('D4', 'spike', 'ne nw', 'short'),
             ]
         )
         XX18State(board=xgzz)
 ===== ======
 
 This example shows how to reference a JSON file using the *settings*
-property.  The JSON file used here, named ``xx18.json``, contains the
-following styles and values:
+property.
+
+
+The JSON file used here, named ``xx18.json``, contains the following styles
+and values:
 
 .. code:: json
 
@@ -1215,8 +1224,15 @@ following styles and values:
       "XX18_TRACK_OUTER_FILL": null,
       "XX18_REVENUE_FILL": "white",
       "XX18_SPIKE_BASE_OUTER": 1.5,
-      "XX18_SPIKE_BASE_INNER": 1.35
+      "XX18_SPIKE_BASE_INNER": 1.35,
+      "XX18_RIVER_LINE": "royalblue",
+      "XX18_RIVER_LINE_WAVE_HEIGHT": null
   }
+
+It can be seen in this example, how the river, which follows the hexagon
+edges, is not "wavy" because the ``"XX18_RIVER_LINE_WAVE_HEIGHT"`` is ``null``;
+and how the small value-containing circles, drawn at the hexagon edges, can
+be used to indicate the cost of laying track across the river at that edge.
 
 
 .. _xx18GameFunctions:
@@ -1537,7 +1553,8 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
 * ``"XX18_SPIKE_BASE_INNER"`` - default is ``0.4`` cm; matches width of black track
 * ``"XX18_SPIKE_BASE_OUTER"`` - default is ``0.5`` cm; matches width of black track
 * ``"XX18_PHASE_REVENUE_BOX"`` - default is ``0.7`` cm; default width of single cell
-* ``"XX18_HEX_RIVER_WAVE_HEIGHT"`` - default is ``0.15`` cm; wave height in feature river_line
+* ``"XX18_RIVER_LINE_WAVE_HEIGHT"`` - default is ``0.15`` cm; wave height in feature river_line
+* ``"XX18_RIVER_LINE"`` - default is ``#01A0D6``; river_line feature color
 * ``"XX18_DEBUG_FONT_FRACTION"`` - default is ``0.75``; relative size of debug font
 * ``"XX18_DEBUG_FONT_OFFSET_X"`` - default is ``0.0``; x-offset for debug lettering
 * ``"XX18_DEBUG_FONT_OFFSET_Y"`` - default is ``0.0``; y-offset for debug lettering
@@ -1635,7 +1652,7 @@ then switch that out with a substitute /fallback value.
 
 * ``block(location, position, stroke)``
 * ``city(location, label, direction, distance, count, rotation, shapes, color)``
-* ``figure(location, direction, distance, thing)``
+* ``figure(location, direction, distance, position, thing)``
 * ``hex_fill(location, color)``
 * ``highlight(location, color, width)``
 * ``mountain(location, label, direction, distance)``

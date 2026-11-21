@@ -132,7 +132,6 @@ DEFAULT_SETTINGS = {
     "XX18_CITY_BACKGROUND_FILL": "white",
     "XX18_TOWN_DIAMETER": 0.45,  # cm
     "XX18_TOWN_BORDER_DIAMETER": 0.55,  # cm; outer-circle
-    # "XX18_TOWN_HEIGHT": 0.45, # cm
     "XX18_TOWN_HEIGHT": 0.7,  # cm
     "XX18_TOWN_HEIGHT_OUTER": 0.8,  # cm
     "XX18_TOWN_WIDTH": 0.4,  # cm
@@ -156,8 +155,10 @@ DEFAULT_SETTINGS = {
     "XX18_SPIKE_FRACTION_LONG": 0.45,  # fraction of hex
     "XX18_SPIKE_BASE_OUTER": 0.5,  # cm - match XX18_TRACK_OUTER_WIDTH
     "XX18_SPIKE_BASE_INNER": 0.4,  # cm - match XX18_TRACK_INNER_WIDTH
-    "XX18_HEX_RIVER_WAVE_HEIGHT": 0.15,  # cm
+    "XX18_RIVER_LINE": "#01A0D6",  # color - match XX18_HEX_RIVER
+    "XX18_RIVER_LINE_WAVE_HEIGHT": 0.15,  # cm
     "XX18_PHASE_REVENUE_BOX": 0.7,  # cm
+    # text: font and stroke
     "XX18_DEBUG_FONT_FRACTION": 0.75,
     "XX18_DEBUG_FONT_OFFSET_X": 0.0,
     "XX18_DEBUG_FONT_OFFSET_Y": 0.0,
@@ -874,7 +875,6 @@ class XX18GameObject(CoreGameObject):
                         True,
                     )
 
-        # print(f"&&& {fhexagon=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
         # ---- feature to function
         feature_type = ftype
         if ftype in XX18_SYMBOL_SET:
@@ -1048,11 +1048,14 @@ class XX18GameObject(CoreGameObject):
                 )
             # ---- custom shape
             case "SHAPE":
+                # print(f"&&& {fhexagon=} {ftype=} {fdirection=} {fdistance=} {flabel=} ")
+                eposition = fdirection if isinstance(fdirection, str) else None  # edge
                 self.figure(
                     location=fhexagon,
                     label=flabel,
                     direction=fdirection,
                     distance=fdistance,
+                    position=eposition,
                     thing=ftype,
                     **kwargs,
                 )
@@ -1085,6 +1088,86 @@ class XX18GameObject(CoreGameObject):
         else:
             fcentre = geo.centre
         return fcentre
+
+    def geo_from_location(
+        self, geo: ShapeGeometry, edge: str = None, feature: str = "feature"
+    ) -> tuple:
+        """Get a set of hexagon geometries in a given compass direction
+
+        Args:
+            geo (ShapeGeometry):  hexagon geometry
+            edge (str): the compass direction of the egde
+            feature (str): the name of the feature requesting the geometries
+
+        Returns:
+            tuple: start, end and mid-point of the edge line
+        """
+        start, end = None, None
+        if self.orientation == HexOrientationName.POINTY.value:
+            match _lower(edge):
+                case "ne":
+                    start = geo.n
+                    end = geo.ne
+                    mid = geo.nne
+                case "e":
+                    start = geo.ne
+                    end = geo.se
+                    mid = geo.e
+                case "se":
+                    start = geo.se
+                    end = geo.s
+                    mid = geo.sse
+                case "sw":
+                    start = geo.s
+                    end = geo.sw
+                    mid = geo.ssw
+                case "w":
+                    start = geo.sw
+                    end = geo.nw
+                    mid = geo.w
+                case "nw":
+                    start = geo.nw
+                    end = geo.n
+                    mid = geo.nnw
+                case _:
+                    feedback(
+                        f'The {feature} position "{edge}" is not a valid one.',
+                        True,
+                        True,
+                    )
+        elif self.orientation == HexOrientationName.FLAT.value:
+            match _lower(edge):
+                case "n":
+                    start = geo.nw
+                    end = geo.ne
+                    mid = geo.n
+                case "ne":
+                    start = geo.ne
+                    end = geo.e
+                    mid = geo.ene
+                case "se":
+                    start = geo.e
+                    end = geo.se
+                    mid = geo.ese
+                case "s":
+                    start = geo.se
+                    end = geo.sw
+                    mid = geo.s
+                case "sw":
+                    start = geo.sw
+                    end = geo.w
+                    mid = geo.wsw
+                case "nw":
+                    start = geo.w
+                    end = geo.nw
+                    mid = geo.wnw
+                case _:
+                    feedback(
+                        f'The {feature} position "{edge}" is not a valid one.',
+                        True,
+                        True,
+                    )
+        return start, end, mid
 
     def validate_edge(
         self, feature: str, location: str, position: str, multi: bool = False
@@ -1605,7 +1688,7 @@ class XX18GameObject(CoreGameObject):
                 True,
                 True,
             )
-        river_stroke = self.process_color(color, self.xxs["XX18_HEX_RIVER"])
+        river_stroke = self.process_color(color, self.xxs["XX18_RIVER_LINE"])
         # start point
         self.validate_edge("river_line", _locations[0], _positions[0], True)
         _geo = self.cells.get(_locations[0])
@@ -1622,7 +1705,6 @@ class XX18GameObject(CoreGameObject):
 
         # loop-through-points
         for _pos in _positions[1:]:
-            # breakpoint()
             result = tools.split(_pos, separator=",", clean=True, no_blanks=True)
             if len(result) < 2:
                 feedback(
@@ -1644,15 +1726,24 @@ class XX18GameObject(CoreGameObject):
             self.validate_edge("river_line", hexagon, edge, True)
             geo = self.cells.get(_hexes[0])
             current_point = getattr(geo, edge)  # Point
-            Line(
-                xy=start_point,
-                xy1=current_point,
-                stroke=river_stroke,
-                stroke_width=_river_width,
-                stroke_ends="rounded",
-                wave_style="wave",
-                wave_height=0.15,
-            )
+            if self.xxs["XX18_RIVER_LINE_WAVE_HEIGHT"]:
+                Line(
+                    xy=start_point,
+                    xy1=current_point,
+                    stroke=river_stroke,
+                    stroke_width=_river_width,
+                    stroke_ends="rounded",
+                    wave_style="wave",
+                    wave_height=self.xxs["XX18_RIVER_LINE_WAVE_HEIGHT"],
+                )
+            else:
+                Line(
+                    xy=start_point,
+                    xy1=current_point,
+                    stroke=river_stroke,
+                    stroke_width=_river_width,
+                    stroke_ends="rounded",
+                )
             start_point = current_point
 
     def town(
@@ -2114,59 +2205,7 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             for edge in _positions:
-                start, end = None, None
-                if self.orientation == HexOrientationName.POINTY.value:
-                    match _lower(edge):
-                        case "ne":
-                            start = geo.n
-                            end = geo.ne
-                        case "e":
-                            start = geo.ne
-                            end = geo.se
-                        case "se":
-                            start = geo.se
-                            end = geo.s
-                        case "sw":
-                            start = geo.s
-                            end = geo.sw
-                        case "w":
-                            start = geo.sw
-                            end = geo.nw
-                        case "nw":
-                            start = geo.nw
-                            end = geo.n
-                        case _:
-                            feedback(
-                                f'The block line position "{position}" is not a valid one.',
-                                True,
-                                True,
-                            )
-                elif self.orientation == HexOrientationName.FLAT.value:
-                    match _lower(edge):
-                        case "n":
-                            start = geo.nw
-                            end = geo.ne
-                        case "ne":
-                            start = geo.ne
-                            end = geo.e
-                        case "se":
-                            start = geo.e
-                            end = geo.se
-                        case "s":
-                            start = geo.se
-                            end = geo.sw
-                        case "sw":
-                            start = geo.sw
-                            end = geo.w
-                        case "nw":
-                            start = geo.w
-                            end = geo.nw
-                        case _:
-                            feedback(
-                                f'The block line position "{position}" is not a valid one.',
-                                True,
-                                True,
-                            )
+                start, end, _ = self.geo_from_location(geo, edge, "block line")
                 if start and end:
                     kwargs["stroke_ends"] = "rounded"
                     Line(
@@ -2674,6 +2713,7 @@ class XX18GameObject(CoreGameObject):
         location: str = None,
         direction: float = None,
         distance: float = None,
+        position: str = None,
         thing: object = None,
         **kwargs,
     ):
@@ -2684,19 +2724,29 @@ class XX18GameObject(CoreGameObject):
             label (str): the label for the symbol
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
+            position (str): hex edge compass reference or references
             thing (object): a protograf shape
         """
         if not isinstance(thing, BaseShape):
             feedback(
-                f"The figure 'thing' property cannot be a '{type(thing)}';",
-                " it must be protograf shape.",
+                f"The figure 'thing' property cannot be a '{type(thing).__name__}';",
+                " it must be protograf Shape.",
                 True,
                 True,
             )
         _locations = self.process_locations(location, "figure")
         for _loc in _locations:
             geo = self.cells.get(_loc)
-            ccentre = self.feature_location(geo, direction, distance)
-            cx = (ccentre.x + self.margin_left) * globals.units
-            cy = (ccentre.y + self.margin_top) * globals.units
-            thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs)
+            if position is not None:
+                _positions = tools.split(position, separator=" ", clean=True)
+                for edge in _positions:
+                    # breakpoint()
+                    _, _, mid = self.geo_from_location(geo, edge, "figure")
+                    cx = (mid.x + self.margin_left) * globals.units
+                    cy = (mid.y + self.margin_top) * globals.units
+                    thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs)
+            else:
+                ccentre = self.feature_location(geo, direction, distance)
+                cx = (ccentre.x + self.margin_left) * globals.units
+                cy = (ccentre.y + self.margin_top) * globals.units
+                thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs)
