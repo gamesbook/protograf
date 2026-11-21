@@ -143,7 +143,7 @@ DEFAULT_SETTINGS = {
     "XX18_PRIVATE_FILL": None,
     "XX18_REVENUE_DIAMETER": 0.8,  # cm
     "XX18_REVENUE_STROKE": "black",
-    "XX18_REVENUE_FILL": None,  # no color
+    "XX18_REVENUE_FILL": "white",
     "XX18_TRACK_INNER_WIDTH": 0.4,  # cm
     "XX18_TRACK_OUTER_WIDTH": 0.5,  # cm
     "XX18_TRACK_INNER_FILL": "black",

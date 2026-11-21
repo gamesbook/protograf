@@ -1203,6 +1203,7 @@ The full list of settings is provided in `XX18Game Style Settings`_.
             ]
         )
         XX18State(board=xgzz)
+
 ===== ======
 
 This example shows how to reference a JSON file using the *settings*
@@ -1222,7 +1223,7 @@ and values:
       "XX18_TOWN_STROKE": "tomato",
       "XX18_TOWN_FILL": "palegreen",
       "XX18_TRACK_OUTER_FILL": null,
-      "XX18_REVENUE_FILL": "white",
+      "XX18_REVENUE_FILL": "yellow",
       "XX18_SPIKE_BASE_OUTER": 1.5,
       "XX18_SPIKE_BASE_INNER": 1.35,
       "XX18_RIVER_LINE": "royalblue",
