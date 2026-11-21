@@ -111,7 +111,8 @@ The command also provides:
 * standard, named 18xx colors
 * the ability to load different map font names & sizes, or colors to use,
   from a settings file
-* simple labelling for use with icons, symbols, towns or cities
+* simple labelling for use with icons, symbols, towns, private railroads
+  or cities
 
 In-hexagon features, for example, cities, towns, icons, symbols or lettering
 will, by default, appear at the centre of a hexagon. These can be repositioned
@@ -939,15 +940,16 @@ Feature #8. Private Railroad
 
       .. code:: python
 
-        ('A1', 'private'),
-        ('A3', 'private', None, 'L&L', 'A3',  None, 'left'),
-        ('B2', 'private', ( 15, 0.7), 'R&R', 'B2', (140, 0.4), 'above'),
-        ('B4', 'private', ( 15, 0.6), 'D&D', 'B6', (140, 0.5), 'below'),
-        ('C1', 'private', (210, 0.4), 'LL', 'C3', ( 15, 0.7), 'left'),
-        ('C5', 'private', (140, 0.5), 'RR', 'C5', ( 15, 0.6), 'right'),
-        ('D2', 'private', (180, 0.7), 'RD', 'D2', (0, 0.4), 'above'),
-        ('D4', 'private', (270, 0.7), 'D&R', 'D4', (90, 0.4), 'above'),
-        ('D6', 'private', (270, 0.7), 'R&D', 'D6', (90, 0.4), 'below'),
+        ('A1', 'private', ( 15, .7), 'L&R', 'A1', (140, .4), 'left'),
+        ('A3', 'private', None, 'L&C', 'A3',  None, 'left'),
+        ('A5', 'private', ( 15, .3), 'R&L', 'A5', (140, .7), 'right'),
+        ('B2', 'private', ( 15, .7), 'B&C', 'B2', (120, .4), 'below'),
+        ('B4', 'private', (195, .6), 'A&C', 'B6', (140, .5), 'above'),
+        ('C1', 'private', (210, .4), 'LL', 'D2', ( 15, .7), 'left'),
+        ('C3', 'private', (180, .7), 'H&A ', 'C3', (0, .4), 'above'),
+        ('C5', 'private', (  0, .5), 'H&B', 'C5', ( 180, .6), 'below'),
+        ('D4', 'private', (270, .7), 'V&A', 'D4', (90, .4), 'above'),
+        ('D6', 'private', (270, .7), 'V&B', 'D6', (90, .4), 'below'),
 
 ===== ======
 
@@ -979,8 +981,9 @@ must appear, are as follows:
    railroad is set here; if ``None`` then it will drawn at the centre
    of the end location's hexagon
 7. The relative location of the private railroad's **label**; ``left``
-   or ``right`` draw this next to the start or end circles; while
-   ``above`` or ``below`` draw it next to the centre of the connecting line
+   or ``right`` draw the label next to the start or end circles; while
+   ``above`` or ``below`` draw the label centred on the connecting line,
+   at a distance based on the font size
 
 
 Feature #9. Offboard Income: Pointy

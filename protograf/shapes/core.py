@@ -2071,13 +2071,14 @@ class LineShape(BaseShape):
                 _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))
                 if self.centre_shapes_offset:
                     # recalculate offset centre
-                    edge = "top" if self.centre_shapes_offset > 0 else "bottom"
+                    _edge = "bottom" if self.centre_shapes_offset > 0 else "top"
+                    _offset = self.centre_shapes_offset * globals.units
                     result = geoms.rectangle_vertices(
                         p1=Point(x, y),
                         p2=Point(x_1, y_1),
-                        height=abs(self.centre_shapes_offset),
-                        angle_deg=_angle,
-                        given_edge=edge,
+                        height=abs(_offset),
+                        angle_deg=180 - _angle,
+                        given_edge=_edge,
                     )
                     l2s, l2e = result[0], result[1]
                     _cx, _cy = (l2s.x + l2e.x) / 2.0, (l2s.y + l2e.y) / 2.0

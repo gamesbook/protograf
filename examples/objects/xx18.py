@@ -293,16 +293,16 @@ xgprv = XX18Game(
     label=True,
     label_size=18,
     features=[
-        ('A1', 'private', None, ''),
-        ('A1', 'private'),
-        ('A3', 'private', None, 'L&L', 'A3',  None, 'left'),
-        ('B2', 'private', ( 15, .7), 'R&R', 'B2', (140, .4), 'below'),
-        ('B4', 'private', ( 15, .6), 'D&D', 'B6', (140, .5), 'above'),
-        ('C1', 'private', (210, .4), 'LL', 'C3', ( 15, .7), 'left'),
-        ('C5', 'private', (140, .5), 'RR', 'C5', ( 15, .6), 'above'),
-        ('D2', 'private', (180, .7), 'RD ', 'D2', (0, .4), 'above'),
-        ('D4', 'private', (270, .7), 'D&R', 'D4', (90, .4), 'above'),
-        ('D6', 'private', (270, .7), 'R&D', 'D6', (90, .4), 'below'),
+        ('A1', 'private', ( 15, .7), 'L&R', 'A1', (140, .4), 'left'),
+        ('A3', 'private', None, 'L&C', 'A3',  None, 'left'),
+        ('A5', 'private', ( 15, .3), 'R&L', 'A5', (140, .7), 'right'),
+        ('B2', 'private', ( 15, .7), 'B&C', 'B2', (120, .4), 'below'),
+        ('B4', 'private', (195, .6), 'A&C', 'B6', (140, .5), 'above'),
+        ('C1', 'private', (210, .4), 'LL', 'D2', ( 15, .7), 'left'),
+        ('C3', 'private', (180, .7), 'H&A ', 'C3', (0, .4), 'above'),
+        ('C5', 'private', (  0, .5), 'H&B', 'C5', ( 180, .6), 'below'),
+        ('D4', 'private', (270, .7), 'V&A', 'D4', (90, .4), 'above'),
+        ('D6', 'private', (270, .7), 'V&B', 'D6', (90, .4), 'below'),
     ]
 )
 XX18State(board=xgprv)
@@ -406,7 +406,7 @@ xgffn.track_edge(
     'A3', 'nw', 30, .3, 0,
     color="purple"),
 xgffn.private(
-    'B2', 15, 0.7,  'B2', 140, 0.4, 'R&R', 'left',
+    'B2', 15, 0.7,  'B2', 140, 0.4, 'C&C', 'right',
     color="orange")
 xgffn.private(
     'B2', 15, 0.7, 'C3', 280, 0.6,

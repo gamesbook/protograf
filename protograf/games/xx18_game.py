@@ -46,8 +46,8 @@ The blueprint will also provide:
 * standard, named 18xx colors
 * ability to load different map font names & sizes, or colors to use, from
   a settings file
-* ability to put labels next to icons, symbols, towns or cities
-  (above, below, left-of, right-of)
+* ability to put labels next to icons, symbols, towns, private railroads
+  or cities (above, below, left-of, right-of)
 
 In-hex features, for example, cities, towns, icons, symbols or lettering will,
 by default, appear at the centre of a hex. These can be repositioned using a
@@ -2489,7 +2489,7 @@ class XX18GameObject(CoreGameObject):
             label_location (str): the relative location of the label
             color (str): fill color name for the Private Railroad circles
         """
-        from protograf.protos import Circle, Line, Text
+        from protograf.protos import Circle, Line, text
 
         _locations_s = self.process_locations(location, "private-start")
         _locations_e = self.process_locations(location1, "private-end")
@@ -2506,7 +2506,8 @@ class XX18GameObject(CoreGameObject):
             # above: heading for upper-circle; above: title for lower-circle;
             # left: above line; right: below line;
             pce_heading, pce_title, pcs_heading, pcs_title = "", "", "", ""
-            lheading, ltitle, labove = "", "", False
+            relative_label_location = None
+            text_offset = self.xxs["XX18_TEXT_SMALL"] / self.units * 0.75
             lwargs = {}
             if label:
                 lwargs["font_name"] = self.xxs["XX18_TEXT_FONT"]
@@ -2519,15 +2520,8 @@ class XX18GameObject(CoreGameObject):
                 lwargs["title_size"] = self.xxs["XX18_TEXT_SMALL"]
                 kwargs["title_stroke"] = self.xxs["XX18_TEXT_STROKE"]
 
-                label_location = kwargs.get("label_location", "below")
-                relative_location = self.relative_location(label_location)
-
-                match relative_location:
-                    case RelativeLocation.ABOVE.value:
-                        lheading = label
-                        labove = True
-                    case RelativeLocation.BELOW.value:
-                        ltitle = label
+                relative_label_location = self.relative_location(label_location)
+                match relative_label_location:
                     case RelativeLocation.LEFT.value:
                         if c_s.x <= c_e.x:
                             if c_s.y < c_e.y:
@@ -2550,8 +2544,10 @@ class XX18GameObject(CoreGameObject):
                                 pce_heading = label
                             else:
                                 pce_title = label
+                    case RelativeLocation.BELOW.value:
+                        text_offset = -1 * text_offset
 
-            # ---- private features; circles with title or heading
+            # ---- private circles (with label?)
             pcs = Circle(
                 cxy=c_s,
                 radius=self.xxs["XX18_PRIVATE_DIAMETER"] / 2.0,
@@ -2572,66 +2568,27 @@ class XX18GameObject(CoreGameObject):
                 heading=pce_heading,
                 **lwargs,
             )
-            breakpoint()
-            Line(
-                links=[pcs, pce],
-                stroke_width=self.stroke_width_xx,
-                heading=lheading,
-                title=ltitle,
-                **lwargs,
-            )
-            # ---- label - title or heading - for private line
-            # breakpoint()
-            if label and (ltitle or lheading):
-                lcntr = geoms.fraction_along_line(c_e, c_s, 0.5)
-                llabel = lheading or ltitle
-                talign = "centre"
-                # print(f"+++ {llabel=} {c_e.x=:.2f} {c_s.x=:.2f} {c_e.y=:.2f} {c_s.y=:.2f}")
-                if c_e.y != c_s.y:
-                    # align text in/out from line centre
-                    if labove:
-                        delta_y = -self.xxs["XX18_TEXT_SMALL"] / self.units / 2.0
+            # ---- private line (with label?)
+            match relative_label_location:
+                case RelativeLocation.ABOVE.value | RelativeLocation.BELOW.value:
+                    if pcs.x < pce.x:
+                        pleft, pright = pcs, pce
                     else:
-                        delta_y = self.xxs["XX18_TEXT_SMALL"] / self.units
-
-                    if c_e.x > c_s.x and c_e.y < c_s.y:
-                        talign = "right" if labove else "left"
-                    if c_e.x < c_s.x and c_e.y > c_s.y:
-                        talign = "right" if labove else "left"
-
-                    if c_e.x > c_s.x and c_e.y > c_s.y:
-                        talign = "left" if labove else "right"
-                    if c_e.x < c_s.x and c_e.y < c_s.y:
-                        talign = "left" if labove else "right"
-
-                    _, text_rot = geoms.angles_from_points(c_s, c_e)
-                    if c_e.x == c_s.x:
-                        # vertically rotate text
-                        text_rotation = kwargs.get("rotation", 90)
-                        Text(
-                            llabel,
-                            x=lcntr.x + delta_y,
-                            y=lcntr.y,
-                            rotation=text_rotation,
-                            align="centre",
-                            **lwargs,
-                        )  # centre
-                    # else:
-                    #     Text(
-                    #         llabel,
-                    #         x=lcntr.x,
-                    #         y=lcntr.y, # + delta_y,
-                    #         rotation=text_rot,
-                    #         # align=talign,
-                    #         **lwargs,
-                    #     )
-                else:
-                    # centre text over/above the line
-                    if labove:
-                        delta_y = -self.xxs["XX18_TEXT_SMALL"] / self.units / 2.0
-                    else:
-                        delta_y = self.xxs["XX18_TEXT_SMALL"] / self.units
-                    Text(llabel, x=lcntr.x, y=lcntr.y + delta_y, **lwargs)  # centre
+                        pleft, pright = pce, pcs
+                    Line(
+                        links=[pleft, pright],
+                        stroke_width=self.stroke_width_xx,
+                        centre_shapes=[text(label, **lwargs)],
+                        centre_shapes_offset=text_offset,
+                        centre_shapes_rotated=True,
+                        **lwargs,
+                    )
+                case RelativeLocation.RIGHT.value | RelativeLocation.LEFT.value | None:
+                    Line(
+                        links=[pcs, pce],
+                        stroke_width=self.stroke_width_xx,
+                        **lwargs,
+                    )
 
     def symbol(
         self,
@@ -2708,8 +2665,8 @@ class XX18GameObject(CoreGameObject):
             ccentre = self.feature_location(geo, direction, distance)
             label_location = kwargs.get("label_location", "below")
             offset = 0.5
-            relative_location = self.relative_location(label_location)
-            lwargs = self.process_label(label, relative_location, offset, "small")
+            relative_label_location = self.relative_location(label_location)
+            lwargs = self.process_label(label, relative_label_location, offset, "small")
             Image(_file, cxy=ccentre, **{**kwargs, **lwargs})
 
     def figure(
