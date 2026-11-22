@@ -91,18 +91,35 @@ class FontStyleType(Enum):
     BOLDITALIC = 4
 
 
+class RelativeLocation(Enum):
+    """Constants for each side of a object"""
+
+    ABOVE = 1
+    RIGHT = 2
+    LEFT = 3
+    BELOW = 4
+
+
 class HexOrientation(Enum):
-    """Constants for hexagon's upwards orientation"""
+    """Constants for a hexagon's upwards orientation"""
 
     FLAT = 1
     POINTY = 2
 
 
 class HexOrientationName(Enum):
-    """Constants for  hexagon's upwards orientation name"""
+    """Constants for a hexagon's upwards orientation name"""
 
     FLAT = "flat"
     POINTY = "pointy"
+
+
+class HexPathCurve(Enum):
+    """Constants for a hexagon's path curve trajectory"""
+
+    FLAT = "flat"
+    GENTLE = "gentle"
+    TIGHT = "tight"
 
 
 class TriangleType(Enum):

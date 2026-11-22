@@ -27,6 +27,7 @@ own particular properties.
 The compound objects available are:
 
 - `AbstractGame`_ - a simple way to define and use boards for abstract games
+- `XX18Game`_ - functions to define and create boards for "18XX" games
 - `CardBox`_ - a template to be cut-out and folded to create a box
 - `Cube`_ - a 3D depiction of a shaded cube
 - `Dice`_ - a top-down view of a "square" with dice pips
@@ -49,6 +50,17 @@ that are similar to well-known ones such Chess, Shogi, Hex and Go |dash| to
 be easily created.
 
 For more details, see the :doc:`Abstracts <abstracts>` section.
+
+
+XX18Game
+============
+`^ <objects-overview_>`_
+
+The aim of the ``XX18Game`` and ``XX18State`` commands is to allow
+boards for many types of existing and new "18XX" series games |dash| to
+be easily created.
+
+For more details, see the :doc:`XX18 <xx18>` section.
 
 
 CardBox

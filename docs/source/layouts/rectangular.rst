@@ -232,7 +232,6 @@ Example 3. Row and Column Interval
 
 ===== ======
 
-
 Example 4. Row and Column Offset
 --------------------------------
 `^ <key-properties-rect_>`_

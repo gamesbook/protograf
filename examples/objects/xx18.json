@@ -1,0 +1,14 @@
+{
+    "XX18_MOUNTAIN_SIDE": 0.9,
+    "XX18_MOUNTAIN_FILL": null,
+    "XX18_TOWN_DIAMETER": 0.9,
+    "XX18_TOWN_BORDER_DIAMETER": 1.1,
+    "XX18_TOWN_STROKE": "tomato",
+    "XX18_TOWN_FILL": "palegreen",
+    "XX18_REVENUE_FILL": "yellow",
+    "XX18_SPIKE_BASE_OUTER": 1.5,
+    "XX18_SPIKE_BASE_INNER": 1.35,
+    "XX18_RIVER_LINE": "royalblue",
+    "XX18_RIVER_LINE_WAVE_HEIGHT": null
+
+}

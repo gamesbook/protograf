@@ -1888,7 +1888,22 @@ class LineShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Line in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        return ShapeGeometry(
+            # centre
+            # centre=cntr_u,
+            # center=cntr_u,
+            # c=cntr_u,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -2054,8 +2069,23 @@ class LineShape(BaseShape):
             # ---- * centre shapes (with offsets)
             if self.centre_shapes:
                 _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))
+                if self.centre_shapes_offset:
+                    # recalculate offset centre
+                    _edge = "bottom" if self.centre_shapes_offset > 0 else "top"
+                    _offset = self.centre_shapes_offset * globals.units
+                    result = geoms.rectangle_vertices(
+                        p1=Point(x, y),
+                        p2=Point(x_1, y_1),
+                        height=abs(_offset),
+                        angle_deg=180 - _angle,
+                        given_edge=_edge,
+                    )
+                    l2s, l2e = result[0], result[1]
+                    _cx, _cy = (l2s.x + l2e.x) / 2.0, (l2s.y + l2e.y) / 2.0
+                else:
+                    _cx, _cy = cx, cy
                 self.draw_centred_shapes(
-                    self.centre_shapes, cx, cy, rotation=180 - _angle
+                    self.centre_shapes, _cx, _cy, rotation=180 - _angle
                 )
             # ---- * dot
             self.draw_dot(cnv, cx, cy)
@@ -3934,6 +3964,7 @@ class TextShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # feedback(f'*** Text init {self.kwargs=}')
         self.height_used = None
         if self.kwargs.get("cx") and self.kwargs.get("cy"):
             self.x = self.kwargs.get("cx")
@@ -4285,8 +4316,14 @@ class TextShape(BaseShape):
             keys["rotation"] = self.rotation
             if self.use_abs_c:
                 keys["absolute"] = True
-                # feedback(f"\n*** Text PLAIN {_text=} {x_t=} {y_t=} {keys=}")
-            self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
+            # feedback(f"\n*** Text PLAIN {_text=} {x_t=} {y_t=} {keys=}")
+            self.draw_multi_string(
+                cnv,
+                x_t,
+                y_t,
+                _text,
+                **{**kwargs, **keys},
+            )  # use morph to rotate
             # TODO - calculate self.height_used
 
 

@@ -12,6 +12,7 @@ in addition to their own particular properties.
 
    objects
    abstracts
+   xx18
    cardbox
    cubes
    dice

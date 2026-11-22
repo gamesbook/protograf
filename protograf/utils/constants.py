@@ -9,6 +9,7 @@ Notes:
 
 # lib
 from collections import namedtuple
+from functools import lru_cache
 import math
 
 # third-party
@@ -31,6 +32,13 @@ ThePaper = namedtuple(
     ],
 )
 
+
+@lru_cache(maxsize=1024)
+def color_list():
+    COLOR_NAMES = getColorList()
+    return COLOR_NAMES
+
+
 YES = True
 NO = False
 SIN_60 = math.sin(math.radians(60))
@@ -40,7 +48,7 @@ HEX_HD = math.sqrt(3) / 2.0
 PHI = 1.61803398875  # an irrational number; decimal places continue...
 
 BGG_IMAGES = "cf.geekdo-images.com"
-COLOR_NAMES = getColorList()
+COLOR_NAMES = color_list()
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 
 RGB_DEBUG_COLOR = "#B0C4DE"
@@ -64,6 +72,39 @@ DEFAULT_PAGE_SIZE = "A4"
 MAXIMUM_PAGE_WIDTH = 10000  # pt ~126" / 3.2m
 MAXIMUM_PAGE_HEIGHT = 10000  # pt ~126" / 3.2m
 
+
+# ---- CSS colors
+CSS_COLOR_NAMES = {
+    "berylgreen": "#D9E3BE",
+    "geraldine": "#E98A84",
+    "chelseacucumber": "#80B26B",
+    "sail": "#C1E6FD",  # 18xx sea blue
+    "cerulean": "#01A0D6",  # 18xx river blue
+    "glacier": "#62BCDE",  # 18xx hex blue
+    "lochmara": "#0D81C0",  # 18xx lake blue
+    "fountainblue": "#64B1BB",
+    "electricviolet": "#8243F8",
+    "camarone": "#11582A",
+    "lynch": "#627890",
+    "blackpearl": "#021128",
+    "internationalorange": "#FF5202",
+    "spindle": "#ADCBF4",
+    "governorbay": "#1444D5",
+    # Railways of the Lost Atlas
+    "cinnabar": "#EB3433",  # RLA Red
+    "casablanca": "#FAB857",  # RLA Yellow
+    "halfbaked": "#76C6CA",  # RLA Blue
+    # "": "",
+    # Catan!
+    "catandesert": "#E6AD3A",
+    "catanwheat": "#FFCF1A",
+    "catanpasture": "#8CC53B",
+    "catanhill": "F17B1D",
+    "catanmountain": "C7B2A7",
+    "catanforest": "0C4F16",
+}
+
+# ---- RGB single letter colors
 RGB_COLOR_SINGLES = {
     "b": "#0000FF",
     "c": "#00FFFF",
@@ -86,6 +127,8 @@ RGB_COLOR_SINGLES = {
     "y": "#FFFF00",
     "x": "#000000",
 }
+
+# ---- CMYK single letter colors
 # converted from RGB via https://colordesigner.io/convert/hextocmyk
 CMYK_COLOR_SINGLES = {
     "b": "100, 100, 0, 0",
@@ -145,6 +188,7 @@ SHAPES_FOR_TRACK = [
     "SquareShape",
 ]
 
+# ---- SVG colors
 COLORS_SVG = {
     "black": "#000000",
     "navy": "#000080",
@@ -295,18 +339,45 @@ COLORS_SVG = {
     "white": "#ffffff",
 }
 
-# 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
+# ---- 18XX colors
 COLORS_18XX = {
-    "18xx_ground": "#fdd9b5",  # sandy tan
-    "18xx_yellow": "#fdee00",  # aureolin
-    "18xx_green": "#00a550",  # pigment green
-    "18xx_russet": "#cd7f32",  # bronze
-    "18xx_grey": "#acacac",  # silver chalice
-    "18xx_brown": "#7b3f00",  # chocolate
-    "18xx_red": "#dc143c",  # crimson
-    "18xx_blue": "#007fff",  # azure
-    "18xx_barrier": "#660000",  # blood red
-    "18xx_white": "#ffffff",  # white
+    "xtile_yellow": "#ffd200",
+    "xtile_green": "#00a651",
+    "xtile_brown": "#7a4b1b",
+    "xtile_gray": "#7f8c8d",
+    "xtile_grey": "#7f8c8d",
+    "xtile_yellow_mf": "#f1c40f",
+    "xtile_green_mf": "#27ae60",
+    "xtile_brown_mf": "#7e5109",
+    "xtile_gray_mf": "#95a5a6",
+    "xtile_grey_mf": "#95a5a6",
+    "xback": "#eaeaea",
+    "xplain": "#ffffff",
+    "xplain_off": "#f9f9f9",
+    "xyellow": "#f1e351",
+    "xgreen": "#4caf50",
+    "xbrown": "#8d6e63",
+    "xgray": "#b0bec5",
+    "xgrey": "#b0bec5",
+    "xbarrier": "#757575",
+    "xoffboard": "#ef5350",
+    "xred": "#ef5350",
+    "xwater": "#4a7f9d",
+}
+
+# 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
+# deprecated - see xx18_game module
+COLORS_18XX_OLD = {
+    "ground": "#fdd9b5",  # sandy tan
+    "yellow": "#fdee00",  # aureolin
+    "green": "#00a550",  # pigment green
+    "russet": "#cd7f32",  # bronze
+    "grey": "#acacac",  # silver chalice
+    "brown": "#7b3f00",  # chocolate
+    "red": "#dc143c",  # crimson
+    "blue": "#007fff",  # azure
+    "barrier": "#660000",  # blood red
+    "white": "#ffffff",  # white
 }
 
 BUILT_IN_FONTS = [

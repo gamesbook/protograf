@@ -77,22 +77,28 @@ class Hexagons(ProtografGrid):
             center=hexgn.geo.centre,
             c=hexgn.geo.centre,
             height=hexgn.geo.height,
+            ht=hexgn.geo.height,
             side=hexgn.geo.side,
-            # vertices  // FLAT
+            radius=hexgn.geo.side,
+            r=hexgn.geo.side,
+            # vertices and perbii
             ne=hexgn.geo.ne,
             se=hexgn.geo.se,
             e=hexgn.geo.e,
             w=hexgn.geo.w,
             sw=hexgn.geo.sw,
             nw=hexgn.geo.nw,
-            # perbii // FLAT
+            nnw=hexgn.geo.nnw,
+            nne=hexgn.geo.nne,
+            ssw=hexgn.geo.ssw,
+            sse=hexgn.geo.sse,
             n=hexgn.geo.n,
             s=hexgn.geo.s,
             wnw=hexgn.geo.wnw,
             ene=hexgn.geo.ene,
             ese=hexgn.geo.ese,
             wsw=hexgn.geo.wsw,
-            # # meta
+            # meta
             blank=self.is_blank,  # signals "no Shape drawn here"
             t="HexShape",
             type="HexShape",
@@ -164,6 +170,50 @@ class Hexagons(ProtografGrid):
                         True,
                     )
         return pattern_list
+
+    def create_frames_rectangle(self):
+        """Create lines for frames around hexagons in a rectangle."""
+        from protograf.protos import hexagon
+
+        sequence = 0
+        hex_pattern = self.process_pattern(hex_rows=self.rows, hex_cols=self.cols)
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if self.hidden and (row + 1, col + 1) in self.hidden:
+                    pass
+                else:
+                    if self.hex_shape:
+                        # feedback(f'$$$ Hexagons.cells {col+1=},{row+1=} {self.hex_shape=}')
+                        the_shape = hexagon(
+                            row=row,
+                            col=col,
+                            hex_rows=self.rows,
+                            hex_cols=self.cols,
+                            centre_shapes=[self.hex_shape],  # used by AbstractGame
+                            **self.kwargs,
+                        )
+                    else:
+                        # breakpoint()
+                        the_shape = hexagon(
+                            row=row,
+                            col=col,
+                            hex_rows=self.rows,
+                            hex_cols=self.cols,
+                            **self.kwargs,
+                        )
+                    self.is_blank = False
+                    if hex_pattern:  # test if current col/row cell in pattern
+                        if hex_pattern[row][col] == ".":
+                            continue
+
+                    # create outer lines around shape
+                    grid_directions = []
+                    for direction in grid_directions:
+                        pass
+                        # shape_geo = self.get_geometry(the_shape)
+                        # self.cells[(col + 1, row + 1)] = shape_geo  # 1-based for cells
+                        # # feedback(f'$$$ Hexagons.cells {col+1=},{row+1=} {shape_geo.blank=}')
+                        # self.locales.append(_locale)
 
     def draw_hexagons(
         self, rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True

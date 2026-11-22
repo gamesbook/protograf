@@ -653,6 +653,7 @@ def split(
     tuple_to_list: bool = False,
     separator: str | None = None,
     clean: bool = False,
+    no_blanks: bool = False,
 ):
     """
     Split a string into a list of individual characters
@@ -684,7 +685,9 @@ def split(
         sep = separator
     else:
         sep = " " if strng and "," not in strng else ","
-    return sequence_split(strng, to_int=False, unique=False, sep=sep, clean=clean)
+    return sequence_split(
+        strng, to_int=False, unique=False, sep=sep, clean=clean, no_blanks=no_blanks
+    )
 
 
 def separate(

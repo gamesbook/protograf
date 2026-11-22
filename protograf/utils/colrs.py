@@ -10,8 +10,21 @@ from colorsys import rgb_to_hls, hls_to_rgb
 from pymupdf.utils import getColor
 
 # local
-from protograf.utils.constants import RGB_COLOR_SINGLES, CMYK_COLOR_SINGLES, COLOR_NAMES
+from protograf.utils.constants import (
+    RGB_COLOR_SINGLES,
+    CMYK_COLOR_SINGLES,
+    COLOR_NAMES,
+    CSS_COLOR_NAMES,
+    COLORS_18XX,
+)
 from protograf.utils.messaging import feedback
+
+
+def hex_to_rgb(name: str) -> tuple:
+    """Convert hexadecimal color to RGB tuple."""
+    _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
+    rgb = tuple(i / 255 for i in _rgb)
+    return rgb
 
 
 def get_color(name: str | None = None, color_model: str = "RGB") -> tuple | None:
@@ -63,13 +76,19 @@ def get_color(name: str | None = None, color_model: str = "RGB") -> tuple | None
     else:
         pass  # unknown format
     try:
-        if name.upper() not in COLOR_NAMES:
-            if name.upper() == "NONE":
-                return None
-            else:
-                feedback(f'The color name "{name}" is not pre-defined!', True)
-        color = getColor(name)
-        return color
+        if name.upper() in COLOR_NAMES:
+            color = getColor(name)
+            return color
+        if name in CSS_COLOR_NAMES:
+            color = CSS_COLOR_NAMES[name]
+            return hex_to_rgb(color)
+        if name in COLORS_18XX:
+            color = COLORS_18XX[name]
+            return hex_to_rgb(color)
+        if name.upper() == "NONE":
+            return None
+        else:
+            feedback(f'The color name "{name}" is not pre-defined!', True)
     except (AttributeError, ValueError):
         feedback(f'The color name "{name}" cannot be converted to RGB!', True)
     return None

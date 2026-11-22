@@ -187,6 +187,10 @@ class BaseCanvas:
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.cxy = self.defaults.get("cxy", None)
+        self.ptl = self.defaults.get("ptl", None)  # top-left Point
+        self.ptr = self.defaults.get("ptr", None)  # top-right Point
+        self.pbl = self.defaults.get("pbl", None)  # bottom-left Point
+        self.pbr = self.defaults.get("pbr", None)  # bottom-right Point
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -306,6 +310,9 @@ class BaseCanvas:
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
+        self.label_align = self.defaults.get(
+            "label_align", "centre"
+        )  # centre,left,right,justify
         self.label_transparency = self.defaults.get("label_transparency", 1.0)
         self.label_mx = self.defaults.get("label_mx", 0.0)
         self.label_my = self.defaults.get("label_my", 0.0)
@@ -637,6 +644,8 @@ class BaseCanvas:
         # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star, domino)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shapes_rotated = self.defaults.get("centre_shapes_rotated", False)
+        self.centre_shapes_offset = self.defaults.get("centre_shapes_offset", 0.0)
+        # ---- single centre shape
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0.0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0.0)
@@ -971,6 +980,10 @@ class BaseShape:
             kwargs.get("cy", __cy if __cy is not None else base.cy)
         )  # centre (for some shapes)
         # print(f"{self.xy=} {self.x=} {self.y=} {self.cx=} {self.cy=}")
+        self.ptl = kwargs.get("ptl", base.ptl)  # top-left Point
+        self.ptr = kwargs.get("ptr", base.ptr)  # top-right Point
+        self.pbl = kwargs.get("pbl", base.pbl)  # bottom-left Point
+        self.pbr = kwargs.get("pbr", base.pbr)  # bottom-right Point
         # ---- to be calculated ...
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
@@ -1069,6 +1082,9 @@ class BaseShape:
         self.label_stroke_width = self.kw_float(
             kwargs.get("label_stroke_width", self.stroke_width)
         )
+        self.label_align = kwargs.get(
+            "label_align", "centre"
+        )  # centre,left,right,justify
         self.label_transparency = self.kw_float(kwargs.get("label_transparency", 1.0))
         self.label_mx = self.kw_float(kwargs.get("label_mx", 0.0))
         self.label_my = self.kw_float(kwargs.get("label_my", 0.0))
@@ -1465,10 +1481,16 @@ class BaseShape:
         self.centre_shapes = kwargs.get(
             "centre_shapes", kwargs.get("center_shapes", [])
         )
-
+        self.centre_shapes_offset = self.kw_float(
+            kwargs.get(
+                "centre_shapes_offset",
+                kwargs.get("center_shapes_offset", base.centre_shapes_offset),
+            )
+        )
         self.centre_shapes_rotated = self.kw_bool(
             kwargs.get("centre_shapes_rotated", base.centre_shapes_rotated)
         )
+        # ---- single centre shape
         self.centre_shape = kwargs.get("centre_shape", kwargs.get("center_shapes", ""))
         self.centre_shape_mx = self.kw_float(
             kwargs.get(
@@ -3148,7 +3170,7 @@ class BaseShape:
                     origin = muPoint(px - tl / 2.0, py)
                 elif align in ["right", "r"]:
                     origin = muPoint(px - tl, py)
-                else:
+                else:  # left
                     origin = point
                 # feedback(f"### move relative {align=} {valign=} {point=} {origin=}")
             return origin  # lower-left for text string
@@ -3185,14 +3207,14 @@ class BaseShape:
                 None,
                 True,
             )
-        elif self.align:
+        elif align:
             point = move_string_start(
                 string,
                 muPoint(xm, ym),
                 font,
                 keys["fontsize"],
                 rotation,
-                self.align,
+                align,
                 self.valign,
                 False,
             )
@@ -3216,7 +3238,7 @@ class BaseShape:
             #     lineheight=None, fill=None, render_mode=0, miter_limit=1,
             #     border_width=1, rotate=0, morph=None, stroke_opacity=1,
             #     fill_opacity=1, oc=0)
-            # print(f'### insert_text:: {point=} {string=} {morph=} \n{keys=}')
+            # print(f'### L3233 insert_text:: {point=} {string=} {morph=} \n{keys=}')
             canvas.insert_text(point, string, morph=morph, **keys)
         except Exception as err:
             if "need font file" in str(err):
@@ -3300,7 +3322,6 @@ class BaseShape:
             self.label = f"{ID}"
         ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
-        # feedback(f' @@@ base.draw_label {ID=} {ttext=}')
         if ttext is not None or ttext != "":
             _ttext = str(ttext)
             yl = yl + (self.label_size / 3.0) if centred else yl
@@ -3310,6 +3331,8 @@ class BaseShape:
             kwargs["font_size"] = self.label_size
             kwargs["stroke"] = kwargs.get("label_stroke", self.label_stroke)
             kwargs["stroke_transparency"] = self.label_transparency
+            align = kwargs.get("label_align", "centre")
+            # if ttext: feedback(f' @@@ base.draw_label {ID=} {ttext=} {align=} {x=} {y=}')
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
                 point_to_rotate = muPoint(x, y)
@@ -3329,7 +3352,13 @@ class BaseShape:
             else:
                 # self.dot = 0.05; self.draw_dot(canvas, x, y)
                 self.draw_multi_string(
-                    canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
+                    canvas,
+                    x,
+                    y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
                 )
             if isinstance(canvas, muShape):
                 canvas.commit()

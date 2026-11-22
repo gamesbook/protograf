@@ -80,6 +80,9 @@ class RectangleShape(BaseShape):
         # ---- check height
         if self.width and not self.height:
             self.height = self.width
+        # ---- points-based setup
+        if self.ptl is not None and isinstance(self.ptl, Point):
+            self.x, self.y = self.ptl.x, self.ptl.y
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()  # need to recalculate!
 
@@ -156,6 +159,7 @@ class RectangleShape(BaseShape):
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
             y = self._abs_cy - self._u.height / 2.0
+        # ---- overide
         vertices = [  # clockwise from right; relative to centre
             Point(x + self._u.width, y),  # ne
             Point(x + self._u.width, y + self._u.height),  # se
@@ -198,6 +202,14 @@ class RectangleShape(BaseShape):
         x_d = x + self._u.width / 2.0
         y_d = y + self._u.height / 2.0
         return Point(x=x_d, y=y_d)
+
+    def calculate_point(self, apoint: Point) -> Point:
+        """Get a Point for the Rectangle in points."""
+        if apoint and isinstance(apoint, Point):
+            x = apoint.x * self.units - self._u.width / 2.0 + self._o.delta_x
+            y = apoint.y * self.units - self._u.height / 2.0 + self._o.delta_y
+            return Point(x=x, y=y)
+        return None
 
     def calculate_perbii(
         self, centre: Point, rotation: float | None = None, **kwargs
@@ -334,6 +346,8 @@ class RectangleShape(BaseShape):
             y = self._u.y + self._o.delta_y
         # ---- overrides to centre the shape
         if (kwargs.get("cx") and kwargs.get("cy")) and not (lx or ly):
+            # c_p = self.calculate_point(Point(kwargs.get("cx"), kwargs.get("cy")))
+            # x, y = c_p.x, c_p.y
             x = kwargs.get("cx") * self.units - self._u.width / 2.0 + self._o.delta_x
             y = kwargs.get("cy") * self.units - self._u.height / 2.0 + self._o.delta_y
         return x, y
