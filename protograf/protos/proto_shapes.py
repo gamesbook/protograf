@@ -1203,6 +1203,37 @@ def xx18game(*args, **kwargs):
 
 
 @docstring_base
+def XX18Market(row=None, col=None, **kwargs):
+    """Store an XX18MarketObject for the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is located.
+    - col (int): column in which the shape is located.
+
+    Kwargs:
+
+    - values (list): a list of market values
+
+    <base>
+
+    """
+    from protograf.games.xx18_market import XX18MarketObject
+
+    kwargs = utils.margins(**kwargs)
+    absmrkt = XX18MarketObject(canvas=globals.canvas, **kwargs)
+    return absmrkt
+
+
+def xx18market(*args, **kwargs):
+    from protograf.games.xx18_market import XX18MarketObject
+
+    kwargs = utils.margins(**kwargs)
+    _obj = args[0] if args else None
+    return XX18MarketObject(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
 def XX18State(row=None, col=None, **kwargs):
     """Draw an XX18StateObject on the canvas.
 

@@ -25,19 +25,21 @@ class XX18StateObject(CoreStateObject):
         self.game_class = "XX18State"
         # ---- unique properties
         self.board = self._commons("board") or kwargs.get("board") or None
+        self.market = self._commons("market") or kwargs.get("market") or None
 
     def draw_features(self):
         """Draw feature elements on the board."""
-        if self.board.features is not None and not isinstance(
-            self.board.features, (tuple, list)
-        ):
-            feedback(
-                f"Feature must contain a set of values; not '{self.board.features}'.",
-                True,
-                True,
-            )
-        for feature in self.board.features:
-            self.board.process_feature(feature)
+        if self.board:
+            if self.board.features is not None and not isinstance(
+                self.board.features, (tuple, list)
+            ):
+                feedback(
+                    f"Feature must contain a set of values; not '{self.board.features}'.",
+                    True,
+                    True,
+                )
+            for feature in self.board.features:
+                self.board.process_feature(feature)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the XX18StateObject on a given canvas."""
@@ -46,17 +48,22 @@ class XX18StateObject(CoreStateObject):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- draw the board frame
-        if self.board.frame is True:
-            self.board.draw_frame()
-        # ---- draw the board
-        self.board.board_layout._draw_grid = True
-        self.board.board_layout.draw_layout()
-        # ---- draw the board labels
-        if self.board.label is True:
-            self.board.draw_labels()
-        # ---- draw the features on the board
-        if self.board.features:
-            self.draw_features()
-        if self.board.kwargs.get("debug", False):
-            self.board.draw_debug_labels()
+        # ---- BOARD
+        if self.board:
+            # ---- * draw the board frame
+            if self.board.frame is True:
+                self.board.draw_frame()
+            # ---- * draw the board
+            self.board.board_layout._draw_grid = True
+            self.board.board_layout.draw_layout()
+            # ---- * draw the board labels
+            if self.board.label is True:
+                self.board.draw_labels()
+            # ---- * draw the features on the board
+            if self.board.features:
+                self.draw_features()
+            if self.board.kwargs.get("debug", False):
+                self.board.draw_debug_labels()
+        # ---- MARKET
+        if self.market:
+            self.market.draw()
