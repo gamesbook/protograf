@@ -1280,6 +1280,7 @@ in some cases, allow further customisation than is otherwise possible.
         XX18State(board=xgffn)
 
         xgffn.hex_fill('C5', 'xoffboard')
+        xgffn.spike('C5', 'nw sw', "medium", color='green')
         xgffn.phase_revenue(
             'C5', '30 40 50', 0, 0.3, 'vertical',
             colors=['xbrown','xgrey','pink'])
@@ -1294,18 +1295,27 @@ in some cases, allow further customisation than is otherwise possible.
             'A3', 'nw', 30, .3, 0,
             color='purple'),
         xgffn.private(
-            'B2', 15, 0.7,  'B2', 140, 0.4, 'R&R', 'left',
-            color='orange')
+            'B2', 15, 0.7,  'B2', 140, 0.4, 'C&C', 'left',
+            color="orange",
+            label_size="xlarge")
         xgffn.private(
             'B2', 15, 0.7, 'C3', 280, 0.6,
-            color='orange')
+            color="orange")
+        xgffn.symbol(
+            location='A7', name='desert',
+            height=2.5, width=2.5,
+            label="$20", label_size="large")
+        xgffn.symbol(
+            location='B8', name='tunnel',
+            height=2.5, width=2.5,
+            label="$40", label_size=20)
 
 ===== ======
 
 Functions should be accessed **after** the ``XX18State()`` in the script.
 
 Functions are the sections of code that ``XX18Game()`` uses internally to
-draw the various features; essentially, the *features* property just feeds
+draw the various features; essentially, its *features* property just passes
 in the correct values to those functions.
 
 The way to reference these functions is by appending their name to the name
@@ -1321,11 +1331,19 @@ changed |dash| in this case to ``dotted``.
 
 For the ``track`` and ``track_edge`` functions, use of the color property
 allows the track's default color |dash| usually ``black`` |dash| to be
-overridden. This is also possible to color the ``private`` railroads
-circles, as is shown in ``B2`` and ``C3``.
+overridden. It is also possible to color the ``private`` railroads
+circles, as is shown in ``B2`` and ``C3``.  The ``spike`` color can be
+changed as shown in ``C5``.
+
+The size of a ``symbol`` can be changed by altering its *height* and/or
+*width* properties.
+
+The size of feature labels can be changed by setting their *label_size*
+property; either a descriptive name |dash| xsmall, small, medium, large,
+xlarge, xxlarge |dash| or an actual point size value.
 
 The full list of functions, and their allowed properties, are supplied in
-`XX18Game Function Options`_
+`XX18Game Function Options`_.
 
 
 .. _xx18GameAdHocDrawing:
@@ -1570,7 +1588,7 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
 * ``"XX18_SPIKE_FRACTION_LONG"`` - default is ``0.45``; fraction of hexagon diameter
     for a long spike
 * ``"XX18_SPIKE_BASE_INNER"`` - default is ``0.4`` cm; matches width of black track
-* ``"XX18_SPIKE_BASE_OUTER"`` - default is ``0.5`` cm; matches width of black track
+* ``"XX18_SPIKE_BASE_OUTER"`` - default is ``0.5`` cm; matches width of white track
 * ``"XX18_PHASE_REVENUE_BOX"`` - default is ``0.7`` cm; default width of single cell
 * ``"XX18_RIVER_LINE_WAVE_HEIGHT"`` - default is ``0.15`` cm; wave height in feature river_line
 * ``"XX18_RIVER_LINE"`` - default is ``#01A0D6``; river_line feature color
@@ -1612,7 +1630,6 @@ The following are the properties that can be used when making use of the
 built-in functions.
 
 * *breadth* - the "thickness" of a line or shape e.g. a river in ``points``
-  or a spike in ``cm``
 * *color* - a color name
 * *colors* - a list of color names
 * *count* - how many of the feature to draw e.g. number of cities in a group
@@ -1623,6 +1640,8 @@ built-in functions.
   letters or numbers or symbols
 * *label_location* - where a label is drawn, relative to the feature; this can
   be ``left``, ``right``, ``above``, ``below``
+* *label_size* - how large or small the label for a feature should be (if
+  different from its default value)
 * *location* - the hexagon grid reference where a feature is to be drawn;
   usually multiple references can be used unless not appropriate
 * *position* - a hexagon edge ``compass`` reference or references; for example
@@ -1639,6 +1658,7 @@ built-in functions.
 * *town* - where a town "block" should appear on a track; this can
   be ``middle``, ``start`` or ``end``
 * *width* - stroke width in ``points``
+
 
 Function Properties
 -------------------
@@ -1674,16 +1694,16 @@ then switch that out with a substitute /fallback value.
 * ``figure(location, direction, distance, position, thing)``
 * ``hex_fill(location, color)``
 * ``highlight(location, color, width)``
-* ``mountain(location, label, direction, distance)``
+* ``mountain(location, label, direction, distance, label_size)``
 * ``phase_revenue(location, income, direction, distance, orientation, colors)``
 * ``private(location, direction, distance, location1,
-  direction1, distance1, label, label_location, color)``
-* ``revenue(location, label, direction, distance, color)``
+  direction1, distance1, label, label_location, color, label_size)``
+* ``revenue(location, label, direction, distance, color, label_size)``
 * ``river_line(location, position, stroke, breadth, color)``
-* ``spike(location, position, stroke, size, breadth, color)``
-* ``symbol(location, label, direction, distance, name)``
-* ``tile_letter(location, label, direction, distance, stroke)``
-* ``town(location, label, direction, distance, style, rotation, color, stroke)``
+* ``spike(location, position, size, color)``
+* ``symbol(location, label, direction, distance, name, label_size)``
+* ``tile_letter(location, label, direction, distance, stroke, label_size)``
+* ``town(location, label, direction, distance, style, rotation, color, stroke, label_size)``
 * ``track(location, label, position, town, color)``
 * ``track_curve(location, direction, distance, height, color)``
 * ``track_edge(location, position, direction, distance, height, color)``
@@ -1703,6 +1723,10 @@ The primary resource for working with 18xx games is the online tool
 written in JSON, displays them, and renders them for printing. This can
 create the game Map, Tiles and Tile Manifest, Tokens and Charters, Tokens
 (without companies) and the Stock Market.
+
+Another useful tool to generate files for Charters, Privates, Shares,
+Station Markers, Trains, and (linear) Stock Markets is *xxpaper*, which is
+available at https://pypi.org/project/xxpaper/
 
 A comprehensive resource of available games can be found at
 http://www.fwtwr.com/18xx/index.htm and games themselves can be played at

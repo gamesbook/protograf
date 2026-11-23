@@ -400,6 +400,7 @@ xgffn = XX18Game(
 XX18State(board=xgffn)
 
 xgffn.hex_fill('C5', 'xoffboard')
+xgffn.spike('C5', 'nw sw', "medium", color='green')
 xgffn.phase_revenue(
     "C5", "30 40 50", 0, 0.3, "vertical",
     ["xbrown","xgrey","pink"])
@@ -414,11 +415,20 @@ xgffn.track_edge(
     'A3', 'nw', 30, .3, 0,
     color="purple"),
 xgffn.private(
-    'B2', 15, 0.7,  'B2', 140, 0.4, 'C&C', 'right',
-    color="orange")
+    'B2', 15, 0.7,  'B2', 140, 0.4, 'C&C', 'left',
+    color="orange",
+    label_size="xlarge")
 xgffn.private(
     'B2', 15, 0.7, 'C3', 280, 0.6,
     color="orange")
+xgffn.symbol(
+    location='A7', name='desert',
+    height=2.5, width=2.5,
+    label="$20", label_size="large")
+xgffn.symbol(
+    location='B8', name='tunnel',
+    height=2, width=2,
+    label="$40", label_size=20)
 
 Text("XX18Game: Functions", common=footer)
 

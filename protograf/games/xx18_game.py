@@ -7,7 +7,7 @@ Credits:
       and are licensed under CC BY 3.0; see resources/xx18/symbols/CREDITS.md
 
 Notes:
-    * all arrays, such the cells of a board, are (col,row) with 1-based values
+    * all arrays, such the hexagons of a board, are (col,row) with 1-based values
 
 Summary of functions:
 
@@ -658,7 +658,7 @@ class XX18GameObject(CoreGameObject):
         )
         # print(f'&&& -XX18 BOARD {self.board_layout.cells.keys()=}')
 
-        # ---- * track non-blank cells
+        # ---- * track non-blank hexagons
         for row in range(1, self.rows + 1):
             non_blank = []
             for col in range(1, self.cols + 1):
@@ -714,7 +714,7 @@ class XX18GameObject(CoreGameObject):
                     self.cells[cell_id] = cell_geo
                 except Exception as err:
                     feedback(
-                        f"Unable to process hex cell: {col=} {row=} ({err})",
+                        f"Unable to process hexagon at: {col=} {row=} ({err})",
                         True,
                         True,
                     )
@@ -723,7 +723,8 @@ class XX18GameObject(CoreGameObject):
         """Extract one or more location(s) from a string.
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
+            name (str): the name of the feature at the location(s)
         """
         if not location:
             return []
@@ -785,11 +786,11 @@ class XX18GameObject(CoreGameObject):
         """Process a feature from its tuple
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
 
         Notes:
             * The feature (tuple) can contain in this order:
-                  * cellID (str): the alphanumeric grid coordinate of the hex
+                  * cellID (str): the alphanumeric grid coordinate of the hexagon
                   * position (tuple | str):
                       either a tuple of
                         direction (float): optional, degrees
@@ -852,7 +853,7 @@ class XX18GameObject(CoreGameObject):
                     feature[2], hexagon=fhexagon
                 )
             else:
-                fdirection = feature[2]  # mix of cells and edges
+                fdirection = feature[2]  # mix of hexagons and edges
         if len(feature) >= 4:
             flabel = str(feature[3])
         if len(feature) >= 5 and ftype in ["phase_revenue", "phase-revenue"]:
@@ -949,11 +950,10 @@ class XX18GameObject(CoreGameObject):
                     **kwargs,
                 )
             case "track_curve" | "track-curve":
+                height = None
                 if len(feature) >= 4:
                     if feature[3] is not None:
                         height = tools.as_float(feature[3], "height", default=0.0)
-                else:
-                    height = None
                 self.track_curve(
                     location=fhexagon,
                     direction=fdirection,
@@ -1111,13 +1111,13 @@ class XX18GameObject(CoreGameObject):
 
         Args:
             geo (ShapeGeometry):  hexagon geometry
-            edge (str): the compass direction of the egde
+            edge (str): the compass direction of the hexagon edge
             feature (str): the name of the feature requesting the geometries
 
         Returns:
-            tuple: start, end and mid-point of the edge line
+            tuple: start, end and middle points of the edge line
         """
-        start, end = None, None
+        start, end, mid = None, None, None
         if self.orientation == HexOrientationName.POINTY.value:
             match _lower(edge):
                 case "ne":
@@ -1260,6 +1260,37 @@ class XX18GameObject(CoreGameObject):
             return the_color
         return None
 
+    def process_text_size(self, text_size: float | str = None) -> float:
+        """Create a valid font size from a name or value.
+
+        Args:
+            size (float|str): the size name or value
+        """
+        if isinstance(text_size, (float, int)):
+            font_size = text_size
+        else:
+            match text_size:
+                case "tiny" | "i" | "xs" | "xsmall" | "extrasmall":
+                    font_size = self.xxs["XX18_TEXT_XS"]
+                case "small" | "s":
+                    font_size = self.xxs["XX18_TEXT_SMALL"]
+                case "medium" | "m" | "med" | None:
+                    font_size = self.xxs["XX18_TEXT_MEDIUM"]
+                case "large" | "l":
+                    font_size = self.xxs["XX18_TEXT_LARGE"]
+                case "extra" | "e" | "x" | "xl" | "xlarge" | "extralarge":
+                    font_size = self.xxs["XX18_TEXT_XL"]
+                case "tower" | "towering" | "o" | "xxl" | "xxlarge":
+                    font_size = self.xxs["XX18_TEXT_XXL"]
+                case _:
+                    font_size = 0.0
+                    feedback(
+                        f'The text, or label, size "{text_size}" is not available.',
+                        True,
+                        True,
+                    )
+        return font_size
+
     def process_label(
         self,
         label: str,
@@ -1272,25 +1303,10 @@ class XX18GameObject(CoreGameObject):
         label_mx = 0.0
         heading, title, _label = "", "", ""
         label_align = "centre"
-        match text_size:
-            case "tiny" | "i" | "xs":
-                font_size = self.xxs["XX18_TEXT_XS"]
-            case "small" | "s":
-                font_size = self.xxs["XX18_TEXT_SMALL"]
-            case "medium" | "m":
-                font_size = self.xxs["XX18_TEXT_MEDIUM"]
-            case "large" | "l":
-                font_size = self.xxs["XX18_TEXT_LARGE"]
-            case "extra" | "e" | "x" | "xl":
-                font_size = self.xxs["XX18_TEXT_XL"]
-            case "tower" | "towering" | "o" | "xxl":
-                font_size = self.xxs["XX18_TEXT_XXL"]
-            case _:
-                raise ValueError(
-                    f'Text size "{text_size}" is not available for label processing.',
-                )
+        font_size = self.process_text_size(text_size)
+
         if label:
-            shift = base_shift + self.label_size / self.units / 3.0
+            shift = base_shift + font_size / self.units / 3.0
             match location:
                 case RelativeLocation.ABOVE.value:
                     heading = label
@@ -1483,7 +1499,7 @@ class XX18GameObject(CoreGameObject):
         """Draw track between hexsides at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             position (str): hex edge compass reference or references
             label (str): the text to be drawn above/below the line
             town (str): position of a town "block" on the track; middle, start or end
@@ -1554,12 +1570,14 @@ class XX18GameObject(CoreGameObject):
                             self.process_track_town_position(hxw, [start, end])
                         )
                         ccentre = self.feature_location(geo, direction, distance)
+                        label_size = kwargs.get("label_size", "medium")
                         _label_loc = kwargs.get("label_location", "above")
                         relative_location = self.relative_location(_label_loc)
                         lwargs = self.process_label(
                             label,
                             relative_location,
                             self.xxs["XX18_TOWN_DIAMETER"] / 2.0,
+                            label_size,
                         )
                         Rectangle(
                             cxy=ccentre,
@@ -1618,7 +1636,7 @@ class XX18GameObject(CoreGameObject):
         """Draw curve track between at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
             height (float): height of the curve above the baseline joining end points
@@ -1674,7 +1692,7 @@ class XX18GameObject(CoreGameObject):
         """Draw track between a hexside and a point at a hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             position (str): hex edge compass reference for start point
             direction (float): degrees clockwise from East to end point
             distance (float): distance from hex centre to end point
@@ -1775,6 +1793,7 @@ class XX18GameObject(CoreGameObject):
 
         # loop-through-points
         for _pos in _positions[1:]:
+            hexagon, edge = None, None
             result = tools.split(_pos, separator=",", clean=True, no_blanks=True)
             if len(result) < 2:
                 feedback(
@@ -1832,7 +1851,7 @@ class XX18GameObject(CoreGameObject):
         """Draw Town shape at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             label (str): the name of the town
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
@@ -1855,9 +1874,13 @@ class XX18GameObject(CoreGameObject):
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             label_location = kwargs.get("label_location", "below")
+            label_size = kwargs.get("label_size", "medium")
             relative_location = self.relative_location(label_location)
             lwargs = self.process_label(
-                label, relative_location, self.xxs["XX18_TOWN_DIAMETER"] / 2.0
+                label,
+                relative_location,
+                self.xxs["XX18_TOWN_DIAMETER"] / 2.0,
+                label_size,
             )
             # ---- style
             if not isinstance(style, str):
@@ -1905,7 +1928,7 @@ class XX18GameObject(CoreGameObject):
         """Draw City shape at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             label (str): the name of the city
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
@@ -1931,8 +1954,9 @@ class XX18GameObject(CoreGameObject):
                     label_location = "below"
             if city_count == 3:
                 label_location = "below"
+            label_size = kwargs.get("label_size", "medium")
             relative_location = self.relative_location(label_location)
-            lwargs = self.process_label(label, relative_location, _radius, "medium")
+            lwargs = self.process_label(label, relative_location, _radius, label_size)
             cwargs = {}
             cwargs["radius"] = _radius
             cwargs["fill"] = "white"
@@ -2137,7 +2161,7 @@ class XX18GameObject(CoreGameObject):
         """Draw Revenue shape at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             label (str): the value of the revenue
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
@@ -2147,6 +2171,9 @@ class XX18GameObject(CoreGameObject):
 
         _locations = self.process_locations(location, "revenue")
         revenue_fill = self.process_color(color, self.xxs["XX18_REVENUE_FILL"])
+        text_size = kwargs.get("label_size", self.xxs["XX18_TEXT_MEDIUM"])
+        label_size = self.process_text_size(text_size)
+
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
@@ -2157,27 +2184,24 @@ class XX18GameObject(CoreGameObject):
                 stroke=self.xxs["XX18_REVENUE_STROKE"],
                 stroke_width=self.stroke_width_xx,
                 label=label if label else "",
-                label_size=self.xxs["XX18_TEXT_MEDIUM"],
+                label_size=label_size,
             )
 
     def spike(
         self,
         location: str = None,
         position: str = None,
-        stroke: object = None,
         size: str = None,
-        breadth: float = None,  # TODO - set this
-        color: str = None,  # TODO - set this
+        color: str = None,
         **kwargs,
     ):
-        """Draw thin inset triangle(s) on hexside(s) at hex location(s).
+        """Draw inset triangle(s) on hexside(s) at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             position (str): hex edge compass reference or references
-            stroke (str): the name of a color (defaults to white)
             size (str): short, medium or long (defaults to medium)
-            breadth (float): the base width of the spike (in cm)
+            color (str): the inner color of the spike
         """
         from protograf.protos import Hexagon
 
@@ -2206,8 +2230,7 @@ class XX18GameObject(CoreGameObject):
             elif self.orientation == HexOrientationName.FLAT.value:
                 position = ["n", "ne", "se", "s", "sw", "nw"]
         _positions = tools.split(position, separator=" ", clean=True)
-        stroke = stroke if stroke else "white"
-        # stroke_color = colrs.get_color(stroke)
+        spike_fill = color or self.xxs["XX18_TRACK_INNER_FILL"]
         height_shrink = (
             self.xxs["XX18_TRACK_OUTER_WIDTH"] - self.xxs["XX18_TRACK_INNER_WIDTH"]
         )
@@ -2247,8 +2270,8 @@ class XX18GameObject(CoreGameObject):
                 stroke_transparency=100,
                 orientation=self.orientation,
                 spikes=_positions,
-                spikes_stroke="black",
-                spikes_fill="black",
+                spikes_stroke=spike_fill,
+                spikes_fill=spike_fill,
                 spikes_width=self.xxs["XX18_SPIKE_BASE_INNER"],
                 spikes_height=-(height - height_shrink),
             )
@@ -2263,7 +2286,7 @@ class XX18GameObject(CoreGameObject):
         """Draw thick line on hexside(s) at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             position (str): hex edge compass reference or references
             stroke: the name of a color (defaults to self.barrier)
         """
@@ -2304,7 +2327,7 @@ class XX18GameObject(CoreGameObject):
         """Draw Tile Letter at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             label (str): the character for the tile letter
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
@@ -2314,6 +2337,8 @@ class XX18GameObject(CoreGameObject):
 
         _locations = self.process_locations(location, "tile_letter")
         letter_stroke = self.process_color(stroke, self.xxs["XX18_TEXT_STROKE"])
+        text_size = kwargs.get("label_size", self.xxs["XX18_TEXT_XXL"])
+        label_size = self.process_text_size(text_size)
 
         for _loc in _locations:
             geo = self.cells.get(_loc)
@@ -2324,7 +2349,7 @@ class XX18GameObject(CoreGameObject):
                 xy=ccentre,
                 stroke=letter_stroke,
                 stroke_width=self.stroke_width_xx,
-                font_size=self.xxs["XX18_TEXT_XXL"],
+                font_size=label_size,
                 font_name=self.xxs["XX18_TEXT_FONT_BOLD"],
             )
 
@@ -2337,7 +2362,7 @@ class XX18GameObject(CoreGameObject):
         """Fill in a hexagon with a single color at grid location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             color (color): a color reference
         """
         from protograf.protos import Hexagon
@@ -2378,7 +2403,7 @@ class XX18GameObject(CoreGameObject):
         """Draw an inner outline hexagon in color at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             color (color): a color reference (default to 18XX yellow)
             width (float): stroke width in points
         """
@@ -2416,7 +2441,7 @@ class XX18GameObject(CoreGameObject):
         """Draw Mountain shape at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             label (str): the cost of the mountain
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
@@ -2424,13 +2449,18 @@ class XX18GameObject(CoreGameObject):
         from protograf.protos import Triangle
 
         _locations = self.process_locations(location, "mountain")
+        label_size = kwargs.get("label_size", "small")
+
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
             label_location = kwargs.get("label_location", "below")
             relative_location = self.relative_location(label_location)
             lwargs = self.process_label(
-                label, relative_location, self.xxs["XX18_MOUNTAIN_SIDE"] / 2.0, "small"
+                label,
+                relative_location,
+                self.xxs["XX18_MOUNTAIN_SIDE"] / 2.0,
+                label_size,
             )
             Triangle(
                 cx=ccentre.x,
@@ -2454,7 +2484,7 @@ class XX18GameObject(CoreGameObject):
         """Draw a Phase Revenue table at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             income (str): the phase revenue incomes (two to four values)
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
@@ -2622,17 +2652,19 @@ class XX18GameObject(CoreGameObject):
             # left: above line; right: below line;
             pce_heading, pce_title, pcs_heading, pcs_title = "", "", "", ""
             relative_label_location = None
+            text_size = kwargs.get("label_size", self.xxs["XX18_TEXT_SMALL"])
+            label_size = self.process_text_size(text_size)
             text_offset = self.xxs["XX18_TEXT_SMALL"] / self.units * 0.75
             lwargs = {}
             if label:
                 lwargs["font_name"] = self.xxs["XX18_TEXT_FONT"]
-                lwargs["font_size"] = self.xxs["XX18_TEXT_SMALL"]
+                lwargs["font_size"] = label_size
                 kwargs["stroke"] = self.xxs["XX18_TEXT_STROKE"]
                 lwargs["heading_font"] = self.xxs["XX18_TEXT_FONT"]
-                lwargs["heading_size"] = self.xxs["XX18_TEXT_SMALL"]
+                lwargs["heading_size"] = label_size
                 kwargs["heading_stroke"] = self.xxs["XX18_TEXT_STROKE"]
                 lwargs["title_font"] = self.xxs["XX18_TEXT_FONT"]
-                lwargs["title_size"] = self.xxs["XX18_TEXT_SMALL"]
+                lwargs["title_size"] = label_size
                 kwargs["title_stroke"] = self.xxs["XX18_TEXT_STROKE"]
 
                 relative_label_location = self.relative_location(label_location)
@@ -2717,11 +2749,12 @@ class XX18GameObject(CoreGameObject):
         """Draw a symbol/shape at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             label (str): the label for the symbol
             direction (float): degrees clockwise from East
-            distance (float): distance from hex centre
-            name (str): the name the symbol
+            distance (float): distance from hexagon centre
+            name (str): the name of the symbol
+            label_size
         """
         from protograf.protos import Image
 
@@ -2778,10 +2811,13 @@ class XX18GameObject(CoreGameObject):
         for _loc in _locations:
             geo = self.cells.get(_loc)
             ccentre = self.feature_location(geo, direction, distance)
+            label_size = kwargs.get("label_size", "small")
             label_location = kwargs.get("label_location", "below")
-            offset = 0.5
             relative_label_location = self.relative_location(label_location)
-            lwargs = self.process_label(label, relative_label_location, offset, "small")
+            offset = 0.5
+            lwargs = self.process_label(
+                label, relative_label_location, offset, label_size
+            )
             Image(_file, cxy=ccentre, **{**kwargs, **lwargs})
 
     def figure(
@@ -2796,7 +2832,7 @@ class XX18GameObject(CoreGameObject):
         """Draw a protograf shape at hex location(s).
 
         Args:
-            location (str): grid reference or references for one or more cells
+            location (str): grid reference or references for one or more hexagons
             label (str): the label for the symbol
             direction (float): degrees clockwise from East
             distance (float): distance from hex centre
@@ -2816,7 +2852,6 @@ class XX18GameObject(CoreGameObject):
             if position is not None:
                 _positions = tools.split(position, separator=" ", clean=True)
                 for edge in _positions:
-                    # breakpoint()
                     _, _, mid = self.geo_from_location(geo, edge, "figure")
                     cx = (mid.x + self.margin_left) * globals.units
                     cy = (mid.y + self.margin_top) * globals.units
