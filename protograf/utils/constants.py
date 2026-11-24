@@ -76,20 +76,21 @@ MAXIMUM_PAGE_HEIGHT = 10000  # pt ~126" / 3.2m
 # ---- CSS colors
 CSS_COLOR_NAMES = {
     "berylgreen": "#D9E3BE",
-    "geraldine": "#E98A84",
-    "chelseacucumber": "#80B26B",
-    "sail": "#C1E6FD",  # 18xx sea blue
-    "cerulean": "#01A0D6",  # 18xx river blue
-    "glacier": "#62BCDE",  # 18xx hex blue
-    "lochmara": "#0D81C0",  # 18xx lake blue
-    "fountainblue": "#64B1BB",
-    "electricviolet": "#8243F8",
-    "camarone": "#11582A",
-    "lynch": "#627890",
     "blackpearl": "#021128",
-    "internationalorange": "#FF5202",
-    "spindle": "#ADCBF4",
+    "camarone": "#11582A",
+    "cerulean": "#01A0D6",  # 18xx river blue
+    "chelseacucumber": "#80B26B",
+    "electricviolet": "#8243F8",
+    "fountainblue": "#64B1BB",
+    "geraldine": "#E98A84",
+    "glacier": "#62BCDE",  # 18xx hex blue
     "governorbay": "#1444D5",
+    "internationalorange": "#FF5202",
+    "lochmara": "#0D81C0",  # 18xx lake blue
+    "lynch": "#627890",
+    "sage": "#9CAA90",
+    "sail": "#C1E6FD",  # 18xx sea blue
+    "spindle": "#ADCBF4",
     # Railways of the Lost Atlas
     "cinnabar": "#EB3433",  # RLA Red
     "casablanca": "#FAB857",  # RLA Yellow

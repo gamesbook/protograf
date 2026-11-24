@@ -718,6 +718,9 @@ class ArrowShape(BaseShape):
         if self.use_abs:
             x = self._abs_x
             y = self._abs_y
+        elif self.use_abs_c:
+            x = self._abs_cx
+            y = self._abs_cy
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
@@ -772,7 +775,12 @@ class ArrowShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        cx, cy = self._shape_centre.x, self._shape_centre.y
+        if self.use_abs:
+            cx, cy = self._abs_x, self._abs_y
+        elif self.use_abs_c:
+            cx, cy = self._abs_cx, self._abs_cy
+        else:
+            cx, cy = self._shape_centre.x, self._shape_centre.y
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- handle rotation

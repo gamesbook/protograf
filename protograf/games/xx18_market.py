@@ -79,6 +79,31 @@ class XX18MarketObject(CoreStateObject):
 
     def validate_settings(self):
         """Ensure correct values are set for properties."""
+        if self.value_direction:
+            if not isinstance(self.value_direction, str):
+                feedback(
+                    f'The value_direction "{self.value_direction}" is invalid',
+                    " for the XX18Market; a string is required.",
+                    True,
+                    True,
+                )
+            if _lower(self.value_direction) not in [
+                "c",
+                "n",
+                "ne",
+                "nw",
+                "s",
+                "se",
+                "sw",
+                "e",
+                "w",
+            ]:
+                feedback(
+                    f'The value_direction "{self.value_direction}" is invalid',
+                    True,
+                    True,
+                )
+
         if self.market_colors:
             for acolor in self.market_colors:
                 if not isinstance(acolor, (tuple, list)):
@@ -103,7 +128,29 @@ class XX18MarketObject(CoreStateObject):
                         True,
                         True,
                     )
-                the_color = colrs.get_color(acolor[1])
+                colrs.get_color(acolor[1])  # raises error if color is invalid
+
+        if self.arrow and not isinstance(self.arrow, BaseShape):
+            feedback(
+                "The arrow property is invalid for the XX18Market;"
+                " it must be a protograf shape.",
+                True,
+                True,
+            )
+        if self.arrow_down and not isinstance(self.arrow_down, BaseShape):
+            feedback(
+                "The arrow_down property is invalid for the XX18Market;"
+                " it must be a protograf shape.",
+                True,
+                True,
+            )
+        if self.arrow_up and not isinstance(self.arrow_up, BaseShape):
+            feedback(
+                "The arrow_up property is invalid for the XX18Market;"
+                " it must be a protograf shape.",
+                True,
+                True,
+            )
 
     def get_color(self, color_number: str = None) -> object:
         """Return a valid color from list supplied to object."""
@@ -191,7 +238,7 @@ class XX18MarketObject(CoreStateObject):
             arrow (str): an arrow setting: u (up), d (down), a (arrow)
             border (bool): whether or not a border must be drawn
         """
-        from protograf.protos import Rectangle, Text
+        from protograf.protos import Rectangle, Text, Line
 
         def track_geo(rect: Rectangle):
             """Store the cell's geometry as a named attribute of XX18Market."""
@@ -202,8 +249,11 @@ class XX18MarketObject(CoreStateObject):
 
         cell_x = col * self.width + self.x
         cell_y = row * self.height + self.y
-        cell_color = self.get_color(color)
-        # print(f"&&& 2.CELL {row=} {col=} {value=} {color=} {arrow=} {border=}::")
+        if color:
+            cell_color = self.get_color(color)
+        else:
+            cell_color = self.fill
+        # print(f"&&& CELL {row=} {col=} {value=} {color=} {arrow=} {border=}::")
 
         # ---- draw an empty cell
         if value in ["0", None, ".", ""]:
@@ -253,11 +303,8 @@ class XX18MarketObject(CoreStateObject):
         )
         track_geo(rect)
 
-        # ---- draw value
-        if value is not None:
-            # TODO - set text position from value_direction and font size
-            # t_x = col * self.width + self.x + self.width / 2.0
-            # t_y = row * self.height + self.x + self.height / 2.0
+        # ---- draw the value
+        if value not in [None, "~"]:
             align, point = self.get_label_xy(rect)
             Text(
                 str(value),
@@ -268,8 +315,81 @@ class XX18MarketObject(CoreStateObject):
                 font_size=self.font_size,
                 font_name=self.font_name,
             )
-        # ---- draw arrow
-        # TODO  - set arrow shape/styles
+
+        # ---- draw arrow(s)
+        if arrow:
+            _value = _lower(arrow)
+            match _value:
+                case "a":
+                    if not self.arrow:
+                        feedback(
+                            "The arrow property is not set for the XX18Market.",
+                            True,
+                            True,
+                        )
+                        return
+                case "d":
+                    if not self.arrow_down:
+                        xa = rect.geo.w.x + rect.geo.width / 10.0
+                        # ya = rect.e.y - rect.height / 10.
+                        if _lower(self.value_direction) in ["s", "se", "sw", "c", "ne"]:
+                            ya = rect.geo.n.y + rect.geo.height / 10.0
+                        else:
+                            ya = rect.geo.w.y - rect.geo.height / 10.0
+                        length = rect.geo.height / 2.0
+                        Line(
+                            x=xa,
+                            y=ya,
+                            length=length,
+                            stroke_width=1.25,
+                            angle=270,
+                            arrow=True,
+                            arrow_style="angle",
+                        )
+                    else:
+                        off_x = getattr(self.arrow_down, "offset_x", 0.0)
+                        off_y = getattr(self.arrow_down, "offset_y", 0.0)
+                        kwargs["rotation"] = getattr(self.arrow_down, "rotation", None)
+                        cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
+                        cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
+                        self.arrow_up.draw(
+                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs
+                        )
+                case "u":
+                    if not self.arrow_up:
+                        xa = rect.geo.e.x - rect.geo.width / 10.0
+                        # ya = rect.e.y - rect.height / 10.
+                        if _lower(self.value_direction) in ["se"]:
+                            ya = rect.geo.e.y + rect.geo.height / 10.0
+                        else:
+                            ya = rect.geo.s.y - rect.geo.height / 10.0
+                        length = rect.geo.height / 2.0
+                        Line(
+                            x=xa,
+                            y=ya,
+                            length=length,
+                            stroke_width=1.25,
+                            angle=90,
+                            arrow=True,
+                            arrow_style="angle",
+                        )
+                    else:
+                        off_x = getattr(self.arrow_up, "offset_x", 0.0)
+                        off_y = getattr(self.arrow_up, "offset_y", 0.0)
+                        kwargs["rotation"] = getattr(self.arrow_up, "rotation", None)
+                        cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
+                        cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
+                        self.arrow_up.draw(
+                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs
+                        )
+                case None:
+                    pass
+                case _:
+                    feedback(
+                        f'The arrow property "{arrow}" is not valid for the XX18Market.',
+                        True,
+                        True,
+                    )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the XX18MarketObject on a given canvas."""
@@ -286,9 +406,9 @@ class XX18MarketObject(CoreStateObject):
                     row_val, separator=",", clean=True, no_blanks=False
                 )
                 items = _items + [None] * (4 - len(_items))
-                _border = True if items[2] else False
+                _border = True if items[3] else False
                 _color = items[1] if items[1] else None
-                # print(f"&&& 1.mrkt {row=} {col=} {_border=} {row_val=} {items=}::")
+                # print(f"&&& mrkt {row=} {col=} {_border=} {_color=} {items=}")
                 if _border is True:
                     border_cells.append((col, row))
                 self.draw_cell(
