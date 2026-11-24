@@ -8,12 +8,12 @@ An 18xx Stock Market chart has adjacent rows of rectangular, outlined cells,
 of variable length, some offset from the left, and each containing a number
 greater than zero.  There is no specific pattern of numbers.
 
-The cells are arranged such that:
+The grid is defined such that:
 
-* the number is a specific location inside each cell
-* some are colored-in, with different colors in different areas
-* some are outlined with a thicker line of a different color
-* some contain an arrow; either up (on the bottom right) or down (on the left)
+* the stock value is at a specific location inside each cell
+* some cells are colored-in, with different colors in different areas
+* some cells are outlined with a thicker line of a different color
+* some cells contain an arrow; either up (on the bottom right) or down (on the left)
 
 Markets in different 18xx games have different:
 
@@ -49,19 +49,22 @@ class XX18MarketObject(CoreStateObject):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # height and width for cell size:  derived from BaseShape properties
         # x and y for market top-left: derived from BaseShape properties
-        # stroke, stroke_width and fill for cell: derived from BaseShape properties
+        # stroke_width and fill for cell: derived from BaseShape properties
         # outline_stroke, outline_width for cell: derived from BaseShape properties
         # font_size, font_name for text: derived from BaseShape properties
         # ---- unique properties
         self.values = (
             self._commons("values") or kwargs.get("values") or []
-        )  # 20,1,u,b => value:20; color:1 in market_colors; u:arrow; b:has border
+        )  # 20,1,u,b => value:20; color:1 in market_colors; u:arrow; b:has border/outline
         if not isinstance(self.values, (list, tuple)):
             feedback
         self.game_class = "XX18Market"
         self.value_direction = (
             self._commons("value_direction") or kwargs.get("value_direction") or "c"
         )  # where label is drawn
+        self.font_stroke = (
+            self._commons("font_stroke") or kwargs.get("font_stroke") or "black"
+        )  # used to draw cell values
         self.market_colors = (
             self._commons("market_colors") or kwargs.get("market_colors") or []
         )
@@ -236,7 +239,7 @@ class XX18MarketObject(CoreStateObject):
             location (str) : the place within the cell to draw text
             color (str): the color number for a color set
             arrow (str): an arrow setting: u (up), d (down), a (arrow)
-            border (bool): whether or not a border must be drawn
+            border (bool): whether or not a border/outline must be drawn
         """
         from protograf.protos import Rectangle, Text, Line
 
@@ -271,7 +274,7 @@ class XX18MarketObject(CoreStateObject):
             if not border:
                 return
 
-        # ---- style border
+        # ---- style border/outline
         if border:
             border_color = (
                 self.outline_stroke if kwargs.get("outline_stroke") else "red"
@@ -311,7 +314,7 @@ class XX18MarketObject(CoreStateObject):
                 x=point.x,
                 y=point.y,
                 align=align,
-                stroke=self.stroke,
+                stroke=self.font_stroke,
                 font_size=self.font_size,
                 font_name=self.font_name,
             )
@@ -328,10 +331,17 @@ class XX18MarketObject(CoreStateObject):
                             True,
                         )
                         return
+                    else:
+                        off_x = getattr(self.arrow_down, "offset_x", 0.0)
+                        off_y = getattr(self.arrow_down, "offset_y", 0.0)
+                        cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
+                        cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
+                        self.arrow.draw(
+                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True
+                        )
                 case "d":
                     if not self.arrow_down:
                         xa = rect.geo.w.x + rect.geo.width / 10.0
-                        # ya = rect.e.y - rect.height / 10.
                         if _lower(self.value_direction) in ["s", "se", "sw", "c", "ne"]:
                             ya = rect.geo.n.y + rect.geo.height / 10.0
                         else:
@@ -352,13 +362,12 @@ class XX18MarketObject(CoreStateObject):
                         kwargs["rotation"] = getattr(self.arrow_down, "rotation", None)
                         cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
                         cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
-                        self.arrow_up.draw(
-                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs
+                        self.arrow_down.draw(
+                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True
                         )
                 case "u":
                     if not self.arrow_up:
                         xa = rect.geo.e.x - rect.geo.width / 10.0
-                        # ya = rect.e.y - rect.height / 10.
                         if _lower(self.value_direction) in ["se"]:
                             ya = rect.geo.e.y + rect.geo.height / 10.0
                         else:
@@ -380,7 +389,7 @@ class XX18MarketObject(CoreStateObject):
                         cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
                         cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
                         self.arrow_up.draw(
-                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs
+                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True,
                         )
                 case None:
                     pass
@@ -420,7 +429,7 @@ class XX18MarketObject(CoreStateObject):
                     border=_border,
                     **kwargs,
                 )
-        # ---- redraw cells with border
+        # ---- redraw cells with border/outline
         for cell in border_cells:
             self.draw_cell(
                 row=cell[1],

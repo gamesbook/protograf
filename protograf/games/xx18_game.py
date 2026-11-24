@@ -2855,9 +2855,9 @@ class XX18GameObject(CoreGameObject):
                     _, _, mid = self.geo_from_location(geo, edge, "figure")
                     cx = (mid.x + self.margin_left) * globals.units
                     cy = (mid.y + self.margin_top) * globals.units
-                    thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs)
+                    thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True)
             else:
                 ccentre = self.feature_location(geo, direction, distance)
                 cx = (ccentre.x + self.margin_left) * globals.units
                 cy = (ccentre.y + self.margin_top) * globals.units
-                thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True, **kwargs)
+                thing.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True)
