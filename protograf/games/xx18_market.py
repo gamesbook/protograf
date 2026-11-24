@@ -336,9 +336,7 @@ class XX18MarketObject(CoreStateObject):
                         off_y = getattr(self.arrow_down, "offset_y", 0.0)
                         cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
                         cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
-                        self.arrow.draw(
-                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True
-                        )
+                        self.arrow.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True)
                 case "d":
                     if not self.arrow_down:
                         xa = rect.geo.w.x + rect.geo.width / 10.0
@@ -362,9 +360,7 @@ class XX18MarketObject(CoreStateObject):
                         kwargs["rotation"] = getattr(self.arrow_down, "rotation", None)
                         cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
                         cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
-                        self.arrow_down.draw(
-                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True
-                        )
+                        self.arrow_down.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True)
                 case "u":
                     if not self.arrow_up:
                         xa = rect.geo.e.x - rect.geo.width / 10.0
@@ -389,7 +385,9 @@ class XX18MarketObject(CoreStateObject):
                         cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
                         cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
                         self.arrow_up.draw(
-                            _abs_cx=cx, _abs_cy=cy, use_abs_c=True,
+                            _abs_cx=cx,
+                            _abs_cy=cy,
+                            use_abs_c=True,
                         )
                 case None:
                     pass
