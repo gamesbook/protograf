@@ -17,6 +17,12 @@ Python for designing and creating simple, regular, graphical outputs in PDF
 counters, tiles, boards, playmats, and boxes for board games, including
 hexagonal grids, but can also be used for creating any simple design that
 has regular or repetitive elements; typically a mix of graphics and text.
+It also supports common or custom abstract games as well 18xx-series boards
+and markets.
+
+**protograf** is written in Python (but you *don't* have to know Python to use it!).
+Under-the-hood, its built on decades of well-tested tools and libraries and is
+extensible with this solid and user-friendly language.
 
 If it's your first time here, *please consult the* `guide <guide.html>`_
 which provides a logical reading order.

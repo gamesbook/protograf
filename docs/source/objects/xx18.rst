@@ -1751,7 +1751,7 @@ The grid is created such that:
   cells on the right side of the grid, or down |dash| typically in
   cells on the left side of the grid.
 
-Markets in different 18xx games have different:
+Stock Markets in different 18xx games have different:
 
 * fonts
 * arrow styles
@@ -1824,7 +1824,6 @@ XX18Market Arrows
 
 
 
-
 .. _xx18MarketExamples:
 
 XX18Market Examples
@@ -1841,10 +1840,20 @@ The basic structure for working with a Stock Market follows this pattern:
 However; in this speciifc case, nothing will be seen because the *values*
 property has not been set.
 
+The following examples illustrate how different propeties can be set to
+style the Stock Market.
+
+- `Example 1. Unstyled Stock Market`_
+- `Example 2. Sized Stock Market`_
+- `Example 3. Colors and Borders for Stock Market`_
+- `Example 4. Default Arrows for Stock Market`_
+- `Example 5. Custom Arrows for Stock Market`_
+- `Example 6. Annotated Stock Market`_
+
 
 Example 1. Unstyled Stock Market
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xx18market-command_>`_
+`^ <xx18MarketExamples_>`_
 
 .. |mx1| image:: ../images/objects/xx18_market_unstyled.png
    :width: 400
@@ -1854,18 +1863,27 @@ Example 1. Unstyled Stock Market
 
       .. code:: python
 
-        xgp = XX18Market()
+        xgp = XX18Market(
+            values=[
+            " 0  0 90 100 110 120 135 150 170",
+            " 0 75 80  90 100 110 120 135 150",
+            "65 70 75  80  90 100 110 120 135",
+            "60 65 70  75  80  90 100 110 120",
+            "55 60 65  70  75  80  90",
+            "50 55 60  65  70  75  80",
+            "40 50 55  60  65  70",
+            "30 40 50  55  60",
+            ])
         XX18State(market=xgp)
 
 ===== ======
 
-For this example,
+For this example, the only property set is *values*.
 
 
-
-Example N. ........ Stock Market
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`^ <xx18market-command_>`_
+Example 2. Sized Stock Market
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18MarketExamples_>`_
 
 .. |mx2| image:: ../images/objects/xx18_market_sized.png
    :width: 400
@@ -1875,14 +1893,286 @@ Example N. ........ Stock Market
 
       .. code:: python
 
-        xgp = XX18Market()
-        XX18State(market=xgp)
+        xgs = XX18Market(
+            x=0, y=0,
+            height=1.5, width=2,
+            font_name='Times-Roman',
+            stroke_width=1,
+            values=[
+                " 0  0 90 100 110 120 135 150 170",
+                " 0 75 80  90 100 110 120 135 150",
+                "65 70 75  80  90 100 110 120 135",
+                "60 65 70  75  80  90 100 110 120",
+                "55 60 65  70  75  80  90",
+                "50 55 60  65  70  75  80",
+                "40 50 55  60  65  70",
+                "30 40 50  55  60",
+            ]
+        )
+        XX18State(market=xgs)
 
 ===== ======
 
 For this example,
 
 
+Example 3. Colors and Borders for Stock Market
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18MarketExamples_>`_
+
+.. |mx3| image:: ../images/objects/xx18_market_colored.png
+   :width: 400
+
+===== ======
+|mx3| This example shows an ``XX18Market`` constructed using these commands:
+
+      .. code:: python
+
+        xgs = XX18Market(
+            x=0, y=0,
+            height=1.5, width=2,
+            font_name='Times-Roman',
+            stroke_width=1,
+            fill="bisque",
+            market_colors=[(1, "sienna", "white"), (2, "lime"), (3, "gold")],
+            value_direction='sw',
+            values=[
+            " 0  0 90 100 110 120 135 150 170",
+            " 0 75 80  90,,,o 100 110 120 135 150",
+            "65 70 75  80,,,o  90 100 110 120 135",
+            "60 65 70  75,,,o  80  90 100 110 120",
+            "55,3 60 65  70,,,o  75  80  90",
+            "50,3 55,3 60  65  70  75  80",
+            "40,2 50,3 55,3  60  65  70",
+            "30,1 40,2 50,3  55,3  60   0   0  ~",
+            ],
+        )
+        XX18State(market=xgs)
+
+===== ======
+
+For this example, a number of new properties have ben changed:
+
+- *fill* is set to ``"bisque"`` so all cells are, by default, drawn in a
+  green color
+- *market_colors* is assigned to a list of sets; values wrapped in ``(...)``
+  brackets
+
+Each *market_colors* set consists of a number (an integer), and at least
+one color value.  If only one color value is provided, then this is the
+color to be used to fill a cell; if two color values are provided, then
+the first is the color to be used to fill a cell and the second is the one
+used for the font stroke of the value of that cell.  For example, a color
+set of ``(1, "sienna", "white")`` means that all cells referring to ``1``
+will be filled with a brown color and the value will drawn with a white
+font color.
+
+The set of items that can appear along with a market value, are used for
+up to three different properties of that cell.  They appear after the cell
+value and are separated by commas.  There can be up to three items, which
+can be remembered by the acronymn **"CAB*""** |dash| **c**olor; **a**rrow,
+and **b**order. These are used as follows:
+
+- *color* is the **number** of the color by which the cell must be filled;
+  this number refers to associated color, which is extracted from the
+  *market_colors* set (described above)
+- *arrow* is either ``u`` for an upwards-facing arrow, ``d`` for a
+  downwards-facing arrow, and ``a`` for another type of arrow; see
+  `Example 4. Default Arrows for Stock Market`_
+- *border* is a signal to draw a border, of the color and thickness
+  set by ``outline_stroke`` and ``outline_width`` respectively; any
+  letter can be used to signal this
+
+
+Example 4. Default Arrows for Stock Market
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18MarketExamples_>`_
+
+.. |mx4| image:: ../images/objects/xx18_market_arrows_default.png
+   :width: 400
+
+===== ======
+|mx4| This example shows an ``XX18Market`` constructed using these commands:
+
+      .. code:: python
+
+        xga = XX18Market(
+            x=0, y=0,
+            height=1.5, width=2,
+            font_name='Times-Roman',
+            stroke_width=1,
+            value_direction='se',
+            values=[
+            " 0  0 90 100 110 120 135 150 170",
+            " 0 75 80  90 100 110 120 135 150,,u",
+            "65,,d 70 75  80  90 100 110 120 135,,u",
+            "60,,d 65 70  75  80  90 100 110 120,,u",
+            "55,,d 60 65  70  75  80  90,,u",
+            "50,,d 55 60  65  70  75  80,,u",
+            "40,,d 50 55  60  65  70,,u",
+            "30 40 50  55  60,,u",
+            ],
+        )
+        XX18State(market=xga)
+
+===== ======
+
+For this example, a number of cells' values have been "annotated" to draw
+arrows.
+
+The annotation follows the "CAB" style described above.  The "A" in "CAB"
+is short for "Arrow" and so it is the second item attached to a value
+that represents that item, For example, ``40,,d`` - represents the *value*
+``40``, followed by nothing for the *color*, followed by a ``u`` to signify
+an up arrow. Similarly, ``70,,d`` - represents the *value* ``70``,
+followed by nothing for the *color*, followed by a ``d`` to signify a down
+arrow.
+
+
+Example 5. Custom Arrows for Stock Market
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18MarketExamples_>`_
+
+.. |mx5| image:: ../images/objects/xx18_market_arrows_custom.png
+   :width: 400
+
+===== ======
+|mx5| This example shows an ``XX18Market`` constructed using these commands:
+
+      .. code:: python
+
+        arrows = Common(
+            fill="black",
+            height=0.6, width=0.1,
+            head_height=0.3, head_width=0.3,)
+        arr_up = arrow(
+            common=arrows,
+            offset_x=0.7, offset_y=0.6)
+        arr_down = arrow(
+            common=arrows,
+            rotation=180,
+            offset_x=-0.7, offset_y=-0.6)
+
+        xgr = XX18Market(
+            x=0, y=0,
+            height=1.5, width=2,
+            font_name='Times-Roman',
+            stroke_width=1,
+            value_direction='s',
+            arrow_up=arr_up,
+            arrow_down=arr_down,
+            values=[
+            " 0  0 90 100 110 120 135 150 170",
+            " 0 75 80  90 100 110 120 135 150,,u",
+            "65,,d 70 75  80  90 100 110 120 135,,u",
+            "60,,d 65 70  75  80  90 100 110 120,,u",
+            "55,,d 60 65  70  75  80  90,,u",
+            "50,,d 55 60  65  70  75  80,,u",
+            "40,,d 50 55  60  65  70,,u",
+            "30 40 50  55  60,,u",
+            ],
+        )
+        XX18State(market=xgr)
+
+===== ======
+
+This example builds on`Example 4. Default Arrows for Stock Market`_.
+
+In this case, the default arrows are replaced by custom ones that must
+be created and named before the ``XX18Market()`` command is used.
+
+In the example, ``arr_up`` and ``arr_down`` are created and styled using
+the **protograf** :ref:`arrow <arrow-command>` command. It can be seen that
+the :ref:`Common <the-common-command>` command is used to set the properties
+applicable to both the up and down arrows.
+
+
+Example 6. Annotated Stock Market
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18MarketExamples_>`_
+
+.. |mx6| image:: ../images/objects/xx18_market_full.png
+   :width: 400
+
+===== ======
+|mx6| This example shows an ``XX18Market`` constructed using these commands:
+
+      .. code:: python
+
+        arrows = Common(
+            fillpr="black",
+            height=0.6, width=0.1,
+            head_height=0.3, head_width=0.3,)
+        arr_up = arrow(
+            common=arrows,
+            offset_x=0.7, offset_y=0.6)
+        arr_down = arrow(
+            common=arrows,
+            rotation=180,
+            offset_x=-0.7, offset_y=-0.6)
+
+        xgf = XX18Market(
+            x=0, y=0,
+            height=1.5, width=2,
+            font_name='Times-Bold',
+            stroke_width=1,
+            value_direction='s',
+            fill="ivory",
+            market_colors=[(1, "sienna"), (2, "lime"), (3, "gold")],
+            arrow_up=arr_up,
+            arrow_down=arr_down,
+            values=[
+            " 0  0 90 100,,,o 110 120 135 150 170",
+            " 0 75 80  90,,,o 100 110 120 135 150,,u",
+            "65,,d 70 75  80,,,o  90 100 110 120 135,,u",
+            "60,,d 65 70  75,,,o  80  90 100 110 120,,u",
+            "55,3,d 60 65  70,,,o  75  80  90,,u",
+            "50,3,d 55,3 60  65  70  75  80,,u",
+            "40,2,d 50,3 55  60  65  70,,u",
+            "30,1 40,2 50,3  55  60,,u",
+            ],
+        )
+        XX18State(market=xgf)
+
+        Text("Initial", xy=xgf.D3.c, stroke="firebrick")
+        Image("images/king.png", x=xgf.I1.c.x, y=xgf.I1.c.y - 0.9)
+        Polyshape(points=[
+            xgs.A1.nw,
+            xgs.B1.ne, xgs.B1.se, xgs.B1.sw,
+            xgs.A2.se, xgs.A2.sw,
+            ],
+            fill="silver",
+            stroke=None)
+
+===== ======
+
+This example is a compilation of all the previous examples into a single
+"ready to use" one.
+
+The only new feature is the demonstration of using **protograf** shape
+commands to overlay other items on, or next to, the grid.
+
+The :ref:`Polyshape <polyshape-command>` command draws a series of points
+and then fills in the area with a ``silver`` color.  The points are all
+specfied using the ``GRID.CELL.COMPASS`` notation.  The  ``GRID`` refers
+to the name assigned to the ``XX18Market`` grid |dash| in this case it
+is ``xgf``; the ``CELL`` refers to a single cell in the grid using an
+Excel-like notation, with letters for columns and numbers for rows; and
+the ``COMPASS`` references a vertex point on the cell (includig ``c`` for
+its centre).
+
+.. NOTE::
+
+    Even though a cell might not be drawn on the grid, its geometry is still
+    available for use with the ``GRID.CELL.COMPASS`` notation.
+
+The :ref:`Image <image-command>` command places an image at a cell location;
+in this case, slighly offset from the centre of cell ``I1``.  Here the
+``GRID.CELL.COMPASS`` point notation is extended to reference the specific
+``x`` or ``y`` value of that point.
+
+The :ref:`Text <text-command>` command simply draws text; in this case,
+centred on the centre of cell ``D3``.
 
 
 .. _xx18state-command:
@@ -1926,6 +2216,9 @@ create the game Map, Tiles and Tile Manifest, Tokens and Charters, Tokens
 Another useful tool to generate files for Charters, Privates, Shares,
 Station Markers, Trains, and (linear) Stock Markets is *xxpaper*, which is
 available at https://pypi.org/project/xxpaper/
+
+For helping to build an interesting and challenging Stock Market, this tool
+may be of use: https://github.com/Galatolol/market_heatmap
 
 A comprehensive resource of available games can be found at
 http://www.fwtwr.com/18xx/index.htm and games themselves can be played at

@@ -52,9 +52,6 @@ xgs = XX18Market(
 )
 XX18State(market=xgs)
 
-# Polyshape(points=[
-#     xgs.A1.nw, xgs.B1.ne, xgs.B1.se, xgs.B1.sw, xgs.A2.se, xgs.A2.sw,
-#     ], fill="pink", stroke=None)
 
 # ---- XX18Market: colors & borders
 PageBreak()
@@ -168,17 +165,26 @@ xgf = XX18Market(
     values=[
     " 0  0 90 100,,,o 110 120 135 150 170",
     " 0 75 80  90,,,o 100 110 120 135 150,,u",
-    "65,,d 70 75  80,,,o  90 100 110 120 135,,u",
-    "60,,d 65 70  75,,,o  80  90 100 110 120,,u",
-    "55,3,d 60 65  70,,,o  75  80  90,,u",
-    "50,3,d 55,3 60  65  70  75  80,,u",
-    "40,2,d 50,3 55  60  65  70,,u",
-    "30,1 40,2 50,3  55  60,,u",
+    "65,,d 70 75 80,,,o 90 100 110 120 135,,u",
+    "60,,d 65 70 75,,,o 80 90 100 110 120,,u",
+    "55,3,d 60 65 70,,,o 75 80 90,,u",
+    "50,3,d 55,3 60 65 70 75 80,,u",
+    "40,2,d 50,3 55 60 65 70,,u",
+    "30,1 40,2 50,3 55 60,,u",
     ],
 )
 XX18State(market=xgf)
 
 Text("Initial", xy=xgf.D3.c, stroke="firebrick")
+Image("images/king.png", x=xgf.I1.c.x, y=xgf.I1.c.y - 0.9)
+Polyshape(points=[
+    xgs.A1.nw,
+    xgs.B1.ne, xgs.B1.se, xgs.B1.sw,
+    xgs.A2.se, xgs.A2.sw,
+    ],
+    fill="silver",
+    stroke=None)
+
 
 # ---- XX18Market: zzz
 PageBreak()

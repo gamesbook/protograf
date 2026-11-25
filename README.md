@@ -8,10 +8,14 @@ graphical designs in PDF (or PNG/GIF/SVG) format via a script.
 __protograf__  has been primarily created to handle the prototyping of cards,
 counters, tiles, boards and boxes for board games, including hexagonal grids,
 but can also be used for creating any relatively simple design that has regular
-or repetitive elements; typically a mix of graphics and text.
+or repetitive elements; typically a mix of graphics and text. It also supports
+common or custom abstract games as well 18xx-series boards and markets.
 
 > You do not need to know the Python language to be able to use __protograf__
 > but you do need Python installed on your machine!
+
+Under-the-hood, __protograf__ built on decades of well-tested tools and libraries
+and is easily extensible with this solid and user-friendly language.
 
 ## :notebook: Documentation
 
@@ -118,9 +122,11 @@ The full feature list is available in the
 * [x] New shapes: Band (aka "Annular Sector")
 * [x] CardBox: create foldable boxes for decks of cards
 * [x] Common gaming objects: Cube, Domino, Die and Pentomino(es)
+* [x] Wargame board: a hex board with terrain features (vector and bitmap)
+* [x] WarpWar board: a fully-styled example
+* [x] 18xx-series board: create a map with tracks, towns, cities and other features
+* [x] 18xx-series market: create an annotated grid for a Stock Market
 * [x] HexHex boards
-* [x] Pathways: (arcs and lines) on a Hexagonal grid
-* [x] Stripes: interior "areas" for a Rectangle
 * [x] Cards:
     * [x] extract cards as a TableTopSimulator image
     * [x] support for card-back designs
@@ -145,10 +151,7 @@ they just represent current / potential areas of work or ideas.
 
 These are possible examples to show board creation based on existing games:
 
-* [x] Wargame board: show full --terrain features (vector and bitmap)
-* [x] WarpWar board: show a fully-styled example
 * [ ] Traveller board: show a fully-styled Star System
-* [ ] 18xx board: show a basic map with tracks, towns, cities and off-map areas
 
 ## :mega: Acknowledgements
 
