@@ -3,9 +3,10 @@ Compound Objects
 ================
 
 Compound objects are ones constructed, or "compounded" out of one or more
-of **protograf's** :doc:`core shapes <../core_shapes>`. Thus these objects
-are able to use, or reference, many of the properties of tose core shapes,
-in addition to their own particular properties.
+of **protograf's** :doc:`core shapes <../core_shapes>`.
+
+These objects are able to use, or reference, many of the properties of the
+core shapes, in addition to their own particular properties.
 
 .. toctree::
    :maxdepth: 1

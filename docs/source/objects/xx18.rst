@@ -1,11 +1,12 @@
-======================
-XX18Game and XX18State
-======================
+=============
+XX18 Commands
+=============
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-The ``XX18Game`` and ``XX18State`` are two of a number of commands
-used to create what are termed :doc:`Compound Objects <index>`.
+The *XX18* commands |dash| ``XX18Game``, ``XX18Market`` and ``XX18State``
+|dash| are some of a number of commands used to create what are termed
+:doc:`Compound Objects <index>`.
 
 This section assumes you are very familiar with the concepts, terms and ideas
 for :doc:`protograf <../index>`  as presented in the
@@ -19,19 +20,28 @@ will also help with understanding how an 18xx game board is created and used.
 
 - `Background`_
 - `Overview`_
-- `Features`_
 - `XX18Game Command`_
 
+    - `XX18Game Summary`_
     - `XX18Game Properties`_
     - `XX18Game Board Grid`_
     - `XX18Game Features`_
     - `XX18Game JSON Styles`_
     - `XX18Game Functions`_
     - `XX18Game AdHoc Drawing with a Map`_
+    - `XX18Game Style Settings`_
+    - `XX18Game Function Options`_
+
+- `XX18Market Command`_
+
+    - `XX18Market Summary`_
+    - `XX18Market Properties`_
+    - `XX18Market Values`_
+    - `XX18Market Arrows`_
+    - `XX18Market Examples`_
 
 - `XX18State Command`_
-- `XX18Game Style Settings`_
-- `XX18Game Function Options`_
+
 - `18xx Resources`_
 
 
@@ -48,12 +58,13 @@ to allow this type of game to be more easily prototyped.
 
 The very first game in the series was *1829*, designed by Francis Tresham, and
 published in 1974.  It was the forerunner to the series, but the game that has
-really provided the foundation for all the ones that came after was *1830*,
+really provided the foundation for most of the ones that came after was *1830*,
 developed by The Avalon Hill Game Company in collaboration with Francis Tresham.
 
 *1830* also set the style for the graphic design that has been used in many of
 the games in the series and the prototyping capability provided here is modeled
-after that design.
+primarily after that design.
+
 
 .. _xx18Over:
 
@@ -61,26 +72,62 @@ Overview
 ========
 `↑ <xx18Index_>`_
 
-The aim of the ``XX18Game`` and ``XX18State`` commands is to allow
-diagrams for many of the 18Xx series of games to be easily created.
+The aim of the ``XX18Game``, ``XX18Market`` and ``XX18State`` commands
+is to allow some of the components for typical games in the 18Xx series
+to be easily created.
 
 The ``XX18Game`` command allows for the details of the board and features
-for such a game to be specified.  However, an ``XX18Game`` is **not**
+for an 18xx-type game to be specified.  However, an ``XX18Game`` is **not**
 designed to be drawn |dash| it can be thought of as the game being
 "still in the box".
 
 The ``XX18State`` command will, when supplied with a previously defined
 ``XX18Game``, draw the board, along with all its features.
 
-.. _xx18game-features:
+The ``XX18Market`` command allows for the details of the Stock Market
+for an 18xx-type game to be specified.  However, an ``XX18Market`` is
+**not** designed to be drawn |dash| it can be thought of as the game
+being "still in the box".
 
-Features
-========
+The ``XX18State`` command will, when supplied with a previously defined
+``XX18Game``, draw the board, along with all its features. Similarly,
+when supplied with a previously defined ``XX18Market``, it will draw the
+Stock Market grid.
+
+
+
+
+.. _xx18game-command:
+
+XX18Game Command
+================
 `↑ <xx18Index_>`_
 
-Below is a short summary of the features available.
+The ``XX18Game()`` command defines the parts of an 18xx game; primarily
+the construction and styling, of the board and features, as well the use
+of its functions for more extensive control of features.
 
-The ``XX18Game()`` command can depict:
+Topics covered are:
+
+- `XX18Game Summary`_
+- `XX18Game Properties`_
+- `XX18Game Board Grid`_
+- `XX18Game Features`_
+- `XX18Game JSON Styles`_
+- `XX18Game Functions`_
+- `XX18Game AdHoc Drawing with a Map`_
+- `XX18Game Style Settings`_
+- `XX18Game Function Options`_
+
+
+.. _xx18game-summary:
+
+XX18Game Summary
+----------------
+`^ <xx18game-command_>`_
+
+Below is a short summary of the map features the ``XX18Game()`` command
+can depict:
 
 * towns as filled-in, black circles, or rectangles
 * cities (different sizes) as white circles; may include
@@ -131,25 +178,6 @@ not handled directly by the ``XX18Game()`` command.  There is simply too much
 variation in how such areas are drawn to use a common formula.  What **is**
 possible is to use the grid references and hexagon geometry to set the
 vertices of such shapes relative to the board.
-
-
-.. _xx18game-command:
-
-XX18Game Command
-================
-`↑ <xx18Index_>`_
-
-The ``XX18Game()`` command defines the parts of an 18xx game; primarily
-the construction and styling, of the board and features.
-
-Topics covered are:
-
-- `XX18Game Properties`_
-- `XX18Game Board Grid`_
-- `XX18Game Features`_
-- `XX18Game JSON Styles`_
-- `XX18Game Functions`_
-- `XX18Game AdHoc Drawing with a Map`_
 
 
 .. _xx18GameProperties:
@@ -408,16 +436,16 @@ Example 6. Styled Board
 
 In this case, the 18xx board is further styled by setting:
 
-- *rows* - the number of rows in the grid
-- *cols* - the number of columns in the grid
-- *x* and *y* - set the offset of the grid's top-left from the page margins
-- *label* - if ``True``, the labels will be drawn
-- *label_locations* - where the labels are drawn at the grid edges;
+* *rows* - the number of rows in the grid
+* *cols* - the number of columns in the grid
+* *x* and *y* - set the offset of the grid's top-left from the page margins
+* *label* - if ``True``, the labels will be drawn
+* *label_locations* - where the labels are drawn at the grid edges;
   in this case below (``B``) and to the left (``L``)
-- *label_size* - the point height of the labels
-- *fill* - the default color of the hexagons
-- *stroke* - the default color for lines and labels
-- *stroke_width* - the default width of lines
+* *label_size* - the point height of the labels
+* *fill* - the default color of the hexagons
+* *stroke* - the default color for lines and labels
+* *stroke_width* - the default width of lines
 
 
 Example 7. Pattern Grid
@@ -1527,33 +1555,11 @@ define these properties in its own definition.
 
 
 
-.. _xx18state-command:
-
-XX18State Command
-==================
-`↑ <xx18Index_>`_
-
-The ``XX18State()`` command will create a display of a board and its pieces
-that have been defined in an :ref:`XX18Game <xx18game-command>`. This
-display represents a given point during the play of an abstract game |dash| a
-situation commonly referred to as "the game state".
-
-In the current version of the software, there are no other specific settings
-for the ``XX18State()`` command other than the *board* property, which refers
-to the name assigned to the ``XX18Game()``.
-
-.. code:: python
-
-    xx_game = XX18Game()
-    XX18State(board=xx_game)
-
-
-
-.. _xx18StyleSettings:
+.. _xx18GameStyleSettings:
 
 XX18Game Style Settings
-=======================
-`↑ <xx18Index_>`_
+-----------------------
+`^ <xx18game-command_>`_
 
 The following are the "internal" settings for styles and sizes used by
 the ``XX18Game()`` command, that be changed in a JSON file; see
@@ -1613,18 +1619,19 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
 * ``"XX18_TEXT_FONT_BOLD"`` - default is ``Times-Bold``; font name for tile_letter
 
 
-.. _xx18FunctionOptions:
+
+.. _xx18GameFunctionOptions:
 
 XX18Game Function Options
-=========================
-`↑ <xx18Index_>`_
+-------------------------
+`^ <xx18game-command_>`_
 
 The section on `XX18Game Functions`_ illustrates example of how to use
 the built-in functions of the ``XX18Game()`` command. Below are the details
 of all available properties and which function(s) make use of them.
 
 Available Properties
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 The following are the properties that can be used when making use of the
 built-in functions.
@@ -1661,7 +1668,7 @@ built-in functions.
 
 
 Function Properties
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 The following list shows which `Available Properties`_ are applicable for
 which functions.
@@ -1707,6 +1714,198 @@ then switch that out with a substitute /fallback value.
 * ``track(location, label, position, town, color)``
 * ``track_curve(location, direction, distance, height, color)``
 * ``track_edge(location, position, direction, distance, height, color)``
+
+
+.. _xx18market-command:
+
+XX18Market Command
+==================
+`↑ <xx18Index_>`_
+
+The ``XX18Market()`` command defines the Stock Market for an 18xx game.
+
+- `XX18Market Summary`_
+- `XX18Market Properties`_
+- `XX18Market Values`_
+- `XX18Market Arrows`_
+- `XX18Market Examples`_
+
+
+.. _xx18MarketSummary:
+
+XX18Market Summary
+------------------
+`^ <xx18market-command_>`_
+
+An 18xx-style Stock Market chart is a **grid**, consisting of adjacent rows of
+rectangular, outlined **cells**. Rows are of variable length, with some being
+offset from the left, and each cell contains a number. However, there is
+no specific pattern of numbers across different 18xx games.
+
+The grid is created such that:
+
+* the stock value is at a specific location inside each cell,
+* some cells are colored-in, with different colors in different areas,
+* some cells are outlined with a thicker line of a different color,
+* some cells contain an arrow; either pointing up |dash| typically in
+  cells on the right side of the grid, or down |dash| typically in
+  cells on the left side of the grid.
+
+Markets in different 18xx games have different:
+
+* fonts
+* arrow styles
+* set of colors
+
+Cells in the grid can sometimes be annotated with a marker or text.
+
+The ``XX18Market()`` command can set:
+
+* a list of values for each of the Stock Market rows
+* fill and stroke color to be associated with specific cells
+* which cells require a border drawn around them
+* which cells should have an arrow (up or down) drawn in them.
+
+The command can accept the usual settings for the font details, to be used
+for the text values, as well the grid line colors and cell size.
+
+Default arrow styles are "built-in", but it is possible to define custom
+:ref:`arrows <arrow-command>` and use these instead.
+
+Additional annotation, or construction of features, for a specific cell or
+cells in the grid can be done using cell geometry. This allow the vertices to
+be used to set shape locations relative to the board.
+
+
+.. _xx18MarketProperties:
+
+XX18Market Properties
+---------------------
+`^ <xx18market-command_>`_
+
+The key properties that can be set for an ``XX18Market()`` command are:
+
+* *values* - a list with rows of values contained within strings
+* *value_direction* - where to locate the value within a cell; typically a
+  compass direction (defaults to the cell centre)
+* *market_colors* - a list of ``(number, fill, stroke)`` values, used to
+  define what colors may be used to fill cells
+* *x* and *y* - set the location for the grid's top-left position
+* *height* - height of a rectanglar cell in the grid (defaults to ``1`` cm)
+* *width* - width of a rectanglar cell in the grid (defaults to ``1`` cm)
+* *stroke_width* - the default stroke width of a rectanglar cell in the grid
+* *fill* - the fill color of a rectanglar cell in the grid (defaults to ``white``)
+* *outline_stroke* - the stroke color for an outline of a rectanglar cell
+* *outline_width* - the stroke width for an outline of a rectanglar cell
+* *font_stroke* - the font color for the values drawn in the cells
+* *font_size* - the font size for the values drawn in the cells
+* *font_name* - the font family for the values drawn in the cells
+* *arrow* - a **protograf** shape to use for other arrows (no default)
+* *arrow_up* - a **protograf** shape to use for arrows pointing up
+  (defaults to a simple line-plus-arrow)
+* *arrow_down* - a **protograf** shape to use for arrows pointing down
+  (defaults to a simple line-plus-arrow)
+
+
+.. _xx18MarketValues:
+
+XX18Market Values
+-----------------
+`^ <xx18market-command_>`_
+
+The key property for an ``XX18Market()`` command is that of *values*.
+
+
+.. _xx18MarketArrows:
+
+XX18Market Arrows
+-----------------
+`^ <xx18market-command_>`_
+
+
+
+
+.. _xx18MarketExamples:
+
+XX18Market Examples
+-------------------
+`^ <xx18market-command_>`_
+
+The basic structure for working with a Stock Market follows this pattern:
+
+.. code:: python
+
+    xgp = XX18Market()
+    XX18State(market=xgp)
+
+However; in this speciifc case, nothing will be seen because the *values*
+property has not been set.
+
+
+Example 1. Unstyled Stock Market
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18market-command_>`_
+
+.. |mx1| image:: ../images/objects/xx18_market_unstyled.png
+   :width: 400
+
+===== ======
+|mx1| This example shows an ``XX18Market`` constructed using these commands:
+
+      .. code:: python
+
+        xgp = XX18Market()
+        XX18State(market=xgp)
+
+===== ======
+
+For this example,
+
+
+
+Example N. ........ Stock Market
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <xx18market-command_>`_
+
+.. |mx2| image:: ../images/objects/xx18_market_sized.png
+   :width: 400
+
+===== ======
+|mx2| This example shows an ``XX18Market`` constructed using these commands:
+
+      .. code:: python
+
+        xgp = XX18Market()
+        XX18State(market=xgp)
+
+===== ======
+
+For this example,
+
+
+
+
+.. _xx18state-command:
+
+XX18State Command
+==================
+`↑ <xx18Index_>`_
+
+The ``XX18State()`` command will create a display of a board and its annotations
+that have been defined in an :ref:`XX18Game <xx18game-command>`. It can also
+create a display of a Stock Market grid and its annotations
+that have been defined in an :ref:`XX18Market <xx18market-command>`.
+
+In the current version of the software, there are no other specific settings
+for the ``XX18State()`` command other than the *board* property, which refers
+to the name assigned to the ``XX18Game()``, or the *market* property, which refers
+to the name assigned to the ``XX18Market()``.
+
+.. code:: python
+
+    xx_game = XX18Game()
+    xx_market = XX18Market()
+    XX18State(board=xx_game, market=xx_market)
 
 
 .. _xx18-resources:
