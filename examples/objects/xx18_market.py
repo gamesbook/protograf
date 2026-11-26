@@ -62,7 +62,7 @@ xgs = XX18Market(
     font_name='Times-Roman',
     stroke_width=1,
     fill="bisque",
-    market_colors=[(1, "sienna"), (2, "lime"), (3, "gold")],
+    market_colors=[(1, "sienna", "white"), (2, "lime"), (3, "gold")],
     value_direction='sw',
     values=[
     " 0  0 90 100 110 120 135 150 170",
@@ -159,7 +159,7 @@ xgf = XX18Market(
     stroke_width=1,
     value_direction='s',
     fill="ivory",
-    market_colors=[(1, "sienna"), (2, "lime"), (3, "gold")],
+    market_colors=[(1, "sienna", "white"), (2, "lime"), (3, "gold")],
     arrow_up=arr_up,
     arrow_down=arr_down,
     values=[

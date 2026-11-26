@@ -117,10 +117,10 @@ class XX18MarketObject(CoreStateObject):
                         True,
                         True,
                     )
-                if len(acolor) != 2:
+                if len(acolor) != 2 and len(acolor) != 3:
                     feedback(
                         f'The color setting "{acolor}" is invalid for the XX18Market colors;'
-                        " exactly two, comma-separated values - number,color - are required.",
+                        " either two or three, comma-separated values - number,color - are required.",
                         True,
                         True,
                     )
@@ -131,7 +131,9 @@ class XX18MarketObject(CoreStateObject):
                         True,
                         True,
                     )
-                colrs.get_color(acolor[1])  # raises error if color is invalid
+                colrs.get_color(acolor[1])  # raise error if color is invalid
+                if len(acolor) == 3:
+                    colrs.get_color(acolor[2])  # raise error if color is invalid
 
         if self.arrow and not isinstance(self.arrow, BaseShape):
             feedback(
@@ -155,13 +157,23 @@ class XX18MarketObject(CoreStateObject):
                 True,
             )
 
-    def get_color(self, color_number: str = None) -> object:
-        """Return a valid color from list supplied to object."""
+    def get_market_color(self, color_number: str = None) -> tuple:
+        """Return market color(s) based on key.
+
+        Args:
+            color_number (str): an integer or string used to ID the color(s)
+
+        Return:
+            tuple: length of 2; first is fill color and second is stroke color
+        """
         if color_number is not None:
             _color_number = tools.as_int(color_number, "color number")
             for acolor in self.market_colors:
                 if acolor[0] == _color_number:
-                    return acolor[1]
+                    if len(acolor) == 3:
+                        return (acolor[1], acolor[2])
+                    else:
+                        return (acolor[1], None)
         return "white"
 
     def get_label_xy(self, cell: object) -> tuple:
@@ -253,9 +265,9 @@ class XX18MarketObject(CoreStateObject):
         cell_x = col * self.width + self.x
         cell_y = row * self.height + self.y
         if color:
-            cell_color = self.get_color(color)
+            cell_color, stroke_color = self.get_market_color(color)
         else:
-            cell_color = self.fill
+            cell_color, stroke_color = self.fill, None
         # print(f"&&& CELL {row=} {col=} {value=} {color=} {arrow=} {border=}::")
 
         # ---- draw an empty cell
@@ -293,7 +305,7 @@ class XX18MarketObject(CoreStateObject):
             if value is None:
                 return
 
-        # ---- draw an outline
+        # ---- draw a cell
         rect = Rectangle(
             x=cell_x,
             y=cell_y,
@@ -314,7 +326,7 @@ class XX18MarketObject(CoreStateObject):
                 x=point.x,
                 y=point.y,
                 align=align,
-                stroke=self.font_stroke,
+                stroke=stroke_color or self.font_stroke,
                 font_size=self.font_size,
                 font_name=self.font_name,
             )
