@@ -1,6 +1,6 @@
-=============
-XX18 Commands
-=============
+============================
+XX18 Commands for 18xx-games
+============================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
@@ -34,10 +34,12 @@ will also help with understanding how an 18xx game board is created and used.
 
 - `XX18Market Command`_
 
+    -  `18xx Stock Markets`_
     - `XX18Market Summary`_
     - `XX18Market Properties`_
     - `XX18Market Values`_
-    - `XX18Market Arrows`_
+    - `XX18Market Value Attributes`_
+    - `XX18Market Value Color`_
     - `XX18Market Examples`_
 
 - `XX18State Command`_
@@ -1724,16 +1726,18 @@ XX18Market Command
 
 The ``XX18Market()`` command defines the Stock Market for an 18xx game.
 
+- `18xx Stock Markets`_
 - `XX18Market Summary`_
 - `XX18Market Properties`_
 - `XX18Market Values`_
-- `XX18Market Arrows`_
+- `XX18Market Value Attributes`_
+- `XX18Market Value Color`_
 - `XX18Market Examples`_
 
 
-.. _xx18MarketSummary:
+.. _xx18StockMarket:
 
-XX18Market Summary
+18xx Stock Markets
 ------------------
 `^ <xx18market-command_>`_
 
@@ -1759,22 +1763,30 @@ Stock Markets in different 18xx games have different:
 
 Cells in the grid can sometimes be annotated with a marker or text.
 
-The ``XX18Market()`` command can set:
+
+.. _xx18MarketSummary:
+
+XX18Market Summary
+------------------
+`^ <xx18market-command_>`_
+
+To create an 18xx-style Stock Market, the ``XX18Market()`` command
+can set:
 
 * a list of values for each of the Stock Market rows
 * fill and stroke color to be associated with specific cells
 * which cells require a border drawn around them
 * which cells should have an arrow (up or down) drawn in them.
 
-The command can accept the usual settings for the font details, to be used
-for the text values, as well the grid line colors and cell size.
+The command can accept the usual font settings to display the
+text values, as well as settings for the grid line colors and cells' size.
 
 Default arrow styles are "built-in", but it is possible to define custom
 :ref:`arrows <arrow-command>` and use these instead.
 
 Additional annotation, or construction of features, for a specific cell or
-cells in the grid can be done using cell geometry. This allow the vertices to
-be used to set shape locations relative to the board.
+cells in the grid can be done using cell geometry. This allow the cells'
+vertices to be used to position shapes at locations relative to the board.
 
 
 .. _xx18MarketProperties:
@@ -1783,28 +1795,30 @@ XX18Market Properties
 ---------------------
 `^ <xx18market-command_>`_
 
-The key properties that can be set for an ``XX18Market()`` command are:
+The properties that can be set for an ``XX18Market()`` command are:
 
 * *values* - a list with rows of values contained within strings
-* *value_direction* - where to locate the value within a cell; typically a
-  compass direction (defaults to the cell centre)
+* *values_direction* - where to locate the value within a cell; typically a
+  compass direction (defaults to the cell ``centre``)
+* *values_separator* - a single character used to separate individual values
+  in the *values* list (defaults to a space)
 * *market_colors* - a list of ``(number, fill, stroke)`` values, used to
-  define what colors may be used to fill cells
+  define what colors may be used to fill cells and color the text
 * *x* and *y* - set the location for the grid's top-left position
-* *height* - height of a rectanglar cell in the grid (defaults to ``1`` cm)
-* *width* - width of a rectanglar cell in the grid (defaults to ``1`` cm)
-* *stroke_width* - the default stroke width of a rectanglar cell in the grid
-* *fill* - the fill color of a rectanglar cell in the grid (defaults to ``white``)
-* *outline_stroke* - the stroke color for an outline of a rectanglar cell
-* *outline_width* - the stroke width for an outline of a rectanglar cell
+* *height* - height of a rectangular cell in the grid (defaults to ``1`` cm)
+* *width* - width of a rectangular cell in the grid (defaults to ``1`` cm)
+* *stroke_width* - the default stroke width of a rectangular cell in the grid
+* *fill* - the fill color of a rectangular cell in the grid (defaults to ``white``)
+* *outline_stroke* - the stroke color for an outline of a rectangular cell
+* *outline_width* - the stroke width for an outline of a rectangular cell
 * *font_stroke* - the font color for the values drawn in the cells
 * *font_size* - the font size for the values drawn in the cells
 * *font_name* - the font family for the values drawn in the cells
-* *arrow* - a **protograf** shape to use for other arrows (no default)
 * *arrow_up* - a **protograf** shape to use for arrows pointing up
-  (defaults to a simple line-plus-arrow)
+  (defaults to a simple line-with-arrowhead)
 * *arrow_down* - a **protograf** shape to use for arrows pointing down
-  (defaults to a simple line-plus-arrow)
+  (defaults to a simple line-with-arrowhead)
+* *arrow* - a **protograf** shape to use for other arrows (no default)
 
 
 .. _xx18MarketValues:
@@ -1815,13 +1829,148 @@ XX18Market Values
 
 The key property for an ``XX18Market()`` command is that of *values*.
 
+The values must be supplied as a list of strings of values.
 
-.. _xx18MarketArrows:
+A simple list could look like:
 
-XX18Market Arrows
------------------
+.. code:: python
+
+    values = [
+        "50  55  60  65  70  75  80",
+        "40  50  55  60  65  70",
+        "30  40  50  55  60",
+    ]
+
+As can be seen, each value in a row of values is separated by a space (or
+spaces; it does not matter).  A row of values like this will be split up and
+each value will then appear in a different **cell** in the Stock Market grid.
+
+It is also possible to use another character for the separator. This needs
+to be supplied as the *values_separator* property. For example, here the
+separator is set to be a semi-colon:
+
+.. code:: python
+
+    values_separator=';',
+    values = [
+        "50;55;60;65;70;75;80",
+        "40;50;55;60;65;70",
+        "30;40;50;55;60",
+    ]
+
+The start of some rows is offset.  In this case, you need to supply a "dummy"
+character to indicate that there are cells that do not contain a value and
+should not be drawn. The dummy character can be a ``0`` or a ``~`` (tilde).
+For example, here the first two rows are offset:
+
+.. code:: python
+
+    values = [
+        " ~  ~ 60 65 70 75 80",
+        " ~ 50 55 60 65 70",
+        "30 40 50 55 60",
+    ]
+
+The values are usually numeric, but do not have to be and this is not
+enforced in any way; a value of ``$20`` could be used as well as the more
+common ``20``.
+
+
+.. _xx18MarketValueAttributes:
+
+XX18Market Value Attributes
+---------------------------
 `^ <xx18market-command_>`_
 
+While many cells in an 18xx-type Stock Market grid simply contain a value,
+there are others whose display is "enhanced" in some way.
+
+The ``XX18Market()`` command supports three kinds of cell attributes to create
+this "enhancement":
+
+- *color* - the fill (and, optional, stroke) color for the cell
+- *arrow* - draw an arrow inside the cell
+- *border* - draw an outline around the cell
+
+These three attributes can be remembered by the acronymn **"CAB"** |dash| for
+**c**\ olor; **a**\ rrow, and **b**\ order.
+
+To set a color, the ``XX18Market()`` command will require the *market_colors*
+property to be set so that a number can be used for |dash| see the details for
+this is in `XX18Market Value Color`_.
+
+To draw an arrow, either use the character ``u`` for an up-arrow, or
+``d`` for a down-arrow.  The arrow will either be drawn in the default style,
+as can be seen in `Example 4. Default Arrows for Stock Market`_
+or it can reference a custom-created one, as can be seen in
+`Example 5. Custom Arrows for Stock Market`_.
+
+To draw a border, simply use the ``o`` character. The color and thickness
+can be set by ``outline_stroke`` and ``outline_width`` respectively.
+
+The cell attributes are added as a short list of values, separated by commas,
+directly after the value itself. The list can be shorter than all three if
+only the color is needed; but must include the commas if, say, only a border
+is needed.
+
+For example, for just a color:
+
+.. code:: python
+
+    values = [
+        "30,1 40 45 55 60",
+        "20,2 25 35 40 50",
+    ]
+
+Here the ``30`` has the color number ``1`` and  ``20`` has the color
+number ``2`` assigned.
+
+For example, for a border or border and color:
+
+.. code:: python
+
+    values = [
+        "30,,,o 40 45 55 60",
+        "20,2,,o 25 35 40 50",
+    ]
+
+Here the ``30`` has a border activated via the ``o`` and ``20`` has the color
+number ``2`` assigned and also has a border activated.  In both cases, three
+commas are needed.
+
+
+.. _xx18MarketValueColor:
+
+XX18Market Value Color
+----------------------
+`^ <xx18market-command_>`_
+
+As described in `XX18Market Value Attributes`_, different colors can be
+set for different cells, by assigning them a number attribute.
+
+This number must be defined by the *market_colors* property, which is
+a list of ``(number, fill, stroke)`` values, used to specify what colors
+may be used to fill-in the cells and also the color of the font used for
+the value text.
+
+The ``stroke`` value is optional, but the ``fill`` value should always
+be supplied. For example:
+
+.. code:: python
+
+    market_colors=[(1, "lime"), (2, "sienna", "white"), (3, "gold")]
+
+As can be seen *market_colors* set consists of a number (an integer), and
+at least one color value.  The first color is to fill the cell; the second
+is the one used for the font stroke of the value of that cell.
+
+For this example:
+
+* the color set of ``(1, "line")`` means that all cells
+  referring to ``1`` will be filled with a green color; and
+* the color set of ``(2, "sienna", "white")`` means that all cells
+  referring to ``2`` will be filled with a brown color and the value
+  will be drawn with a white font color.
 
 
 .. _xx18MarketExamples:
@@ -1830,15 +1979,16 @@ XX18Market Examples
 -------------------
 `^ <xx18market-command_>`_
 
-The basic structure for working with a Stock Market follows this pattern:
+The basic script structure for working with an 18xx-type Stock Market
+in a script follows this pattern:
 
 .. code:: python
 
     xgp = XX18Market()
     XX18State(market=xgp)
 
-However; in this speciifc case, nothing will be seen because the *values*
-property has not been set.
+However; in this specific case, nothing will be seen because the *values*
+property has not been set, so there is nothing to draw!
 
 The following examples illustrate how different propeties can be set to
 style the Stock Market.
@@ -1878,7 +2028,14 @@ Example 1. Unstyled Stock Market
 
 ===== ======
 
-For this example, the only property set is *values*.
+For this example, the only property set is *values*.  This data is used to
+define how many rows are in the grid and how long each row is.
+
+As explained in `XX18Market Values`_, using a ``0`` at the start of a row
+results in an "empty" and undrawn cell.
+
+This grid is completely unstyled so is just drawn with the default cell sizes,
+fonts, strokes and colors.
 
 
 Example 2. Sized Stock Market
@@ -1896,8 +2053,8 @@ Example 2. Sized Stock Market
         xgs = XX18Market(
             x=0, y=0,
             height=1.5, width=2,
-            font_name='Times-Roman',
             stroke_width=1,
+            font_name='Times-Roman',
             values=[
                 " 0  0 90 100 110 120 135 150 170",
                 " 0 75 80  90 100 110 120 135 150",
@@ -1913,7 +2070,13 @@ Example 2. Sized Stock Market
 
 ===== ======
 
-For this example,
+For this example, the *height* and *width* of each cell is set (in ``cm`` as
+for all XX18 commands!), and the lines for the grid are drawn with a
+*stroke_width* of ``1`` point.  The grid itself is placed to start right next
+to the left and top margins, although it may appear offset if no cells are
+drawn close to that position.
+
+The cell values are all drawn in ``Times Roman`` font.
 
 
 Example 3. Colors and Borders for Stock Market
@@ -1935,7 +2098,7 @@ Example 3. Colors and Borders for Stock Market
             stroke_width=1,
             fill="bisque",
             market_colors=[(1, "sienna", "white"), (2, "lime"), (3, "gold")],
-            value_direction='sw',
+            values_direction='sw',
             values=[
             " 0  0 90 100 110 120 135 150 170",
             " 0 75 80  90,,,o 100 110 120 135 150",
@@ -1951,37 +2114,12 @@ Example 3. Colors and Borders for Stock Market
 
 ===== ======
 
-For this example, a number of new properties have ben changed:
+For this example, a number of new properties have been set:
 
-- *fill* is set to ``"bisque"`` so all cells are, by default, drawn in a
+- *fill* is set to ``"bisque"`` so all cells are, by default, filled in a
   green color
-- *market_colors* is assigned to a list of sets; values wrapped in ``(...)``
-  brackets
-
-Each *market_colors* set consists of a number (an integer), and at least
-one color value.  If only one color value is provided, then this is the
-color to be used to fill a cell; if two color values are provided, then
-the first is the color to be used to fill a cell and the second is the one
-used for the font stroke of the value of that cell.  For example, a color
-set of ``(1, "sienna", "white")`` means that all cells referring to ``1``
-will be filled with a brown color and the value will drawn with a white
-font color.
-
-The set of items that can appear along with a market value, are used for
-up to three different properties of that cell.  They appear after the cell
-value and are separated by commas.  There can be up to three items, which
-can be remembered by the acronymn **"CAB*""** |dash| **c**olor; **a**rrow,
-and **b**order. These are used as follows:
-
-- *color* is the **number** of the color by which the cell must be filled;
-  this number refers to associated color, which is extracted from the
-  *market_colors* set (described above)
-- *arrow* is either ``u`` for an upwards-facing arrow, ``d`` for a
-  downwards-facing arrow, and ``a`` for another type of arrow; see
-  `Example 4. Default Arrows for Stock Market`_
-- *border* is a signal to draw a border, of the color and thickness
-  set by ``outline_stroke`` and ``outline_width`` respectively; any
-  letter can be used to signal this
+- *market_colors* is assigned to a list of sets; the set values being wrapped
+  in ``(...)``  brackets
 
 
 Example 4. Default Arrows for Stock Market
@@ -2001,7 +2139,7 @@ Example 4. Default Arrows for Stock Market
             height=1.5, width=2,
             font_name='Times-Roman',
             stroke_width=1,
-            value_direction='se',
+            values_direction='se',
             values=[
             " 0  0 90 100 110 120 135 150 170",
             " 0 75 80  90 100 110 120 135 150,,u",
@@ -2021,12 +2159,13 @@ For this example, a number of cells' values have been "annotated" to draw
 arrows.
 
 The annotation follows the "CAB" style described above.  The "A" in "CAB"
-is short for "Arrow" and so it is the second item attached to a value
-that represents that item, For example, ``40,,d`` - represents the *value*
-``40``, followed by nothing for the *color*, followed by a ``u`` to signify
-an up arrow. Similarly, ``70,,d`` - represents the *value* ``70``,
-followed by nothing for the *color*, followed by a ``d`` to signify a down
-arrow.
+is the mnemonic for **a**\ rrow" and so it is the second item, in the
+comma-separated list attached to a value, that represents that thing.
+
+For example, ``40,,d`` - represents the *value* ``40``, followed by nothing
+for the *color*, followed by a ``d`` to signify a *down arrow*. Similarly,
+``70,,u`` represents the *value* ``70``, followed by nothing for the *color*,
+followed by a ``u`` to signify an *up arrow*.
 
 
 Example 5. Custom Arrows for Stock Market
@@ -2058,7 +2197,7 @@ Example 5. Custom Arrows for Stock Market
             height=1.5, width=2,
             font_name='Times-Roman',
             stroke_width=1,
-            value_direction='s',
+            values_direction='s',
             arrow_up=arr_up,
             arrow_down=arr_down,
             values=[
@@ -2076,7 +2215,7 @@ Example 5. Custom Arrows for Stock Market
 
 ===== ======
 
-This example builds on`Example 4. Default Arrows for Stock Market`_.
+This example builds on `Example 4. Default Arrows for Stock Market`_.
 
 In this case, the default arrows are replaced by custom ones that must
 be created and named before the ``XX18Market()`` command is used.
@@ -2084,7 +2223,10 @@ be created and named before the ``XX18Market()`` command is used.
 In the example, ``arr_up`` and ``arr_down`` are created and styled using
 the **protograf** :ref:`arrow <arrow-command>` command. It can be seen that
 the :ref:`Common <the-common-command>` command is used to set the properties
-applicable to both the up and down arrows.
+applicable to both the up- and down-arrows.
+
+Once created they can be used in ``XX18Market()`` command, by being assigned
+to the properties *arrow_up* and *arrow_down*.
 
 
 Example 6. Annotated Stock Market
@@ -2116,7 +2258,7 @@ Example 6. Annotated Stock Market
             height=1.5, width=2,
             font_name='Times-Bold',
             stroke_width=1,
-            value_direction='s',
+            values_direction='s',
             fill="ivory",
             market_colors=[(1, "sienna"), (2, "lime"), (3, "gold")],
             arrow_up=arr_up,
@@ -2134,8 +2276,6 @@ Example 6. Annotated Stock Market
         )
         XX18State(market=xgf)
 
-        Text("Initial", xy=xgf.D3.c, stroke="firebrick")
-        Image("images/king.png", x=xgf.I1.c.x, y=xgf.I1.c.y - 0.9)
         Polyshape(points=[
             xgs.A1.nw,
             xgs.B1.ne, xgs.B1.se, xgs.B1.sw,
@@ -2143,6 +2283,10 @@ Example 6. Annotated Stock Market
             ],
             fill="silver",
             stroke=None)
+        Image("images/king.png", x=xgf.I1.c.x, y=xgf.I1.c.y - 0.9)
+        Text("Initial", xy=xgf.D3.c, stroke="firebrick")
+
+       xgf.csv_values("xgf.csv", ";")
 
 ===== ======
 
@@ -2152,16 +2296,25 @@ This example is a compilation of all the previous examples into a single
 The only new feature is the demonstration of using **protograf** shape
 commands to overlay other items on, or next to, the grid.
 
-The :ref:`Polyshape <polyshape-command>` command draws a series of points
-and then fills in the area with a ``silver`` color.  The points are all
-specfied using the ``GRID.CELL.COMPASS`` notation.  The  ``GRID`` refers
-to the name assigned to the ``XX18Market`` grid |dash| in this case it
-is ``xgf``; the ``CELL`` refers to a single cell in the grid using an
-Excel-like notation, with letters for columns and numbers for rows; and
-the ``COMPASS`` references a vertex point on the cell (includig ``c`` for
-its centre).
+.. IMPORTANT::
 
-.. NOTE::
+    Any shape commands that reference the grid cells' geometries can only
+    be used in the script **after** the ``XX18State()``` command is used
+    to draw that grid.
+
+The :ref:`Polyshape <polyshape-command>` command draws a series of points
+and then fills in the area with a ``silver`` color.  The *points* in this
+shape are all specified using the ``GRID.CELL.COMPASS`` notation:
+
+* ``GRID`` refers to the name assigned to the ``XX18Market`` grid |dash|
+  in this case it is ``xgf``;
+* ``CELL`` refers to a single cell in the grid using an Excel-like notation,
+  with letters for columns and numbers for rows; and
+* ``COMPASS`` references a point on the cell edge determined by a
+  :ref:`compass direction<termsDirection>` |dash| also including ``c``
+  to refer the cell's centre.
+
+.. HINT::
 
     Even though a cell might not be drawn on the grid, its geometry is still
     available for use with the ``GRID.CELL.COMPASS`` notation.
@@ -2173,6 +2326,36 @@ in this case, slighly offset from the centre of cell ``I1``.  Here the
 
 The :ref:`Text <text-command>` command simply draws text; in this case,
 centred on the centre of cell ``D3``.
+
+Bonus: Export Values to csv
++++++++++++++++++++++++++++
+
+One final "extra" shown here is that you can extract the *values* from
+those provided to ``XX18Market`` by making use of the built-in
+``csv_values`` function.
+
+You can supply a filename and CSV separator if needed; otherwise
+these will default to: the name of your script but with a ``.csv``
+extension; and the use of a ``,`` for the value delimiter.
+
+The short rows will be "padded out" with null values, so that all the lines
+are the same length.
+
+For this example, the ``xgf.csv`` CSV file would contain:
+
+.. code:: text
+
+    ;;90;100;110;120;135;150;170
+    ;75;80;90;100;110;120;135;150
+    65;70;75;80;90;100;110;120;135
+    60;65;70;75;80;90;100;110;120
+    55;60;65;70;75;80;90;;
+    50;55;60;65;70;75;80;;
+    40;50;55;60;65;70;;;
+    30;40;50;55;60;;;;
+
+
+Note there is no header row in the file.
 
 
 .. _xx18state-command:
@@ -2215,7 +2398,9 @@ create the game Map, Tiles and Tile Manifest, Tokens and Charters, Tokens
 
 Another useful tool to generate files for Charters, Privates, Shares,
 Station Markers, Trains, and (linear) Stock Markets is *xxpaper*, which is
-available at https://pypi.org/project/xxpaper/
+available at https://pypi.org/project/xxpaper/  It could be helpful to
+read the discussions at
+https://boardgamegeek.com/thread/1023598/xxpaper-a-tool-for-generating-charters-privates-sh/
 
 For helping to build an interesting and challenging Stock Market, this tool
 may be of use: https://github.com/Galatolol/market_heatmap

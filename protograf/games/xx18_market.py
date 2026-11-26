@@ -25,13 +25,16 @@ Cells in the grid can sometimes be annotated with a marker or text.
 """
 
 # lib
+import csv
+import os
+from pathlib import Path
 
 # third party
 
 # module
 from protograf import globals
 from protograf.base import BaseShape
-from protograf.utils import tools, colrs, geoms
+from protograf.utils import tools, colrs
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (  # named tuples; enums
     Point,
@@ -40,6 +43,8 @@ from protograf.utils.tools import _lower
 
 # local
 from .core_state import CoreStateObject
+
+NULL_MARKET_VALUES = ["0", None, "", "~"]
 
 
 class XX18MarketObject(CoreStateObject):
@@ -53,15 +58,16 @@ class XX18MarketObject(CoreStateObject):
         # outline_stroke, outline_width for cell: derived from BaseShape properties
         # font_size, font_name for text: derived from BaseShape properties
         # ---- unique properties
+        self.game_class = "XX18Market"
         self.values = (
             self._commons("values") or kwargs.get("values") or []
         )  # 20,1,u,b => value:20; color:1 in market_colors; u:arrow; b:has border/outline
-        if not isinstance(self.values, (list, tuple)):
-            feedback
-        self.game_class = "XX18Market"
-        self.value_direction = (
-            self._commons("value_direction") or kwargs.get("value_direction") or "c"
+        self.values_direction = (
+            self._commons("values_direction") or kwargs.get("values_direction") or "c"
         )  # where label is drawn
+        self.values_separator = (
+            self._commons("values_separator") or kwargs.get("values_separator") or " "
+        )  # character between different market values
         self.font_stroke = (
             self._commons("font_stroke") or kwargs.get("font_stroke") or "black"
         )  # used to draw cell values
@@ -77,20 +83,28 @@ class XX18MarketObject(CoreStateObject):
         self.arrow_up = (
             self._commons("arrow_up") or kwargs.get("arrow_up") or None
         )  # edge arrow - referenced as 'u'
+        self.values_for_export = []  # a list-of-lists of clean values
         # ---- final check
         self.validate_settings()
 
     def validate_settings(self):
         """Ensure correct values are set for properties."""
-        if self.value_direction:
-            if not isinstance(self.value_direction, str):
+        if not isinstance(self.values, (list, tuple)):
+            feedback(
+                "The values are invalid for the XX18Market;",
+                " a list of strings is required.",
+                True,
+                True,
+            )
+        if self.values_direction:
+            if not isinstance(self.values_direction, str):
                 feedback(
-                    f'The value_direction "{self.value_direction}" is invalid',
+                    f'The values_direction "{self.values_direction}" is invalid',
                     " for the XX18Market; a string is required.",
                     True,
                     True,
                 )
-            if _lower(self.value_direction) not in [
+            if _lower(self.values_direction) not in [
                 "c",
                 "n",
                 "ne",
@@ -102,7 +116,7 @@ class XX18MarketObject(CoreStateObject):
                 "w",
             ]:
                 feedback(
-                    f'The value_direction "{self.value_direction}" is invalid',
+                    f'The values_direction "{self.values_direction}" is invalid',
                     True,
                     True,
                 )
@@ -172,8 +186,7 @@ class XX18MarketObject(CoreStateObject):
                 if acolor[0] == _color_number:
                     if len(acolor) == 3:
                         return (acolor[1], acolor[2])
-                    else:
-                        return (acolor[1], None)
+                    return (acolor[1], None)
         return "white"
 
     def get_label_xy(self, cell: object) -> tuple:
@@ -192,7 +205,7 @@ class XX18MarketObject(CoreStateObject):
         y_g_t = self.font_size / globals.units * 1
         y_g_b = self.font_size / globals.units / 2.0
         y_g_o = self.font_size / globals.units / 4.0
-        location = self.value_direction if self.value_direction else "c"
+        location = self.values_direction if self.values_direction else "c"
         _value = _lower(location)
         match _value:
             case "c":
@@ -231,12 +244,39 @@ class XX18MarketObject(CoreStateObject):
                 )
         return align, point
 
+    def csv_values(self, filename: str = None, delimiter: str = ","):
+        """Export the values for the Stock Market as a CSV file.
+
+        Args:
+            filename (str): name of the CSV file
+            delimiter (str): character to insert between each value
+        """
+        # ---- set default filename
+        if not filename:
+            _filename = f"{Path(__file__).stem}.csv"
+            if globals.pargs.directory:
+                filename = os.path.join(globals.pargs.directory, _filename)
+            else:
+                directory = Path.cwd()
+                filename = directory / _filename
+        if self.values_for_export:
+            # ---- pad the list for export
+            max_len = 0
+            for row in self.values_for_export:
+                max_len = len(row) if len(row) > max_len else max_len
+            _values_for_export = []
+            for row in self.values_for_export:
+                _values_for_export.append(row + [None] * (max_len - len(row)))
+            # ---- write to file
+            with open(filename, mode="w", newline="", encoding="utf-8") as file:
+                writer = csv.writer(file, delimiter=delimiter)
+                writer.writerows(_values_for_export)
+
     def draw_cell(
         self,
         row: int,
         col: int,
         value: str = None,
-        location: str = None,
         color: str = None,
         arrow: str = None,
         border: bool = False,
@@ -248,7 +288,6 @@ class XX18MarketObject(CoreStateObject):
             row (int): the row number in which the cell appears
             col (int): the column number in which the cell appears
             value (str) : the value to draw as text in the cell
-            location (str) : the place within the cell to draw text
             color (str): the color number for a color set
             arrow (str): an arrow setting: u (up), d (down), a (arrow)
             border (bool): whether or not a border/outline must be drawn
@@ -343,16 +382,21 @@ class XX18MarketObject(CoreStateObject):
                             True,
                         )
                         return
-                    else:
-                        off_x = getattr(self.arrow_down, "offset_x", 0.0)
-                        off_y = getattr(self.arrow_down, "offset_y", 0.0)
-                        cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
-                        cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
-                        self.arrow.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True)
+                    off_x = getattr(self.arrow_down, "offset_x", 0.0)
+                    off_y = getattr(self.arrow_down, "offset_y", 0.0)
+                    cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
+                    cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
+                    self.arrow.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True)
                 case "d":
                     if not self.arrow_down:
                         xa = rect.geo.w.x + rect.geo.width / 10.0
-                        if _lower(self.value_direction) in ["s", "se", "sw", "c", "ne"]:
+                        if _lower(self.values_direction) in [
+                            "s",
+                            "se",
+                            "sw",
+                            "c",
+                            "ne",
+                        ]:
                             ya = rect.geo.n.y + rect.geo.height / 10.0
                         else:
                             ya = rect.geo.w.y - rect.geo.height / 10.0
@@ -376,7 +420,7 @@ class XX18MarketObject(CoreStateObject):
                 case "u":
                     if not self.arrow_up:
                         xa = rect.geo.e.x - rect.geo.width / 10.0
-                        if _lower(self.value_direction) in ["se"]:
+                        if _lower(self.values_direction) in ["se"]:
                             ya = rect.geo.e.y + rect.geo.height / 10.0
                         else:
                             ya = rect.geo.s.y - rect.geo.height / 10.0
@@ -418,12 +462,20 @@ class XX18MarketObject(CoreStateObject):
         border_cells = []
         # ---- validate and draw the market values
         for row, value in enumerate(self.values):
-            row_values = tools.split(value, separator=" ", clean=True, no_blanks=True)
+            current_row_list = []
+            row_values = tools.split(
+                value, separator=self.values_separator, clean=True, no_blanks=True
+            )
             # ---- draw the cells
             for col, row_val in enumerate(row_values):
                 _items = tools.split(
                     row_val, separator=",", clean=True, no_blanks=False
                 )
+                value = _items[0]
+                if value in NULL_MARKET_VALUES:
+                    current_row_list.append(None)
+                else:
+                    current_row_list.append(value)
                 items = _items + [None] * (4 - len(_items))
                 _border = True if items[3] else False
                 _color = items[1] if items[1] else None
@@ -433,12 +485,13 @@ class XX18MarketObject(CoreStateObject):
                 self.draw_cell(
                     row=row,
                     col=col,
-                    value=items[0],
+                    value=value,
                     color=_color,
                     arrow=items[2],
                     border=_border,
                     **kwargs,
                 )
+            self.values_for_export.append(current_row_list)
         # ---- redraw cells with border/outline
         for cell in border_cells:
             self.draw_cell(
