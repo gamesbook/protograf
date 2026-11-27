@@ -22,17 +22,6 @@ xgp = XX18Market()
 XX18State(market=xgp)
 
 the_values=[
-    " 0  0 90 100 110 120 135 150 170",
-    " 0 75 80  90 100 110 120 135 150",
-    "65 70 75  80  90 100 110 120 135",
-    "60 65 70  75  80  90 100 110 120",
-    "55 60 65  70  75  80  90",
-    "50 55 60  65  70  75  80",
-    "40 50 55  60  65  70",
-    "30 40 50  55  60",
-]
-
-the_values=[
 "0;0;90;100;110;120;135;150;170",
 "0;75;80;90;100;110;120;135;150",
 "65;70;75;80;90;100;110;120;135",
@@ -171,7 +160,7 @@ xgf = XX18Market(
     font_name='Times-Bold',
     stroke_width=1,
     values_direction='s',
-    fill="ivory",
+    fill="pearl",
     market_colors=[(1, "sienna", "white"), (2, "lime"), (3, "gold")],
     arrow_up=arr_up,
     arrow_down=arr_down,
@@ -199,8 +188,54 @@ Polyshape(points=[
     stroke=None)
 
 # ---- * export CSV data
-# xgf.csv_values("xgf.csv", ";")
-xgf.csv_values()
+# xgf.csv_values()
+xgf.csv_values("xgf.csv", ";")
+
+
+# ---- XX18Market: Overlay
+PageBreak()
+Text("XX18Market: Overlay", common=header)
+
+setup = Common(
+    x=0, y=0,
+    height=1.5, width=2,
+    font_name='Times-Roman',
+    stroke_width=1,
+    )
+xgul = XX18Market(
+    common=setup,
+    values_direction='nw',
+    fill="bisque",
+    values=[
+        " 0  0 90 100 110 120 135 150 170",
+        " 0 75 80  90 100 110 120 135 150",
+        "65 70 75  80  90 100 110 120 135",
+        "60 65 70  75  80  90 100 110 120",
+        "55 60 65  70  75  80  90",
+        "50 55 60  65  70  75  80",
+        "40 50 55  60  65  70",
+        "30 40 50  55  60",
+    ]
+    )
+XX18State(market=xgul)
+
+xgov = XX18Market(
+    common=setup,
+    values_direction='se',
+    fill=None,
+    font_stroke="red",
+    values=[
+        " 0  0 75 80 90 100 110 120 135",
+        " 0 65 70 75 80  90 100 110 120",
+        "55 60 65 70 75  80  90 100 110",
+        "50 55 60 65 70  75  80  90 100",
+        "45 50 55 60 65  70  75",
+        "30 40 50 55 60  65  70",
+        "25 30 40 50 55  60",
+        "20 30 40 50 55",
+    ]
+)
+XX18State(market=xgov)
 
 # ---- XX18Market: zzz
 PageBreak()
@@ -222,6 +257,7 @@ Save(
         'xx18_market_arrows_default',
         'xx18_market_arrows_custom',
         'xx18_market_full',
+        'xx18_market_overlay',
         'xx18_market_zz',
     ]
 )

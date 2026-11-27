@@ -88,6 +88,8 @@ CSS_COLOR_NAMES = {
     "internationalorange": "#FF5202",
     "lochmara": "#0D81C0",  # 18xx lake blue
     "lynch": "#627890",
+    "pearl": "#EAE0C8",
+    "pearlbush": "#E3DFD5",
     "sage": "#9CAA90",
     "sail": "#C1E6FD",  # 18xx sea blue
     "spindle": "#ADCBF4",
