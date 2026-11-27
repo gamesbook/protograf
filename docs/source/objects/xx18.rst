@@ -68,7 +68,7 @@ the games in the series and the prototyping capability provided here is modeled
 primarily after that design.
 
 
-.. _xx18Over:
+.. _xx18Over::
 
 Overview
 ========
@@ -96,7 +96,12 @@ The ``XX18State`` command will, when supplied with a previously defined
 when supplied with a previously defined ``XX18Market``, it will draw the
 Stock Market grid.
 
+.. IMPORTANT::
 
+    Unlike almost all other elements in **protograf**, the ones in the
+    XX18 set are all designed to be drawn use using ``cm``.  If you switch
+    to another type of unit, there is no guarantee that they will be drawn
+    correctly.
 
 
 .. _xx18game-command:
@@ -1292,6 +1297,37 @@ The ``XX18Game()`` command comes with functions that allow creation of
 features without using the ``features`` property itself.  These functions,
 in some cases, allow further customisation than is otherwise possible.
 
+The full list of functions, and their allowed properties, are supplied in
+`XX18Game Function Options`_.
+
+Functions should be accessed **after** the ``XX18State()`` in the script.
+
+Functions are the sections of code that ``XX18Game()`` uses internally to
+draw the various features; essentially, the *features* property just passes
+in the correct values to those functions.
+
+The way to reference these functions is by appending their name to the name
+assigned to the ``XX18Game()`` command; so, for example,
+``xgffn.hex_fill()``.  The properties for that function are then supplied
+between the ``()`` brackets; these values should look similar to the ones
+already described earlier for that feature.
+
+Functions can also support additional properties that would normally
+be assigned to their "underlying" shape.  For example:
+
+* The size of a ``symbol`` can be changed by altering its *height* and/or
+  *width* properties.
+* The size of feature labels can be changed by setting their *label_size*
+  property; either a descriptive name |dash| ``xsmall``, ``small``,
+  ``medium``, ``large``,  ``xlarge``, ``xxlarge`` |dash| or an actual
+  point size value.
+
+Below are two examples showing how functions can be used.
+
+
+Example 1: Assorted Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. |xgn| image:: ../images/objects/xx18_functions.png
    :width: 330
 
@@ -1314,9 +1350,7 @@ in some cases, allow further customisation than is otherwise possible.
         xgffn.phase_revenue(
             'C5', '30 40 50', 0, 0.3, 'vertical',
             colors=['xbrown','xgrey','pink'])
-        xgffn.block(
-            'B4', 'ne n nw',
-            dotted=True)
+
         xgffn.track(
             'A5 B6',
             position='ne,sw',
@@ -1324,6 +1358,18 @@ in some cases, allow further customisation than is otherwise possible.
         xgffn.track_edge(
             'A3', 'nw', 30, .3, 0,
             color='purple'),
+
+        xgffn.block(
+            'B4', 'ne n nw',
+            dotted=True)
+        xgffn.block(
+            'C7', 'sw nw n',
+            stroke="sienna",
+            stroke_width=15,
+            stroke_transparency="50")
+
+        xgffn.private(
+            'A1', 15, 0.7, 'A1', 160, 0.5, 'A&B', 'below', curve=0.2)
         xgffn.private(
             'B2', 15, 0.7,  'B2', 140, 0.4, 'C&C', 'left',
             color="orange",
@@ -1331,6 +1377,7 @@ in some cases, allow further customisation than is otherwise possible.
         xgffn.private(
             'B2', 15, 0.7, 'C3', 280, 0.6,
             color="orange")
+
         xgffn.symbol(
             location='A7', name='desert',
             height=2.5, width=2.5,
@@ -1342,38 +1389,93 @@ in some cases, allow further customisation than is otherwise possible.
 
 ===== ======
 
-Functions should be accessed **after** the ``XX18State()`` in the script.
-
-Functions are the sections of code that ``XX18Game()`` uses internally to
-draw the various features; essentially, its *features* property just passes
-in the correct values to those functions.
-
-The way to reference these functions is by appending their name to the name
-assigned to the ``XX18Game()`` command; so, for example,
-``xgffn.hex_fill()``.  The properties for that function are then supplied
-between the ``()`` brackets; these values should look similar to the ones
-already described earlier for that feature.
-
-Functions can also support additional properties that would normally
-be assigned to their "underlying" shape. For example, the *block* in
-``B4`` is a just a :ref:`line <line-command>` and so its style can be
-changed |dash| in this case to ``dotted``.
+The ``spike`` color can be changed as shown in ``C5``.
 
 For the ``track`` and ``track_edge`` functions, use of the color property
 allows the track's default color |dash| usually ``black`` |dash| to be
-overridden. It is also possible to color the ``private`` railroads
-circles, as is shown in ``B2`` and ``C3``.  The ``spike`` color can be
-changed as shown in ``C5``.
+overridden.
 
-The size of a ``symbol`` can be changed by altering its *height* and/or
-*width* properties.
+The ``block`` function used for ``B4`` actually just references a
+:ref:`line <line-command>`, and so its style can be changed |dash|
+in this case to ``dotted``.  In addition, other line properties can
+be set, as can be seen in ``C7``; here the *stroke*, *stroke_width*,
+and *stroke_transparency* are all used to create a different looking
+``block`` along the hexagon edge.
 
-The size of feature labels can be changed by setting their *label_size*
-property; either a descriptive name |dash| xsmall, small, medium, large,
-xlarge, xxlarge |dash| or an actual point size value.
+The ``private`` functions shows how the *label_size* for that feature
+can made larger, and how the fill colors for the railroads circles can
+be set by the *color* property, as is shown in ``B2`` and ``C3``.
 
-The full list of functions, and their allowed properties, are supplied in
-`XX18Game Function Options`_.
+The ``private`` function for ``A1`` shows how the line can be made to
+"bend" by setting the ``curve`` value to indicate the height of the
+bend.  A negative value will invert the direction of the bend; but be
+aware that this property setting may clash with the label placement.
+
+The ``symbol`` function allows the image size to be changed by altering the
+*height* and/or *width* properties.  Similarly, the *label_size* can be set.
+
+
+.. _xx18GameTrackStylingFunctions:
+
+Example 2: Track Styling Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. |xgs| image:: ../images/objects/xx18_functions_track_style.png
+   :width: 330
+
+===== ======
+|xgs| This example shows using feature functions for an ``XX18Game``:
+
+      .. code:: python
+
+        xgtsf = XX18Game(
+            rows=4, cols=3,
+            fill='berylgreen',
+            label=True,
+            label_size=18,
+            orientation='flat',
+        )
+        XX18State(board=xgtsf)
+
+        xgtsf.track(
+            'A1 B2', position='nw,se', style="dashed")
+        xgtsf.track(
+            'C3', position='ne,n', color="blue", style="dashed")
+        xgtsf.track_edge(
+            'A3', 'nw', 30, .3, 0, style="dashed")
+        xgtsf.track(
+            'B4', position='sw,ne', town="middle", color=None, style="dashed")
+
+        xgtsf.track(
+            'A5 B6', position='nw,se', style="thin")
+        xgtsf.track(
+            'C7', position='ne,n', style="thin")
+        xgtsf.track_edge(
+            'A7', 'nw', 30, .3, 0, color="red", style="thin")
+        xgtsf.track(
+            'B8', position='sw,ne', town="middle", color=None, style="thin")
+
+===== ======
+
+For the ``track`` and ``track_edge`` functions, in addition to the use of the
+*color* property to override the track's default color, the *style* can also
+be set.
+
+The top half of the examples here show when "normal" track is set to be
+``dashed`` by setting ``style="dashed"``. This effectively adds a series of
+equally spaced blocks which, by default, are ``white``. The example in ``C3``
+shows how setting the *color* to override the track's default demonstrates
+that it is the color of the "gap" between the blocks that is visible.
+
+The lower half of the examples here show when "normal" track is set to be
+``thin`` by setting ``style="thin"``.  This simply changes the width of
+the outer |dash| usually ``white`` |dash| and the inner |dash| usually
+``black`` |dash| lines used to draw the track. The example in ``A7``
+shows how setting the *color* will also override a thin track's default.
+
+It can be seen that size of the town rectangle drawn on the track does not
+change when its *style* is set to ``thin``.
+
 
 
 .. _xx18GameAdHocDrawing:
@@ -1585,16 +1687,21 @@ the ``XX18Game()`` command, that be changed in a JSON file; see
 * ``"XX18_REVENUE_STROKE"`` - default is ``black"``; in-hex revenue circle stroke color
 * ``"XX18_REVENUE_FILL"`` - default is ``None``; in-hex revenue circle fill color
 * ``"XX18_TRACK_INNER_WIDTH"`` - default is ``0.4`` cm; width of outer, white track
-* ``"XX18_TRACK_OUTER_WIDTH"`` - default is ``0.5`` cm; width of black track
-* ``"XX18_TRACK_OUTER_FILL"`` - default is ```white``; edge color
+* ``"XX18_TRACK_OUTER_WIDTH"`` - default is ``0.5`` cm; width of inner, black track
+* ``"XX18_TRACK_DASHED_WIDTH"`` - default is ``0.3`` cm; width of dashed track
+* ``"XX18_TRACK_INNER_THIN_WIDTH"`` - default is ``0.1`` cm; width of outer, white, thin track
+* ``"XX18_TRACK_OUTER_THIN_WIDTH"`` - default is ``0.15`` cm; width of inner, black thin track
+* ``"XX18_TRACK_INNER_FILL"`` - default is ``black``; track inner color
+* ``"XX18_TRACK_OUTER_FILL"`` - default is ``white``; track outer color
+* ``"XX18_TRACK_DASHED_FILL"`` - default is ``white``; track dashes color
 * ``"XX18_MOUNTAIN_SIDE"`` - default is ``0.6`` cm; side of the triangle
 * ``"XX18_MOUNTAIN_FILL"`` - default is ``black``; color inside the triangle
 * ``"XX18_SPIKE_FRACTION_SHORT"`` - default is ``0.1``; fraction of hexagon diameter
-    for a short spike
+  for a short spike
 * ``"XX18_SPIKE_FRACTION_MEDIUM"`` - default is ``0.25``; fraction of hexagon diameter
-    for a medium spike
+  for a medium spike
 * ``"XX18_SPIKE_FRACTION_LONG"`` - default is ``0.45``; fraction of hexagon diameter
-    for a long spike
+  for a long spike
 * ``"XX18_SPIKE_BASE_INNER"`` - default is ``0.4`` cm; matches width of black track
 * ``"XX18_SPIKE_BASE_OUTER"`` - default is ``0.5`` cm; matches width of white track
 * ``"XX18_PHASE_REVENUE_BOX"`` - default is ``0.7`` cm; default width of single cell
@@ -1628,9 +1735,11 @@ XX18Game Function Options
 -------------------------
 `^ <xx18game-command_>`_
 
-The section on `XX18Game Functions`_ illustrates example of how to use
-the built-in functions of the ``XX18Game()`` command. Below are the details
-of all available properties and which function(s) make use of them.
+The section on `XX18Game Functions`_ illustrates examples of how to use
+the built-in functions of the ``XX18Game()`` command.
+
+Below are the details of all available properties and which function(s)
+make use of them.
 
 Available Properties
 ~~~~~~~~~~~~~~~~~~~~
@@ -1661,8 +1770,9 @@ built-in functions.
 * *size* - the length of a spike; this can be ``short``, ``medium`` (default)
   or ``long``
 * *stroke* - the color name for a line
-* *style* - the shape used to draw a town; this can be ``circle`` (default)
-  or ``rectangle``
+* *style* - this is an additional option |dash| used when drawing a town,
+  it can be ``circle`` (default) or ``rectangle``; used when drawing track,
+  or track_curve, it can be ``thin`` or ``dashed`` (no default)
 * *thing* - a **protograf** :doc:`shape <../core_shapes>`
 * *town* - where a town "block" should appear on a track; this can
   be ``middle``, ``start`` or ``end``
@@ -1713,8 +1823,8 @@ then switch that out with a substitute /fallback value.
 * ``symbol(location, label, direction, distance, name, label_size)``
 * ``tile_letter(location, label, direction, distance, stroke, label_size)``
 * ``town(location, label, direction, distance, style, rotation, color, stroke, label_size)``
-* ``track(location, label, position, town, color)``
-* ``track_curve(location, direction, distance, height, color)``
+* ``track(location, label, position, town, color, style)``
+* ``track_curve(location, direction, distance, height, color, style)``
 * ``track_edge(location, position, direction, distance, height, color)``
 
 

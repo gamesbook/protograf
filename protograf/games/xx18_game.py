@@ -144,10 +144,15 @@ DEFAULT_SETTINGS = {
     "XX18_REVENUE_DIAMETER": 0.8,  # cm
     "XX18_REVENUE_STROKE": "black",
     "XX18_REVENUE_FILL": "white",
+    "XX18_TRACK_DASHED_WIDTH": 0.3,  # cm
     "XX18_TRACK_INNER_WIDTH": 0.4,  # cm
     "XX18_TRACK_OUTER_WIDTH": 0.5,  # cm
+    "XX18_TRACK_INNER_THIN_WIDTH": 0.1,  # cm
+    "XX18_TRACK_OUTER_THIN_WIDTH": 0.15,  # cm
     "XX18_TRACK_INNER_FILL": "black",
     "XX18_TRACK_OUTER_FILL": "white",
+    "XX18_TRACK_DASHED_FILL": "white",
+    "XX18_TRACK_DASHED_RATIO": 2.0 / 3.0,  # ratio of width:height
     "XX18_MOUNTAIN_SIDE": 0.6,  # cm; side of triangle
     "XX18_MOUNTAIN_FILL": "black",  # inside triangle
     "XX18_SPIKE_FRACTION_SHORT": 0.1,  # fraction of hex
@@ -1487,6 +1492,35 @@ class XX18GameObject(CoreGameObject):
                     rotation = 300
         return direction, distance, rotation
 
+    def process_track_style(self, style: str = None) -> tuple:
+        """Determine what size / width a track should be.
+
+        Args:
+            style (str): the name of the style to use for the track; thin or dashed
+
+        Returns:
+            tuple (float, float): inner and outer width of track
+        """
+        inner, outer, dashed = None, None, None
+        if style is None:
+            inner = self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units
+            outer = self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units
+        elif isinstance(style, str) and _lower(style) in ["t", "thin"]:
+            inner = self.xxs["XX18_TRACK_INNER_THIN_WIDTH"] * self.units
+            outer = self.xxs["XX18_TRACK_OUTER_THIN_WIDTH"] * self.units
+        elif isinstance(style, str) and _lower(style) in ["d", "dash", "dashed"]:
+            inner = self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units
+            outer = self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units
+            dashed = self.xxs["XX18_TRACK_DASHED_WIDTH"] * self.units
+        else:
+            feedback(
+                f'The track style "{style}" is not one that is available; use "dashed" or "thin".',
+                True,
+                True,
+            )
+
+        return inner, outer, dashed
+
     def track(
         self,
         location: str = None,
@@ -1494,6 +1528,7 @@ class XX18GameObject(CoreGameObject):
         position: str = None,
         town: str = None,
         color: str = None,
+        style: str = None,
         **kwargs,
     ):
         """Draw track between hexsides at hex location(s).
@@ -1504,6 +1539,7 @@ class XX18GameObject(CoreGameObject):
             label (str): the text to be drawn above/below the line
             town (str): position of a town "block" on the track; middle, start or end
             color (str): the name of color to use for the track
+            style (str): the name of the style to use for the track; thin or dashed
         """
         from protograf.protos import Hexagon, Rectangle
 
@@ -1513,6 +1549,10 @@ class XX18GameObject(CoreGameObject):
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         track_outer_fill = self.process_color(None, self.xxs["XX18_TRACK_OUTER_FILL"])
         track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
+        track_dashed_fill = self.process_color(
+            color, self.xxs["XX18_TRACK_DASHED_FILL"]
+        )
+        width_inner, width_outer, width_dashed = self.process_track_style(style)
         paths = []
         perbii = ""
 
@@ -1555,13 +1595,11 @@ class XX18GameObject(CoreGameObject):
                         stroke_transparency=100,
                         orientation=self.orientation,
                         paths_stroke=track_outer_fill,
-                        paths_stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"]
-                        * self.units,
+                        paths_stroke_width=width_outer,
                         paths=paths,
                         perbii=perbii,
                         perbii_stroke=track_outer_fill,
-                        perbii_stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"]
-                        * self.units,
+                        perbii_stroke_width=width_outer,
                         **kwargs,
                     )
                     # ---- town-on-track
@@ -1597,15 +1635,36 @@ class XX18GameObject(CoreGameObject):
                         stroke_transparency=100,
                         orientation=self.orientation,
                         paths_stroke=track_inner_fill,
-                        paths_stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"]
-                        * self.units,
+                        paths_stroke_width=width_inner,
                         paths=paths,
                         perbii=perbii,
                         perbii_stroke=track_inner_fill,
-                        perbii_stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"]
-                        * self.units,
+                        perbii_stroke_width=width_inner,
                         **kwargs,
                     )
+                    if width_dashed is not None:
+                        a_dash = (
+                            self.xxs["XX18_TRACK_DASHED_RATIO"]
+                            * self.xxs["XX18_TRACK_DASHED_WIDTH"]
+                        )
+                        Hexagon(  # overlying dashed
+                            cxy=geo.centre,
+                            height=self.hex_height,
+                            fill=None,
+                            stroke="white",
+                            stroke_width=0.1,
+                            stroke_transparency=100,
+                            orientation=self.orientation,
+                            paths_stroke=self.xxs["XX18_TRACK_DASHED_FILL"],
+                            paths_stroke_width=width_dashed,
+                            paths_dashed=[a_dash, a_dash],
+                            paths=paths,
+                            perbii=perbii,
+                            perbii_stroke=self.xxs["XX18_TRACK_DASHED_FILL"],
+                            perbii_stroke_width=width_dashed,
+                            perbii_dashed=[a_dash, a_dash],
+                            **kwargs,
+                        )
                     if town:
                         Rectangle(
                             cxy=ccentre,  # as set for white above
@@ -1631,6 +1690,7 @@ class XX18GameObject(CoreGameObject):
         distance: float = None,
         height: float = None,
         color: str = None,
+        style: str = None,
         **kwargs,
     ):
         """Draw curve track between at hex location(s).
@@ -1641,12 +1701,14 @@ class XX18GameObject(CoreGameObject):
             distance (float): distance from hex centre
             height (float): height of the curve above the baseline joining end points
             color (str): the name of color to use for the track
+            style (str): the name of the style to use for the track; thin or dashed
         """
         from protograf.protos import Line
 
         _locations = self.process_locations(location, "track_curve")
         track_outer_fill = self.process_color(None, self.xxs["XX18_TRACK_OUTER_FILL"])
         track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
+        width_inner, width_outer, width_dashed = self.process_track_style(style)
         if height is None:
             height = 0.0
         if not isinstance(height, float):
@@ -1666,7 +1728,7 @@ class XX18GameObject(CoreGameObject):
                 xy=bcentre,
                 xy1=ccentre,
                 stroke=track_outer_fill,
-                stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units,
+                stroke_width=width_outer,
                 curve=height,
                 **kwargs,
             )
@@ -1674,10 +1736,24 @@ class XX18GameObject(CoreGameObject):
                 xy=bcentre,
                 xy1=ccentre,
                 stroke=track_inner_fill,
-                stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units,
+                stroke_width=width_inner,
                 curve=height,
                 **kwargs,
             )
+            if width_dashed is not None:
+                a_dash = (
+                    self.xxs["XX18_TRACK_DASHED_RATIO"]
+                    * self.xxs["XX18_TRACK_DASHED_WIDTH"]
+                )
+                Line(  # overlying dashed
+                    xy=bcentre,
+                    xy1=ccentre,
+                    stroke=self.xxs["XX18_TRACK_DASHED_FILL"],
+                    stroke_width=width_dashed,
+                    curve=height,
+                    dashed=[a_dash, a_dash],
+                    **kwargs,
+                )
 
     def track_edge(
         self,
@@ -1687,6 +1763,7 @@ class XX18GameObject(CoreGameObject):
         distance: float = None,
         height: float = None,
         color: str = None,
+        style: str = None,
         **kwargs,
     ):
         """Draw track between a hexside and a point at a hex location(s).
@@ -1698,6 +1775,7 @@ class XX18GameObject(CoreGameObject):
             distance (float): distance from hex centre to end point
             height (float): height of the curve above the baseline joining its points
             color (str): the name of color to use for the track
+            style (str): the name of the style to use for the track; thin or dashed
         """
         from protograf.protos import Line
 
@@ -1707,6 +1785,8 @@ class XX18GameObject(CoreGameObject):
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         track_outer_fill = self.process_color(None, self.xxs["XX18_TRACK_OUTER_FILL"])
         track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
+        width_inner, width_outer, width_dashed = self.process_track_style(style)
+
         # ---- validate allowed track position
         for pos in _positions:
             self.validate_edge("track_edge", location, pos)
@@ -1727,12 +1807,15 @@ class XX18GameObject(CoreGameObject):
                         pos = "w" + pos
                 end = getattr(geo, pos, None)
                 # print(f"&&& track point {location=} {pos=} {end=}")
+                width_inner, width_outer, width_dashed = self.process_track_style(
+                    style=style
+                )
                 # ---- draw curve track
                 Line(  # underlying white
                     xy=start,
                     xy1=end,
                     stroke=track_outer_fill,
-                    stroke_width=self.xxs["XX18_TRACK_OUTER_WIDTH"] * self.units,
+                    stroke_width=width_outer,
                     curve=height,
                     **kwargs,
                 )
@@ -1740,10 +1823,24 @@ class XX18GameObject(CoreGameObject):
                     xy=start,
                     xy1=end,
                     stroke=track_inner_fill,
-                    stroke_width=self.xxs["XX18_TRACK_INNER_WIDTH"] * self.units,
+                    stroke_width=width_inner,
                     curve=height,
                     **kwargs,
                 )
+                if width_dashed is not None:
+                    a_dash = (
+                        self.xxs["XX18_TRACK_DASHED_RATIO"]
+                        * self.xxs["XX18_TRACK_DASHED_WIDTH"]
+                    )
+                    Line(  # overlying dashed
+                        xy=start,
+                        xy1=end,
+                        stroke=self.xxs["XX18_TRACK_DASHED_FILL"],
+                        stroke_width=width_dashed,
+                        curve=height,
+                        dashed=[a_dash, a_dash],
+                        **kwargs,
+                    )
 
     def river_line(
         self,
@@ -2307,11 +2404,14 @@ class XX18GameObject(CoreGameObject):
                 start, end, _ = self.geo_from_location(geo, edge, "block line")
                 if start and end:
                     kwargs["stroke_ends"] = "rounded"
+                    if kwargs.get("stroke_width"):
+                        kwargs["stroke_width"] = kwargs.get("stroke_width")
+                    else:
+                        kwargs["stroke_width"] = self.xxs["XX18_STROKE_WIDTH_BLOCK"]
                     Line(
                         xy=start,
                         xy1=end,
                         stroke=block_stroke,
-                        stroke_width=self.xxs["XX18_STROKE_WIDTH_BLOCK"],
                         **kwargs,
                     )
 
@@ -2619,6 +2719,7 @@ class XX18GameObject(CoreGameObject):
         label: str = None,
         label_location: str = None,
         color: str = None,
+        curve: float = None,
         **kwargs,
     ):
         """Draw a Private Railroad at hex location(s).
@@ -2633,6 +2734,7 @@ class XX18GameObject(CoreGameObject):
             label (str): the name of the Private Railroad
             label_location (str): the relative location of the label
             color (str): fill color name for the Private Railroad circles
+            curve (float): height of the Private Railroad above the horizontal
         """
         from protograf.protos import Circle, Line, text
 
@@ -2728,12 +2830,14 @@ class XX18GameObject(CoreGameObject):
                         centre_shapes=[text(label, **lwargs)],
                         centre_shapes_offset=text_offset,
                         centre_shapes_rotated=True,
+                        curve=curve or 0.0,
                         **lwargs,
                     )
                 case RelativeLocation.RIGHT.value | RelativeLocation.LEFT.value | None:
                     Line(
                         links=[pcs, pce],
                         stroke_width=self.stroke_width_xx,
+                        curve=curve or 0.0,
                         **lwargs,
                     )
 

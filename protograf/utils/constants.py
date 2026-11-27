@@ -78,8 +78,9 @@ CSS_COLOR_NAMES = {
     "berylgreen": "#D9E3BE",
     "blackpearl": "#021128",
     "camarone": "#11582A",
-    "cerulean": "#01A0D6",  # 18xx river blue
+    "cerulean": "#01A0D6",  # 18xx river dark blue
     "chelseacucumber": "#80B26B",
+    "curiousblue": "#04A2E7",  # 18xx river dark blue
     "electricviolet": "#8243F8",
     "fountainblue": "#64B1BB",
     "geraldine": "#E98A84",
@@ -91,12 +92,22 @@ CSS_COLOR_NAMES = {
     "pearl": "#EAE0C8",
     "pearlbush": "#E3DFD5",
     "sage": "#9CAA90",
-    "sail": "#C1E6FD",  # 18xx sea blue
+    "sail": "#C1E6FD",  # 18xx sea light blue
     "spindle": "#ADCBF4",
-    # Railways of the Lost Atlas
+    # 18xx: Railways of the Lost Atlas
     "cinnabar": "#EB3433",  # RLA Red
     "casablanca": "#FAB857",  # RLA Yellow
     "halfbaked": "#76C6CA",  # RLA Blue
+    # 18xx: 18CO Rock & Stock
+    "parchment": "#EBE6CC",  # 18CO filled mountain hex
+    "terracotta": "#E8796E",  # 18CO offboard
+    "stormdust": "#636361",  # 18CO town
+    "limedoak": "#A78A4D",  # 18CO block
+    "driftwood": "#B28453",  # 18CO track inner
+    "dovegray": "#6D6B69",  # 18CO track outer
+    "mandalay": "#AE772B",  # 18CO hex brown (income)
+    "flax": "#E0D982",  # 18CO hex yellow (income)
+    "cloud": "#C7C9C6",  # 18CO hex grey
     # "": "",
     # Catan!
     "catandesert": "#E6AD3A",

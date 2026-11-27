@@ -8,7 +8,7 @@ Created on: 11 November 2026
 from protograf import *
 
 Create(
-    filename="xx18.pdf",
+    filename="xx18_board.pdf",
     paper="A5",
     margin=1,
     page_grid=1)
@@ -404,16 +404,26 @@ xgffn.spike('C5', 'nw sw', "medium", color='green')
 xgffn.phase_revenue(
     "C5", "30 40 50", 0, 0.3, "vertical",
     ["xbrown","xgrey","pink"])
-xgffn.block(
-    'B4', 'ne n nw',
-    dotted=True)
+
 xgffn.track(
     'A5 B6',
     position='nw,se',
     color="red")
 xgffn.track_edge(
     'A3', 'nw', 30, .3, 0,
-    color="purple"),
+    color="purple")
+
+xgffn.block(
+    'B4', 'ne n nw',
+    dotted=True)
+xgffn.block(
+    'C7', 'sw nw n',
+    stroke="sienna",
+    stroke_width=15,
+    stroke_transparency="50")
+
+xgffn.private(
+    'A1', 15, 0.7, 'A1', 160, 0.5, 'A&B', 'below', curve=0.2)
 xgffn.private(
     'B2', 15, 0.7,  'B2', 140, 0.4, 'C&C', 'left',
     color="orange",
@@ -421,6 +431,7 @@ xgffn.private(
 xgffn.private(
     'B2', 15, 0.7, 'C3', 280, 0.6,
     color="orange")
+
 xgffn.symbol(
     location='A7', name='desert',
     height=2.5, width=2.5,
@@ -432,6 +443,39 @@ xgffn.symbol(
 
 Text("XX18Game: Functions", common=footer)
 
+
+# ---- XX18Game: Track Style Functions
+PageBreak()
+xgtsf = XX18Game(
+    rows=4, cols=3,
+    fill='berylgreen',
+    label=True,
+    label_size=18,
+    orientation='flat',
+)
+XX18State(board=xgtsf)
+
+xgtsf.track(
+    'A5 B6', position='nw,se', style="thin")
+xgtsf.track(
+    'C7', position='ne,n', style="thin")
+xgtsf.track_edge(
+    'A7', 'nw', 30, .3, 0, color="red", style="thin")
+xgtsf.track(
+    'B8', position='sw,ne', town="middle", color=None, style="thin")
+
+xgtsf.track(
+    'A1 B2', position='nw,se', style="dashed")
+xgtsf.track(
+    'C3', position='ne,n', color="blue", style="dashed")
+xgtsf.track_edge(
+    'A3', 'nw', 30, .3, 0, style="dashed")
+xgtsf.track(
+    'B4', position='sw,ne', town="middle", color=None, style="dashed")
+
+Text("XX18Game: Track Style Functions", common=footer)
+
+
 # ---- XX18Game: zzz
 PageBreak()
 xgzz = XX18Game(
@@ -439,9 +483,7 @@ xgzz = XX18Game(
     fill='berylgreen',
     label=True,
     label_size=18,
-    features=[
-        ('A5', 'hex_fill', None, 'black'),
-    ]
+    features=[]
 )
 XX18State(board=xgzz)
 Text("XX18Game: zzz", common=footer)
@@ -471,6 +513,7 @@ Save(
         'xx18_miscellaneous',
         'xx18_json',
         'xx18_functions',
+        'xx18_functions_track_style',
         'xx18_zz',
     ]
 )
