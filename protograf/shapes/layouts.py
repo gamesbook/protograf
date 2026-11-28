@@ -18,7 +18,7 @@ from protograf.utils.structures import (
     HexOrientation,
     Locale,
 )
-from protograf.utils import tools, support
+from protograf.utils import tools, support, colrs
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import HexShape, TextShape
@@ -482,12 +482,17 @@ class TableShape(BaseShape):
         self.disable_row = self.kwargs.get("disable_row", False)
         self.disable_col = self.kwargs.get("disable_col", False)
         self.is_filled = False if kwargs.get("fill") == None else True
+        self.row_fills = self._commons("row_fills") or kwargs.get("row_fills") or []
+        self.col_fills = self._commons("col_fills") or kwargs.get("col_fills") or []
         if "side" in self.kwargs:
             self.use_side = True
             if "width" in self.kwargs or "height" in self.kwargs:
                 self.use_side = False
         self.col_count, self.row_count = 0, 0
-        # validate settings
+        self.validate_settings()
+
+    def validate_settings(self):
+        """Ensure all values set correctly."""
         if isinstance(self.cols, int):
             self.col_count = self.cols
             self.col_widths = [
@@ -523,6 +528,23 @@ class TableShape(BaseShape):
         # combined?
         if self.col_count < 2 or self.row_count < 2:
             feedback("Minimum layout size is 2 columns x 2 rows!", True)
+        # fills
+        if self.row_fills and not isinstance(self.row_fills, list):
+            feedback(
+                "The row_fills for a Table must be a list of colors!",
+                True,
+            )
+        if self.row_fills:
+            for _colr in self.row_fills:
+                colrs.get_color(_colr)  # raises error if invalid color
+        if self.col_fills and not isinstance(self.col_fills, list):
+            feedback(
+                "The col_fills for a Table must be a list of colors!",
+                True,
+            )
+        if self.col_fills:
+            for _colr in self.col_fills:
+                colrs.get_color(_colr)  # raises error if invalid color
 
     @lru_cache(maxsize=999)
     def cell(
@@ -532,6 +554,7 @@ class TableShape(BaseShape):
         pad_y: float | None = None,
     ) -> Locale:
         """Retrieve cell attributes as a Locale in user units."""
+        # DEPRECATED - padding is not is use because of switch to cell geometry
         data = self._cell(cell_id)
         # print('~~~ Table Cell', cell_id, data.x, data.y, data.xy, self.padding)
         padding_x = (
@@ -571,7 +594,7 @@ class TableShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Table on a given canvas."""
-        from protograf.protos import Rectangle, rectangle
+        from protograf.protos import rectangle
 
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
@@ -600,12 +623,29 @@ class TableShape(BaseShape):
         # ---- iterate cols and rows
         cell_y = y
         sequence = 0
+        cwargs = copy.copy(kwargs)
         self.vertexes = [None, None, None, None]  # TL, BL, BR, TR
         for row_no in range(0, self.row_count):
             cell_x = x
             rheight = self.unit(self.row_heights[row_no], label="row height")
+            row_fill = None
+            if self.row_fills:
+                row_fill = (
+                    colrs.get_color(self.row_fills[row_no])
+                    if row_no <= len(self.row_fills) - 1
+                    else None
+                )
             for col_no in range(0, self.col_count):
                 cwidth = self.unit(self.col_widths[col_no], label="column width")
+                cwargs["fill"] = None
+                if self.col_fills:
+                    cwargs["fill"] = (
+                        colrs.get_color(self.col_fills[col_no])
+                        if col_no <= len(self.col_fills) - 1
+                        else None
+                    )
+                if cwargs["fill"] is None:
+                    cwargs["fill"] = row_fill or self.fill
                 # ---- * conditional line draw
                 if self.disable_col:
                     cnv.draw_line(Point(cell_x, cell_y), Point(cell_x + cwidth, cell_y))
@@ -623,6 +663,11 @@ class TableShape(BaseShape):
                     )
                 else:
                     cnv.draw_rect((cell_x, cell_y, cell_x + cwidth, cell_y + rheight))
+                    self.set_canvas_props(  # shape.finish()
+                        cnv=cnv,
+                        index=ID,
+                        **cwargs,
+                    )
                 cx, cy = cell_x + cwidth / 2.0, cell_y + rheight / 2.0
                 cell_id = tools.sheet_column(col_no + 1) + str(row_no + 1)
                 locale = Locale(

@@ -3476,8 +3476,10 @@ A DotGrid is a series of dots |dash| both in the vertical and horizontal
 directions. This will, by default, fill the page, as far as possible,
 between its margins.
 
-Example 1. Defaults
-+++++++++++++++++++
+.. _dotgridDefaults:
+
+Example 1. DotGrid Defaults
++++++++++++++++++++++++++++
 
 .. |dtg| image:: images/defaults/dotgrid.png
    :width: 330
@@ -3562,7 +3564,7 @@ as possible between its margins.
 
 Examples showing how the Grid can be styled are described below.
 
-- `Example 1. Defaults <gridDefaults_>`_
+- `Example 1. Grid Defaults <gridDefaults_>`_
 - `Example 2. Side, Stroke & Fill <gridSide_>`_
 - `Example 3. Fixed Size <gridFixed_>`_
 - `Example 4. Ignore Margins <gridMargins_>`_
@@ -3571,8 +3573,8 @@ Examples showing how the Grid can be styled are described below.
 
 .. _gridDefaults:
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Grid Defaults
+++++++++++++++++++++++++
 `↑ <grid-command_>`_
 
 .. |grd| image:: images/defaults/grid.png
@@ -3989,21 +3991,22 @@ Tables are an arrangement of styled rectangles in a column-and-row
 layout.
 
 Either the rows and columns are split evenly across the Table's
-height and width, or the values of each column and/or row can be set
+height and width, or the sizes of each column and/or row can be set
 via lists of values.
 
 Table colors and line styles can be set as described in the examples
-below, as can the cell padding |dash| the "white space" around the
-inner-edges of a cell.
+below.
 
 Tables do **not**, themselves, contain any information.  However, any of
 the "cells" in a table can be accessed using a spreadsheet-like notation
-to make use of their location and size to display other shapes or elements.
+to make use of their location, vertices and size to help display other
+shapes or elements within them.
 
 - `Example 1. Table Basics`_
 - `Example 2. Customised Table`_
 - `Example 3. Customised Table Rows and Columns`_
-- `Example 4. Locating shapes at a Table cell`_
+- `Example 4. Customised Row and Column Colors`_
+- `Example 5. Locating shapes at a Table cell`_
 
 Example 1. Table Basics
 +++++++++++++++++++++++
@@ -4024,25 +4027,26 @@ Example 1. Table Basics
               width=3, height=2,
               cols=3, rows=4)
 
-      The first Table has the following properties:
-
-      - top-left corner at defaults of x-position ``1`` cm and
-        y-position ``1`` cm
-      - *height* and *width* of default ``1`` cm each
-
-      There are 2 rows |dash| in the y-direction |dash| and 2 columns in
-      |dash| the x-direction.  This is the minimum allowed.
-
-      The second Table has the following properties:
-
-      - top-left corner at x-position ``1`` cm and
-        y-position ``2.5`` cm
-      - *height* and *width* of ``3`` cm and ``2`` cm respectively
-
-      There are 4 rows |dash| in the y-direction |dash| and 3 columns in
-      |dash| the x-direction. Each row is equal in size as is each column.
-
 ===== ======
+
+The first Table has the following properties:
+
+- top-left corner at defaults of x-position ``1`` cm and
+  y-position ``1`` cm
+- *height* and *width* of default ``1`` cm each
+
+There are 2 rows |dash| in the y-direction |dash| and 2 columns in
+|dash| the x-direction.  This is the minimum allowed.
+
+The second Table has the following properties:
+
+- top-left corner at x-position ``1`` cm and
+  y-position ``2.5`` cm
+- *height* and *width* of ``3`` cm and ``2`` cm respectively
+
+There are 4 rows |dash| in the y-direction |dash| and 3 columns in
+|dash| the x-direction. Each row is equal in size as is each column.
+
 
 Example 2. Customised Table
 +++++++++++++++++++++++++++
@@ -4067,41 +4071,41 @@ Example 2. Customised Table
               stroke="blue", fill="aqua",
               borders=('*', 2, "grey"))
 
-      The first Table has the following properties:
-
-      - starts at x-position ``1`` cm and y-position ``0`` cm
-      - *height* and *width* of ``2.5`` cm and ``3`` cm respectively
-      - *stroke* color of ``red``
-      - *dotted* border lines for each Rectangle
-
-      The second Table has the following properties:
-
-      - starts at x-position ``1`` cm and y-position ``3`` cm
-      - *cols* is a list of column widths
-      - *rows* is a list of row heights
-      - *stroke* color of ``blue``
-      - *fill* color of ``aqua``
-      - *borders* have an all-around of color ``grey`` with a stroke width
-        of ``2``; a set of border values contains in this order:
-
-        - *direction* - one of n(orth), s(outh), e(ast) or w(est), or all(*)
-        - *width* - the line thickness
-        - *color* - either a named color or a hexadecimal value
-        - *style* - this optional value can either be:
-          ``True`` to make the line dotted; or a list of values that will
-          creates dashes
-
 ===== ======
+
+The first Table has the following properties:
+
+- starts at x-position ``1`` cm and y-position ``0`` cm
+- *height* and *width* of ``2.5`` cm and ``3`` cm respectively
+- *stroke* color of ``red``
+- *dotted* border lines for each Rectangle
+
+The second Table has the following properties:
+
+- starts at x-position ``1`` cm and y-position ``3`` cm
+- *cols* is a list of column widths
+- *rows* is a list of row heights
+- *stroke* color of ``blue``
+- *fill* color of ``aqua``
+- *borders* have an all-around of color ``grey`` with a stroke width
+  of ``2``; a set of border values contains in this order:
+
+  - *direction* - one of n(orth), s(outh), e(ast) or w(est), or all(*)
+  - *width* - the line thickness
+  - *color* - either a named color or a hexadecimal value
+  - *style* - this optional value can either be:
+    ``True`` to make the line dotted; or a list of values that will
+    creates dashes
 
 Example 3. Customised Table Rows and Columns
 ++++++++++++++++++++++++++++++++++++++++++++
 `^ <table-command_>`_
 
-.. |tb2| image:: images/customised/table_rows_cols.png
+.. |tb3| image:: images/customised/table_rows_cols.png
    :width: 330
 
 ===== ======
-|tb2| This example shows the Table constructed using the command with
+|tb3| This example shows the Table constructed using the command with
       these properties:
 
       .. code:: python
@@ -4126,49 +4130,137 @@ Example 3. Customised Table Rows and Columns
             borders_footer=('s', 2, "red", True),
         )
 
-      The first Table has the following properties:
+===== ======
 
-      - starts at x-position ``0.5`` cm and y-position ``0.5`` cm
-      - *height* and *width* of ``2`` cm and ``3`` cm respectively
-      - *fill* color of ``gold``
-      - *stroke* color of ``red``
-      - *stroke_width*  of ``1``
-      - *borders* of ``grey`` set to the east (right) and west (left)
+The first Table has the following properties:
 
-      The first table also has the setting ``disable_row=True`` which means
-      that no **row** lines are drawn.
+- starts at x-position ``0.5`` cm and y-position ``0.5`` cm
+- *height* and *width* of ``2`` cm and ``3`` cm respectively
+- *fill* color of ``gold``
+- *stroke* color of ``red``
+- *stroke_width*  of ``1``
+- *borders* of ``grey`` set to the east (right) and west (left)
 
-      The second Table has the following properties:
+The first table also has the setting ``disable_row=True`` which means
+that no **row** lines are drawn.
 
-      - starts at x-position ``0`` cm and y-position ``3`` cm
-      - *cols* is a list of column widths
-      - *rows* is a list of row heights
-      - *stroke* color of ``grey``
-      - *stroke_width*  of ``1``
-      - *fill* color of ``aqua``
+The second Table has the following properties:
 
-      The second table also has the setting ``disable_col=True`` which means
-      that no **column** lines are drawn.
+- starts at x-position ``0`` cm and y-position ``3`` cm
+- *cols* is a list of column widths
+- *rows* is a list of row heights
+- *stroke* color of ``grey``
+- *stroke_width*  of ``1``
+- *fill* color of ``aqua``
 
-      In addition, the second table also demonstrates the use of border styles
-      for the first |dash| header |dash| and last |dash| footer |dash| rows.
-      The syntax for these styles follows that for the table borders |dash| see
-      `Example 2. Customised Table`_.
+The second table also has the setting ``disable_col=True`` which means
+that no **column** lines are drawn.
+
+In addition, the second table also demonstrates the use of border styles
+for the first |dash| header |dash| and last |dash| footer |dash| rows.
+The syntax for these styles follows that for the table borders |dash| see
+`Example 2. Customised Table`_.
+
+
+Example 4. Customised Row and Column Colors
++++++++++++++++++++++++++++++++++++++++++++
+`^ <table-command_>`_
+
+.. |tb4| image:: images/customised/table_colors.png
+   :width: 330
+
+===== ======
+|tb4| This example shows the Table constructed using the command with
+      these properties:
+
+      .. code:: python
+
+        t1 = Table(
+            x=0.5, y=0.5,
+            width=3, height=2,
+            cols=5, rows=3,
+            stroke="silver", stroke_width=1,
+            fill="pearl",
+            col_fills=["tomato", "gold", None, "lime", "pink"],
+        )
+        t2 = Table(
+            x=0, y=3,
+            width=1.5, height=3,
+            cols=3, rows=5,
+            stroke="grey", stroke_width=1,
+            fill="pearl",
+            row_fills=["tomato", "gold", None, "lime", "pink"],
+        )
+        t3 = Table(
+            x=2.5, y=3,
+            width=1.5, height=3,
+            cols=3, rows=5,
+            stroke="grey", stroke_width=1,
+            fill="pearl",
+            row_fills=["tomato", "gold", None, "lime", "pink"],
+            col_fills=[None, None, "aqua"],
+        )
 
 ===== ======
 
-Example 4. Locating shapes at a Table cell
+The first Table has the following properties:
+
+- starts at x-position ``0.5`` cm and y-position ``0.5`` cm
+- *height* and *width* of ``2`` cm and ``3`` cm respectively
+- *stroke* color of ``silver``
+- *stroke_width*  of ``1``
+- *fill* color of ``pearl``
+- *col_fills* set to a number of different colors
+
+This table shows how the different colors in the *col_fills* list
+are assigned, in order, to columns from left to right.  A value
+``None`` means that the fill color "falls back" to that assigned to
+the Table's normal *fill* property.
+
+The second Table has the following properties:
+
+- starts at x-position ``0`` cm and y-position ``3`` cm
+- *height* and *width* of ``3`` cm and ``1.5`` cm respectively
+- *stroke* color of ``grey``
+- *stroke_width*  of ``1``
+- *fill* color of ``pearl``
+- *row_fills* set to a number of different colors
+
+This table shows how the different colors in the *row_fills* list
+are assigned, in order, to rows from top to bottom.  A value
+``None`` means that the fill color "falls back" to that assigned to
+the Table's normal *fill* property.
+
+The third Table has the following properties:
+
+- starts at x-position ``2.5`` cm and y-position ``3`` cm
+- *height* and *width* of ``3`` cm and ``1.5`` cm respectively
+- *stroke* color of ``grey``
+- *stroke_width*  of ``1``
+- *fill* color of ``pearl``
+- *row_fills* set to a number of different colors
+- *col_fills* set to a number of different colors
+
+This table shows how the different colors in the *row_fills* list
+are assigned, in order, to rows from top to bottom. It also shows
+how the different colors in the *col_fills* list  are assigned, in
+order, to columns from left to right and that **column colors takes**
+**precedence over row colors**.
+
+
+Example 5. Locating shapes at a Table cell
 ++++++++++++++++++++++++++++++++++++++++++
 `^ <table-command_>`_
 
-To locate a shape where a Table's cell has been drawn, you can make use of
-the Table's ``cell`` property to reference its top-left point (``xy`),
-centre point (``cxy``) or ``height`` and ``width``.
-
 A cell is referenced using a spreadsheet-style notation, linked to the name
 assigned to the Table; for example, if the Table is called ``T1`` then a
-reference to the top-left cell would be ``T1.cell("A1")``.  The height of
-that cell would be referenced as ``T1.cell("A1").height``.
+reference to the top-left cell would be ``T1.A1``.
+
+To locate a shape where a Table's cell has been drawn, you can access any of
+the cell's vertex positions via a compass direction: for example,
+the top-left point is ``nw``; as well the centre point(``c``). You can also
+reference the cell's ``height`` and ``width``.  The height of top-left cell
+would be referenced as ``T1.A1.height``.
 
 .. NOTE::
 
@@ -4178,11 +4270,11 @@ that cell would be referenced as ``T1.cell("A1").height``.
     up to the script author to ensure that the shapes are positioned and sized
     correctly to achieve this!
 
-.. |tb3| image:: images/customised/table_cells.png
+.. |tb5| image:: images/customised/table_cells.png
    :width: 330
 
 ===== ======
-|tb3| This example shows the Table constructed using the command with
+|tb5| This example shows the Table constructed using the command with
       these properties:
 
       .. code:: python
@@ -4194,85 +4286,67 @@ that cell would be referenced as ``T1.cell("A1").height``.
             stroke="grey", stroke_width=0.5,
             borders_header=('n s', 1, "black"),
             borders_footer=('s', 1, "black"),
-            padding=0.05,
         )
 
         picture = "fantasy-forest-with-old-bridges-crop.jpg"
-        Image(
-          picture,
-          xy=tt.cell("A2").xy,
-          height=tt.cell("A2").height)
-        Image(
-          picture,
-          xy=tt.cell("A3", 0, 0).xy,
-          height=tt.cell("A3", 0, 0).height)
-        Image(
-          picture,
-          xy=tt.cell("A4").xy,
-          height=tt.cell("A4").height)
+        Image(picture, xy=tt.A2.nw, height=tt.A2.height)
+        Image(picture, cxy=tt.A3.c, height=tt.A3.height - 0.2)
+        Image(picture, xy=tt.A4.nw, height=tt.A4.height)
 
         Text(
-            xy=tt.cell("B2").xy,
-            height=tt.cell("B2").height,
-            width=tt.cell("B2").width,
+            xy=tt.B2.nw,
+            height=tt.B2.height,
+            width=tt.B2.width,
             html=True, box_fill="orange",
-            text="""All the King's ponies and all the King's men?
-            """)
+            text="""All the King's ponies and all the King's men?""")
         Text(
-            xy=tt.cell("B3").xy,
-            height=tt.cell("B3").height,
-            width=tt.cell("B3").width,
-            html=True, box_fill="tan",
+            xy=tt.B3.nw,
+            height=tt.B3.height,
+            width=tt.B3.width,
+            html=True, box_fill=None,
             text="""Now is the time for all good men
             to come to the aid of their party.
             """)
         Text(
-            xy=tt.cell("B4").xy,
-            height=tt.cell("B4").height,
-            width=tt.cell("B4").width,
-            html=True, box_fill="silver",
-            text="""Fly, you fools!
-            """)
-        Circle(
-          cxy=tt.cell("C2").cxy,
-          radius=0.25, fill="tomato")
-        Square(
-          cxy=tt.cell("C3").cxy,
-          side=0.5, fill="green")
-        Hexagon(
-          cxy=tt.cell("C4").cxy,
-          side=0.25, fill="aqua")
-
-      This example shows a table, styled in a similar way to previous examples,
-      and assigned the name ``tt``.  This table also has a *padding* of
-      ``0.05`` cm.
-
-      The ``Text``, ``Image`` and various geometric shapes make use of the
-      attributes of the ``tt`` table to locate and size themselves.
-
-      A cell is referenced using a spreadsheet-style notation |dash| here the
-      upper-left cell is ``tt.cell("A1")`` and the lower-right cell is
-      ``tt.cell("C3")``.
-
-      A cell's attributes include its top-left point (``xy`), its centre point
-      (``cxy``), as well as ``height`` and ``width``.
-
-      It should be noted that:
-
-      - The ``Images`` get "sized" to fit their cell, making use of the resize
-        option that is triggered when only their height is supplied; setting
-        the width to maintain their aspect ratio.  The image in cell "A3"
-        overrides the padding via the ``0, 0`` to reach the top and bottom of
-        the cell.
-      - The ``Text`` boxes are sized to fit in the cell's ``height`` and
-        ``width``, as can be seen by the extent of their colored box.  The
-        ``html=True`` means that text is auto-sized to fit into the available
-        space (which includes the padding).
-      - The various geometric shapes are centred in the cells; but should they
-        be assigned a larger size they would "overflow" the apparent cell
-        borders.
+            xy=tt.B4.nw,
+            height=tt.B4.height,
+            width=tt.B4.width,
+            wrap=True, box_fill="silver",
+            valign="middle",
+            text="""Fly, you fools!""")
+        Circle(cxy=tt.C2.c, radius=0.25, fill="tomato")
+        Square(cxy=tt.C3.c, side=0.5, fill="green")
+        Hexagon(cxy=tt.C4.c, side=0.25, fill="aqua")
 
 ===== ======
+
+This example shows a table, styled in a similar way to previous examples,
+and assigned the name ``tt``.
+
+The ``Text``, ``Image`` and various geometric shapes make use of the
+attributes of the ``tt`` table to locate and size themselves.
+
+A cell is referenced using a spreadsheet-style notation |dash| here the
+upper-left cell is ``tt.A1`` and the lower-right cell is ``tt.C3`` |dash|
+appended by a dot (``.``) to the name assigned to the table (``tt``).
+
+A cell's attributes include its points as compass direction; for example,
+the top-left point is ``nw``, its centre point(``c``), as well as its
+``height`` and ``width``.
+
+It should be noted that:
+
+- The ``Images`` get "sized" to fit their cell, making use of the resize
+  option that is triggered when only their height is supplied; setting
+  the width to maintain their aspect ratio.  The image in cell "A3"
+  overrides this by changing its height and being centred in the cell.
+- The ``Text`` boxes are sized to fit in the cell's ``height`` and
+  ``width``, as can be seen by the extent of their colored box.  The
+  ``html=True`` means that text is auto-sized to fit into the available
+  space.
+- The various geometric shapes are centred in the cells; but should they
+  be assigned a larger size they would "overflow" the apparent cell
+  borders.
 
 
 .. _shapes-common-properties:

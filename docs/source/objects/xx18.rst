@@ -1641,8 +1641,8 @@ supplement the ``XX18Game()`` command for the creation of a map-enhanced board.
 .. HINT::
 
     The SVG for the map of Ghana shown here is sourced from
-    https://simplemaps.com/svg/country/gh#all - a very useful resource
-    for simple, scalable country outlines.
+    https://simplemaps.com/svg/country/gh#all |dash| the website is a
+    very useful resource for simple, scalable country outlines.
 
 There are effectively six main layers in this board creation process, with
 each layer being drawn over the one before:
@@ -1676,9 +1676,14 @@ the ``x`` or ``y`` value of that vertex.  So, for example, the position
 vertex of the hexagon at grid location ``D8`` of the XX18 grid named ``xgh``.
 
 The :ref:`Text <text-command>` that is displayed at grid location ``D8`` also
-makes uses of the geometry available for that hexagon; in this case it is using
-the ``.c`` (short for ``centre``) property to locate where the text is
-displayed.
+makes uses of the geometry available for that hexagon; in this case it is
+using the ``c`` (short for ``centre``) property of the hexagon to locate where
+the text is displayed.
+
+The other ``Text`` and :ref:`Table <table-command>` commands are added to
+illustrate how the additional elements of a more complete map can be
+created with **protograf**.
+
 
 Python Functions
 ~~~~~~~~~~~~~~~~

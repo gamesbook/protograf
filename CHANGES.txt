@@ -4,9 +4,11 @@ protograf Changes
 2026-00-00 (0.6.3)
 ------------------
 - Updates to XX18Board features
-- Add style for XX18Board track
-- Add XX18Market object
-
+- Updates to XX18Board map example
+- Add style option for XX18Board train tracks
+- Add XX18Market command for 18xx Stock Market
+- Add grid-reference shortcut to Table
+- Removed use of Table cell padding
 - [PLANNED-1] Upgrade Abstract (hex lines grid; SGF demo)
 - [PLANNED-2] Expand geo coverage for minor shapes
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line

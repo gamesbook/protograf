@@ -121,9 +121,15 @@ tt = Table(
 Text("No. of Players", xy=tt.A1.sw, align="left")
 Text("Starting Capital", xy=tt.A2.sw, align="left")
 Text("Certificate Limit", xy=tt.A3.sw, align="left")
-Text("2", xy=tt.B1.s); Text("3", xy=tt.C1.s); Text("4", xy=tt.D1.s); Text("5", xy=tt.E1.s)
-Text("$500", xy=tt.B2.s); Text("$400", xy=tt.C2.s); Text("$300", xy=tt.D2.s); Text("$200", xy=tt.E2.s)
-Text("30", xy=tt.B3.s); Text("20", xy=tt.C3.s); Text("15", xy=tt.D3.s); Text("12", xy=tt.E3.s)
+
+Text("2", xy=tt.B1.s); Text("3", xy=tt.C1.s)
+Text("4", xy=tt.D1.s); Text("5", xy=tt.E1.s)
+
+Text("$500", xy=tt.B2.s); Text("$400", xy=tt.C2.s)
+Text("$300", xy=tt.D2.s); Text("$200", xy=tt.E2.s)
+
+Text("30", xy=tt.B3.s); Text("20", xy=tt.C3.s)
+Text("15", xy=tt.D3.s); Text("12", xy=tt.E3.s)
 
 Save(
     output='png',

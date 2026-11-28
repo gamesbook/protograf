@@ -1268,39 +1268,69 @@ tt = Table(
     stroke="grey", stroke_width=0.5,
     borders_header=('n s', 1, "black"),
     borders_footer=('s', 1, "black"),
-    padding=0.05,
 )
 
 picture = "fantasy-forest-with-old-bridges-crop.jpg"
-Image(picture, xy=tt.cell("A2").xy, height=tt.cell("A2").height)
-Image(picture, xy=tt.cell("A3", 0, 0).xy, height=tt.cell("A3", 0, 0).height)
-Image(picture, xy=tt.cell("A4").xy, height=tt.cell("A4").height)
+Image(picture, xy=tt.A2.nw, height=tt.A2.height)
+Image(picture, cxy=tt.A3.c, height=tt.A3.height - 0.2)
+Image(picture, xy=tt.A4.nw, height=tt.A4.height)
 
 Text(
-    xy=tt.cell("B2").xy,
-    height=tt.cell("B2").height,
-    width=tt.cell("B2").width,
+    xy=tt.B2.nw,
+    height=tt.B2.height,
+    width=tt.B2.width,
     html=True, box_fill="orange",
     text="""All the King's ponies and all the King's men?
     """)
 Text(
-    xy=tt.cell("B3").xy,
-    height=tt.cell("B3").height,
-    width=tt.cell("B3").width,
-    html=True, box_fill="tan",
+    xy=tt.B3.nw,
+    height=tt.B3.height,
+    width=tt.B3.width,
+    html=True, box_fill=None,
     text="""Now is the time for all good men
     to come to the aid of their party.
     """)
 Text(
-    xy=tt.cell("B4").xy,
-    height=tt.cell("B4").height,
-    width=tt.cell("B4").width,
-    html=True, box_fill="silver",
-    text="""Fly, you fools!
-    """)
-Circle(cxy=tt.cell("C2").cxy, radius=0.25, fill="tomato")
-Square(cxy=tt.cell("C3").cxy, side=0.5, fill="green")
-Hexagon(cxy=tt.cell("C4").cxy, side=0.25, fill="aqua")
+    xy=tt.B4.nw,
+    height=tt.B4.height,
+    width=tt.B4.width,
+    wrap=True, box_fill="silver",
+    valign="middle",
+    text="""Fly, you fools!""")
+Circle(cxy=tt.C2.c, radius=0.25, fill="tomato")
+Square(cxy=tt.C3.c, side=0.5, fill="green")
+Hexagon(cxy=tt.C4.c, side=0.25, fill="aqua")
+
+PageBreak()
+
+# ---- table - color rows and columns
+Blueprint()
+Text(common=txt, text="Table: row and col colors")
+t1 = Table(
+    x=0.5, y=0.5,
+    width=3, height=2,
+    cols=5, rows=3,
+    stroke="silver", stroke_width=1,
+    fill="pearl",
+    col_fills=["tomato", "gold", None, "lime", "pink"],
+)
+t2 = Table(
+    x=0, y=3,
+    width=1.5, height=3,
+    cols=3, rows=5,
+    stroke="grey", stroke_width=1,
+    fill="pearl",
+    row_fills=["tomato", "gold", None, "lime", "pink"],
+)
+t3 = Table(
+    x=2.5, y=3,
+    width=1.5, height=3,
+    cols=3, rows=5,
+    stroke="grey", stroke_width=1,
+    fill="pearl",
+    row_fills=["tomato", "gold", None, "lime", "pink"],
+    col_fills=[None, None, "aqua"],
+)
 PageBreak()
 
 # ---- wave styles
@@ -1750,7 +1780,7 @@ Save(
         "shape_rotation",
         "shape_rotation_two",
         "shape_hatches_and_rotation",
-        "table_defaults", "table_custom", "table_rows_cols", "table_cells",
+        "table_defaults", "table_custom", "table_rows_cols", "table_cells", "table_colors",
         "perbii_styled",
         "poly_waves",
         "vertex_shapes",
