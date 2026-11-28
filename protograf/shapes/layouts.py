@@ -571,6 +571,8 @@ class TableShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Table on a given canvas."""
+        from protograf.protos import Rectangle, rectangle
+
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -638,6 +640,16 @@ class TableShape(BaseShape):
                 )
                 self.locales.append(locale)
                 self.cells[cell_id] = locale
+
+                # set geo attributes for table keyed on Excel-like attribute
+                cell_rect = rectangle(
+                    x=cell_x / globals.units - self.margin_left,
+                    y=cell_y / globals.units - self.margin_top,
+                    height=rheight / globals.units,
+                    width=cwidth / globals.units,
+                )
+                setattr(self, cell_id, cell_rect.geo)
+
                 # track vertices for outline of Table and Header/Footer rows
                 if row_no == 0 and col_no == 0:
                     # top_left

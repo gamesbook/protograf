@@ -91,7 +91,39 @@ xgf = XX18Game(
 )
 XX18State(board=xgf)
 
+# "on map"
 Text("Togo", xy=xgf.B8.c, stroke="white", font_size=18)
+
+# "off map"
+Text("Map: https://simplemaps.com/svg/country/gh#all", x=xgf.F8.s.x, y=24.75, font_size=8)
+Text(
+     wrap=True,
+     x=xgf.G5.se.x + 1,
+     y=xgf.G5.se.y,
+     width=6, height=3,
+     box_stroke="black",
+     box_stroke_width=4,
+     box_fill="white",
+     valign="middle",
+     align="centre",
+     font_name="Georgia",
+     font_size=36,
+     text='18Ghana'
+)
+tt = Table(
+      y=xgf.G1.s.y + 0.4,
+      x=xgf.G1.w.x,
+      cols=[3, 1.5, 1.5, 1.5, 1.5],
+      rows=[0.5, 0.5, 0.5],
+      fill="pearl",
+      stroke_width=1,
+)
+Text("No. of Players", xy=tt.A1.sw, align="left")
+Text("Starting Capital", xy=tt.A2.sw, align="left")
+Text("Certificate Limit", xy=tt.A3.sw, align="left")
+Text("2", xy=tt.B1.s); Text("3", xy=tt.C1.s); Text("4", xy=tt.D1.s); Text("5", xy=tt.E1.s)
+Text("$500", xy=tt.B2.s); Text("$400", xy=tt.C2.s); Text("$300", xy=tt.D2.s); Text("$200", xy=tt.E2.s)
+Text("30", xy=tt.B3.s); Text("20", xy=tt.C3.s); Text("15", xy=tt.D3.s); Text("12", xy=tt.E3.s)
 
 Save(
     output='png',

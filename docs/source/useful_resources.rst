@@ -9,12 +9,16 @@ game design when working with :doc:`protograf <index>`.
 
    Inclusion of these resources does **not** constitute a recommendation! As
    always, check how they are allowed to be used and any terms and conditions.
+   If any links have expired, please
+   `create an issue <https://github.com/gamesbook/protograf/issues>`_.
+
 
 Contents
 ========
 
 - `Prototyping Tools`_
 - `Icons, Art and Images`_
+- `Map Art and Icons`_
 - `Card Suit Icons`_
 - `BoardGameGeek`_
 - `Unicode Characters`_
@@ -35,8 +39,11 @@ Prototyping Tools
     Please also refer to the tool lists/guides for
     :ref:`hexagonal grid resources <other-hexagonal-resources>`,
     :ref:`playing cards resources <other-card-resources>`,
-    as well as :ref:`card/deck box resources <cardbox-resources>`.
+    as well as :ref:`card/deck box resources <cardbox-resources>`,
+    and :ref:`18xx game resources <xx18-resources>`.
 
+
+.. _resources-icons:
 
 Icons, Art and Images
 =====================
@@ -79,6 +86,10 @@ Map Art and Icons
 
 (Bonus: https://watabou.github.io/realm_styles.html can be used for the above
 to set themes and drawing styles)
+
+A useful source for simple country, and region, map outlines in SVG format
+is that of https://simplemaps.com/resources/svg-maps - these are free to use
+subject to some minor restrictions.
 
 
 Card Suit Icons

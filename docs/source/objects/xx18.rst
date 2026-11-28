@@ -53,10 +53,11 @@ Background
 ==========
 `↑ <xx18Index_>`_
 
-**protograf** is a general purpose tool and is not designed to produce prototypes
-for specific games.  However, there are hundreds of games in the 18xx series of
-railroad board games, and so it seemed worthwhile developing custom functionality
-to allow this type of game to be more easily prototyped.
+**protograf** is a general purpose tool and is not designed to specifically
+support the production of prototypes for particular games.  However, there are
+hundreds of games in the 18xx series of railroad board games, and so it seemed
+worthwhile developing custom functionality to allow this type of game to be
+more easily prototyped.
 
 The very first game in the series was *1829*, designed by Francis Tresham, and
 published in 1974.  It was the forerunner to the series, but the game that has
@@ -65,10 +66,10 @@ developed by The Avalon Hill Game Company in collaboration with Francis Tresham.
 
 *1830* also set the style for the graphic design that has been used in many of
 the games in the series and the prototyping capability provided here is modeled
-primarily after that design.
+after that.
 
 
-.. _xx18Over::
+.. _xx18Overview:
 
 Overview
 ========
@@ -99,7 +100,7 @@ Stock Market grid.
 .. IMPORTANT::
 
     Unlike almost all other elements in **protograf**, the ones in the
-    XX18 set are all designed to be drawn use using ``cm``.  If you switch
+    XX18 set are all designed to be drawn using ``cm``.  If you switch
     to another type of unit, there is no guarantee that they will be drawn
     correctly.
 
@@ -561,15 +562,15 @@ General Feature Specification
 `^ <xx18GameFeatures_>`_
 
 Each feature contains two or more pieces of information as a *set* of values
-enclosed in round brackets ``( ... )``. The **order of these items is vital**
-and must follow the sequence below.
+enclosed in round brackets ``( ... )``. The **order** of these items is vital
+and **must** follow the sequence below.
 
 1. Feature **location**: this is a grid reference of one or more hexagons,
-   with each reference separated by a space; for example ``A1 B4```.  In a
+   with each reference separated by a space; for example ``A1 B4``.  In a
    pointy hexagons grid, the letter is the row identifier, and in a grid
    with flat hexagons, the letter is the column identifier.
-2. Feature **name**: the lowercase name of the feature, such as town, city,
-   track etc.
+2. Feature **name**: the lowercase name of the feature, such as ``town``,
+   ``city``, ``track``, ``symbol``, ``private``, etc.
 3. Feature **offset**: by default, a feature is drawn in the centre of the
    hexagon.  By specifying an offset, the feature can be drawn elsewhere in
    the hexagon. The offset is defined by a pair of comma-separated numbers
@@ -585,13 +586,13 @@ and must follow the sequence below.
    the name of a city, or the cost associated with a mountain.
 5. Feature **label location**: the place where the label is drawn relative
    to the feature, by default it is drawn below it.  Possible label locations
-   are: above, below, left, or right.
+   are: ``above``, ``below``, ``left``, or ``right``.
 
 
 This general pattern of feature specification is changed somewhat for the
-following features: *hex_fill*, *highlight*, *private railroads*, and
+following features: *hex_fill*, *highlight*, *private* railroads, and
 *track_edge*.  See the specific feature examples and description below for
-details of these changes.
+details of the differences.
 
 
 Construction of Examples
@@ -673,7 +674,7 @@ A city is depicted by large circle, usually white, with a black border.
 
 A city is by default drawn at the centre of the hexagon, or hexagons,
 in which it is located (``A1`` in this example).  To shift the position,
-set values for ``(direction, distance)`` offset; for example, in ``A5``.
+set values for the ``(direction, distance)`` offset; for example, see ``A5``.
 
 The city label and the relative label position can also be set, as shown
 for ``A3`` and ``A5``.
@@ -777,14 +778,18 @@ This example shows how to add railroad track to the board.
 Railroad track is depicted as a thick line, straight or curved, usually
 with a white border, that typically connects two edges of a hexagon.
 
-The name of this feature is ``track``, and it should be followed by
-the track settings.  These are the compass location of one or more
-pairs of edges, separated by a comma.  Each pair should be separated
-by a space.
+.. HINT::
+
+   The track's appearance can be changed by setting it's *style*;
+   see `Example 2: Track Styling Functions`_ for details.
+
+The feature name ``track`` should be followed by the track settings.
+These are the compass location of one or more pairs of edges, separated
+by a comma.  Each pair should be separated by a space.
 
 Note that for a board comprised of ``pointy`` hexagons, the available
 compass location of edges are: ``ne``, ``nw``, ``se``, ``sw``, ``e``,
-and ``w``; while for one comprised of ``dlat`` hexagons, the available
+and ``w``; while for one comprised of ``flat`` hexagons, the available
 compass location of edges are: ``ne``, ``se``, ``nw``, ``sw``, ``n``,
 and ``s``.  Using other values will trigger an error such as:
 
@@ -928,7 +933,13 @@ As with towns and cities, the symbols are drawn by default in the
 centre of the hexagon, but can be offset from the centre by setting
 the values for ``(direction, distance)``.
 
-The feature label and the relative label position can also be set.
+The feature label and the relative label position can also be set;
+this is shown in various other examples.
+
+.. HINT::
+
+    The *size* of a symbol can be changed; see
+    `Example 1: Assorted Functions`_.
 
 
 Feature #7. Colored Hexagons
@@ -1076,8 +1087,8 @@ The colors for the table cells are from a "yellow, green, brown, grey"
 sequence or, for the case of two income values, a "yellow, brown"
 sequence. This can be seen for hexagons ``C1`` and ``D4`` respectively.
 
-A fifth item in the specifications can be added to define a custom set
-of different colors to be used, as can be seen for hexagon ``A5``. Note
+A fifth item in the specifications can optionally be added to define a custom
+set of different colors to be used, as can be seen for hexagon ``A5``. Note
 that there must be a matching color for each value in the income "label".
 
 For a board grid with "pointy" orientation of the hexagons, the income
@@ -1581,10 +1592,43 @@ exceptions.  For these cases, you need to fall back to using
                 ('C3 D4', plot),
             ]
         )
+
+        # "on map"
+        Text("Togo", xy=xgf.B8.c, stroke="white", font_size=18)
+
+        # "off map"
+        Text("Map: https://simplemaps.com/svg/country/gh#all", x=xgf.F8.s.x, y=24.75, font_size=8)
         Text(
-          'Togo',
-          xy=xgf.B8.c,
-          stroke='white', font_size=18)
+             wrap=True,
+             x=xgf.G5.se.x + 1,
+             y=xgf.G5.se.y,
+             width=6, height=3,
+             box_stroke="black",
+             box_stroke_width=4,
+             box_fill="white",
+             valign="middle",
+             align="centre",
+             font_name="Georgia",
+             font_size=36,
+             text='18Ghana'
+        )
+        tt = Table(
+              y=xgf.G1.s.y + 0.4,
+              x=xgf.G1.w.x,
+              cols=[3, 1.5, 1.5, 1.5, 1.5],
+              rows=[0.5, 0.5, 0.5],
+              fill="pearl",
+              stroke_width=1,
+        )
+        Text("No. of Players", xy=tt.A1.sw, align="left")
+        Text("Starting Capital", xy=tt.A2.sw, align="left")
+        Text("Certificate Limit", xy=tt.A3.sw, align="left")
+        Text("2", xy=tt.B1.s); Text("3", xy=tt.C1.s)
+        Text("4", xy=tt.D1.s); Text("5", xy=tt.E1.s)
+        Text("$500", xy=tt.B2.s); Text("$400", xy=tt.C2.s)
+        Text("$300", xy=tt.D2.s); Text("$200", xy=tt.E2.s)
+        Text("30", xy=tt.B3.s); Text("20", xy=tt.C3.s)
+        Text("15", xy=tt.D3.s); Text("12", xy=tt.E3.s)
 
         XX18State(board=xgf)
 
@@ -2351,17 +2395,21 @@ Example 6. Annotated Stock Market
 
       .. code:: python
 
-        arrows = Common(
-            fillpr="black",
+        arrows = Default(
+            fill="black",
             height=0.6, width=0.1,
             head_height=0.3, head_width=0.3,)
         arr_up = arrow(
-            common=arrows,
+            default=arrows,
             offset_x=0.7, offset_y=0.6)
         arr_down = arrow(
-            common=arrows,
+            default=arrows,
             rotation=180,
             offset_x=-0.7, offset_y=-0.6)
+        arr = arrow(
+            default=arrows,
+            offset_x=0.7, offset_y=0.6,
+            fill=None)
 
         xgf = XX18Market(
             x=0, y=0,
@@ -2373,11 +2421,12 @@ Example 6. Annotated Stock Market
             market_colors=[(1, "sienna"), (2, "lime"), (3, "gold")],
             arrow_up=arr_up,
             arrow_down=arr_down,
+            arrow=arr,
             values=[
             " 0  0 90 100,,,o 110 120 135 150 170",
-            " 0 75 80  90,,,o 100 110 120 135 150,,u",
-            "65,,d 70 75  80,,,o  90 100 110 120 135,,u",
-            "60,,d 65 70  75,,,o  80  90 100 110 120,,u",
+            " 0 75 80  90,,,o 100 110 120,,a 135 150,,u",
+            "65,,d 70 75 80,,,o 90 100 110,,a 120 135,,u",
+            "60,,d 65 70 75,,,o 80 90 100,,a 110 120,,u",
             "55,3,d 60 65  70,,,o  75  80  90,,u",
             "50,3,d 55,3 60  65  70  75  80,,u",
             "40,2,d 50,3 55  60  65  70,,u",
@@ -2387,15 +2436,22 @@ Example 6. Annotated Stock Market
         XX18State(market=xgf)
 
         Polyshape(points=[
-            xgs.A1.nw,
+           xgs.A1.nw,
             xgs.B1.ne, xgs.B1.se, xgs.B1.sw,
             xgs.A2.se, xgs.A2.sw,
-            ],
-            fill="silver",
-            stroke=None)
-        Image("images/king.png", x=xgf.I1.c.x, y=xgf.I1.c.y - 0.9)
-        Text("Initial", xy=xgf.D3.c, stroke="firebrick")
+          ],
+          fill="silver",
+          stroke=None)
+        Image(
+          "images/king.png",
+          x=xgf.I1.c.x,
+          y=xgf.I1.c.y - 0.9)
+        Text(
+          "Central",
+          xy=xgf.D3.c,
+          stroke="firebrick")
 
+       # export data to CSV
        xgf.csv_values("xgf.csv", ";")
 
 ===== ======
@@ -2403,7 +2459,11 @@ Example 6. Annotated Stock Market
 This example is a compilation of all the previous examples into a single
 "ready to use" one.
 
-The only new feature is the demonstration of using **protograf** shape
+The one new feature is the demonstration of the use of the *arrow* property
+to add a third type of arrow to the grid |dash| shown here as an outline.
+This is a less common use but might be needed in some cases.
+
+The other new feature is the demonstration of using **protograf** shape
 commands to overlay other items on, or next to, the grid.
 
 .. IMPORTANT::
@@ -2437,12 +2497,13 @@ in this case, slighly offset from the centre of cell ``I1``.  Here the
 The :ref:`Text <text-command>` command simply draws text; in this case,
 centred on the centre of cell ``D3``.
 
-Bonus: Export Values to csv
-+++++++++++++++++++++++++++
+Bonus Feature: Export Values to CSV
++++++++++++++++++++++++++++++++++++
 
 One final "extra" shown here is that you can extract the *values* from
 those provided to ``XX18Market`` by making use of the built-in
-``csv_values`` function.
+``csv_values`` function to save these to a CSV (comma-separated values)
+file.
 
 You can supply a filename and CSV separator if needed; otherwise
 these will default to: the name of your script but with a ``.csv``
@@ -2464,8 +2525,7 @@ For this example, the ``xgf.csv`` CSV file would contain:
     40;50;55;60;65;70;;;
     30;40;50;55;60;;;;
 
-
-Note there is no header row in the file.
+Note that there is no header row in the file.
 
 
 .. _xx18state-command:

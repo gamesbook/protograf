@@ -278,7 +278,7 @@ class XX18MarketObject(CoreStateObject):
         col: int,
         value: str = None,
         color: str = None,
-        arrow: str = None,
+        cell_arrow: str = None,
         border: bool = False,
         **kwargs,
     ):
@@ -289,7 +289,7 @@ class XX18MarketObject(CoreStateObject):
             col (int): the column number in which the cell appears
             value (str) : the value to draw as text in the cell
             color (str): the color number for a color set
-            arrow (str): an arrow setting: u (up), d (down), a (arrow)
+            cell_arrow (str): an arrow setting: u (up), d (down), a (arrow)
             border (bool): whether or not a border/outline must be drawn
         """
         from protograf.protos import Rectangle, Text, Line
@@ -371,8 +371,8 @@ class XX18MarketObject(CoreStateObject):
             )
 
         # ---- draw arrow(s)
-        if arrow:
-            _value = _lower(arrow)
+        if cell_arrow:
+            _value = _lower(cell_arrow)
             match _value:
                 case "a":
                     if not self.arrow:
@@ -382,8 +382,8 @@ class XX18MarketObject(CoreStateObject):
                             True,
                         )
                         return
-                    off_x = getattr(self.arrow_down, "offset_x", 0.0)
-                    off_y = getattr(self.arrow_down, "offset_y", 0.0)
+                    off_x = getattr(self.arrow, "offset_x", 0.0)
+                    off_y = getattr(self.arrow, "offset_y", 0.0)
                     cx = (rect.geo.c.x + self.margin_left + off_x) * globals.units
                     cy = (rect.geo.c.y + self.margin_top + off_y) * globals.units
                     self.arrow.draw(_abs_cx=cx, _abs_cy=cy, use_abs_c=True)
@@ -487,7 +487,7 @@ class XX18MarketObject(CoreStateObject):
                     col=col,
                     value=value,
                     color=_color,
-                    arrow=items[2],
+                    cell_arrow=items[2],
                     border=_border,
                     **kwargs,
                 )
@@ -499,7 +499,7 @@ class XX18MarketObject(CoreStateObject):
                 col=cell[0],
                 value=None,
                 color=None,
-                arrow=None,
+                cell_arrow=None,
                 border=True,
                 **kwargs,
             )

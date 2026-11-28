@@ -142,17 +142,21 @@ XX18State(market=xgr)
 PageBreak()
 Text("XX18Market", common=header)
 
-arrows = Common(
+arrows = Default(
     fill="black",
     height=0.6, width=0.1,
     head_height=0.3, head_width=0.3,)
 arr_up = arrow(
-    common=arrows,
+    default=arrows,
     offset_x=0.7, offset_y=0.6)
 arr_down = arrow(
-    common=arrows,
+    default=arrows,
     rotation=180,
     offset_x=-0.7, offset_y=-0.6)
+arr = arrow(
+    default=arrows,
+    offset_x=0.7, offset_y=0.6,
+    fill=None)
 
 xgf = XX18Market(
     x=0, y=0,
@@ -164,11 +168,12 @@ xgf = XX18Market(
     market_colors=[(1, "sienna", "white"), (2, "lime"), (3, "gold")],
     arrow_up=arr_up,
     arrow_down=arr_down,
+    arrow=arr,
     values=[
     " 0  0 90 100,,,o 110 120 135 150 170",
-    " 0 75 80  90,,,o 100 110 120 135 150,,u",
-    "65,,d 70 75 80,,,o 90 100 110 120 135,,u",
-    "60,,d 65 70 75,,,o 80 90 100 110 120,,u",
+    " 0 75 80  90,,,o 100 110 120,,a 135 150,,u",
+    "65,,d 70 75 80,,,o 90 100 110,,a 120 135,,u",
+    "60,,d 65 70 75,,,o 80 90 100,,a 110 120,,u",
     "55,3,d 60 65 70,,,o 75 80 90,,u",
     "50,3,d 55,3 60 65 70 75 80,,u",
     "40,2,d 50,3 55 60 65 70,,u",
@@ -177,8 +182,11 @@ xgf = XX18Market(
 )
 XX18State(market=xgf)
 
-Text("Initial", xy=xgf.D3.c, stroke="firebrick")
-Image("images/king.png", x=xgf.I1.c.x, y=xgf.I1.c.y - 0.9)
+Text("Central", xy=xgf.D3.c, stroke="firebrick")
+Image(
+    "images/king.png",
+    x=xgf.I1.c.x,
+    y=xgf.I1.c.y - 0.9)
 Polyshape(points=[
     xgs.A1.nw,
     xgs.B1.ne, xgs.B1.se, xgs.B1.sw,

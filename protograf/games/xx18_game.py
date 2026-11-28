@@ -1549,9 +1549,6 @@ class XX18GameObject(CoreGameObject):
         _positions = tools.split(position, separator=" ", clean=True, no_blanks=True)
         track_outer_fill = self.process_color(None, self.xxs["XX18_TRACK_OUTER_FILL"])
         track_inner_fill = self.process_color(color, self.xxs["XX18_TRACK_INNER_FILL"])
-        track_dashed_fill = self.process_color(
-            color, self.xxs["XX18_TRACK_DASHED_FILL"]
-        )
         width_inner, width_outer, width_dashed = self.process_track_style(style)
         paths = []
         perbii = ""
